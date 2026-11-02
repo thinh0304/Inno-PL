@@ -1,0 +1,25 @@
+{
+  "name": "Case",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "x-entityField": "title"
+      },
+      "urgent": {
+        "type": "boolean",
+        "x-entityField": "urgent"
+      },
+      "opened_on": {
+        "type": "string",
+        "format": "date",
+        "x-entityField": "opened_on"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:case"
+}

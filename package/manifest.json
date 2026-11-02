@@ -1,0 +1,154 @@
+{
+  "formatVersion": 1,
+  "id": "inno/pl",
+  "version": "0.1.0",
+  "name": "Pl",
+  "summary": "Open a case, review it, and approve or reject it.",
+  "publisher": {
+    "name": "Acme",
+    "contact": "apps@acme.example",
+    "support": "https://acme.example/support"
+  },
+  "license": "Proprietary",
+  "dataHandling": {
+    "purpose": "Recording cases and their review",
+    "storage": "In the organization's AgentFlow",
+    "retention": "As long as the organization keeps its cases",
+    "privacy": "https://acme.example/privacy",
+    "recipients": []
+  },
+  "changelog": "First release.",
+  "contentLocale": "en",
+  "minPlatformVersion": "2026.10",
+  "requires": {
+    "platformCapabilities": [],
+    "entities": [
+      {
+        "key": "user",
+        "access": "read",
+        "fields": {}
+      }
+    ],
+    "permissions": [
+      {
+        "group": "@param:app_users",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      }
+    ]
+  },
+  "exports": [],
+  "parameters": [
+    {
+      "key": "app_users",
+      "type": "group_ref",
+      "required": true,
+      "label": "Pl users",
+      "help": "Everyone who opens, reviews and reads cases. Give its members a role with entity.read, entity.list and entity.write: a role does not come from a group."
+    }
+  ],
+  "audience": "@param:app_users",
+  "features": {},
+  "objects": [
+    {
+      "key": "entity:case",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:case/title",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:case/urgent",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:case/opened_on",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:case/summary",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:case/amount",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:case/status",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:case/opened_by",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:case/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:case",
+      "kind": "form"
+    },
+    {
+      "key": "workflow:open_case",
+      "kind": "workflow"
+    }
+  ],
+  "grants": [
+    {
+      "key": "case_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:case",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization"
+      },
+      "record_scopes": {
+        "update": [
+          {
+            "kind": "field",
+            "field": "opened_by"
+          }
+        ]
+      }
+    },
+    {
+      "key": "start_open_case",
+      "to": "@param:app_users",
+      "workflow": "@obj:workflow:open_case"
+    }
+  ],
+  "ceiling": {
+    "narrow": {}
+  },
+  "egress": [],
+  "mcp": {
+    "enabled": false
+  },
+  "ui": {
+    "kind": "module",
+    "entry": "ui/index.js",
+    "contract": 1
+  },
+  "launcher": {
+    "entries": [
+      {
+        "key": "cases",
+        "label": {
+          "en": "Cases",
+          "vi": "Hồ sơ"
+        },
+        "icon": "inbox",
+        "target": {
+          "module": "/"
+        }
+      }
+    ]
+  },
+  "tests": []
+}

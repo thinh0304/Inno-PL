@@ -1,0 +1,5 @@
+# The AgentFlow SDK's packages come from git and refer to each other by git
+# reference, which pnpm refuses below a direct dependency unless this is off.
+blockExoticSubdeps: false
+allowBuilds:
+  esbuild: true

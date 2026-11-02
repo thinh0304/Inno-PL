@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "1.0",
+  "name": "Open a case",
+  "description": "Opens a case from a summary and an amount, then asks whoever opened it to approve or reject it.",
+  "runAs": "initiator",
+  "exposedSteps": [
+    "review"
+  ],
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "summary": {
+        "type": "string",
+        "title": "Summary"
+      },
+      "amount": {
+        "type": "number",
+        "title": "Amount"
+      }
+    },
+    "required": [
+      "summary"
+    ]
+  },
+  "start": "start",
+  "end": [
+    "done_approved",
+    "done_rejected"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "node_type": "start",
+      "parameters": {
+        "id": "start",
+        "label": "Start",
+        "inputContract": {
+          "subject": {
+            "kind": "none"
+          },
+          "params": {
+            "kind": "schema"
+          }
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "case",
+      "name": "Create the case",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "case",
+        "label": "Create the case",
+        "operation": "create",
+        "entityId": "@obj:entity:case",
+        "body": [
+          {
+            "field": "title",
+            "kind": "reference",
+            "value": "input.summary"
+          },
+          {
+            "field": "summary",
+            "kind": "reference",
+            "value": "input.summary"
+          },
+          {
+            "field": "amount",
+            "kind": "reference",
+            "value": "input.amount"
+          },
+          {
+            "field": "opened_on",
+            "kind": "template",
+            "value": "{{ today() }}"
+          },
+          {
+            "field": "opened_by",
+            "kind": "reference",
+            "value": "workflow.requester.id"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "review",
+      "name": "Review case",
+      "node_type": "human",
+      "parameters": {
+        "id": "review",
+        "label": "Review case",
+        "assignment": {
+          "candidates": [
+            {
+              "kind": "dynamic",
+              "source": {
+                "type": "initiator"
+              },
+              "relation": {
+                "type": "direct"
+              },
+              "fallback": [
+                {
+                  "kind": "group",
+                  "id": "@param:app_users"
+                }
+              ]
+            }
+          ]
+        },
+        "actions": [
+          {
+            "id": "approve",
+            "label": "Approve",
+            "edgeIds": [
+              "e_approve"
+            ],
+            "tone": "primary"
+          },
+          {
+            "id": "reject",
+            "label": "Reject",
+            "edgeIds": [
+              "e_reject"
+            ]
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "approved",
+      "name": "Mark approved",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "approved",
+        "label": "Mark approved",
+        "operation": "update",
+        "entityId": "@obj:entity:case",
+        "recordIdExpr": {
+          "kind": "reference",
+          "value": "nodes.case.output.record.id"
+        },
+        "body": [
+          {
+            "field": "status",
+            "kind": "literal",
+            "value": "approved"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "rejected",
+      "name": "Mark rejected",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "rejected",
+        "label": "Mark rejected",
+        "operation": "update",
+        "entityId": "@obj:entity:case",
+        "recordIdExpr": {
+          "kind": "reference",
+          "value": "nodes.case.output.record.id"
+        },
+        "body": [
+          {
+            "field": "status",
+            "kind": "literal",
+            "value": "rejected"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "done_approved",
+      "name": "Approved",
+      "node_type": "end",
+      "parameters": {
+        "id": "done_approved",
+        "label": "Approved",
+        "outcomeLabel": "approved"
+      },
+      "settings": {}
+    },
+    {
+      "id": "done_rejected",
+      "name": "Rejected",
+      "node_type": "end",
+      "parameters": {
+        "id": "done_rejected",
+        "label": "Rejected",
+        "outcomeLabel": "rejected"
+      },
+      "settings": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_start",
+      "from": "start",
+      "to": "case"
+    },
+    {
+      "id": "e_created",
+      "from": "case",
+      "to": "review"
+    },
+    {
+      "id": "e_approve",
+      "from": "review",
+      "to": "approved"
+    },
+    {
+      "id": "e_reject",
+      "from": "review",
+      "to": "rejected"
+    },
+    {
+      "id": "e_approved",
+      "from": "approved",
+      "to": "done_approved"
+    },
+    {
+      "id": "e_rejected",
+      "from": "rejected",
+      "to": "done_rejected"
+    }
+  ]
+}

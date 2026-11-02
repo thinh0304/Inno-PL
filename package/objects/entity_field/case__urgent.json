@@ -1,0 +1,8 @@
+{
+  "label": "Urgent",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

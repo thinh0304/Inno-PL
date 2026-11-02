@@ -1,0 +1,82 @@
+{
+  "configVersion": 1,
+  "formatVersion": 1,
+  "id": "inno/pl",
+  "version": "0.1.0",
+  "name": "Pl",
+  "summary": "Open a case, review it, and approve or reject it.",
+  "publisher": {
+    "name": "Acme",
+    "contact": "apps@acme.example",
+    "support": "https://acme.example/support"
+  },
+  "license": "Proprietary",
+  "dataHandling": {
+    "purpose": "Recording cases and their review",
+    "storage": "In the organization's AgentFlow",
+    "retention": "As long as the organization keeps its cases",
+    "privacy": "https://acme.example/privacy",
+    "recipients": []
+  },
+  "changelog": "First release.",
+  "contentLocale": "en",
+  "minPlatformVersion": "2026.10",
+  "requires": {
+    "platformCapabilities": [],
+    "entities": [
+      {
+        "key": "user",
+        "access": "read",
+        "fields": {}
+      }
+    ],
+    "permissions": [
+      {
+        "group": "@param:app_users",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      }
+    ]
+  },
+  "parameters": [
+    {
+      "key": "app_users",
+      "type": "group_ref",
+      "required": true,
+      "label": "Pl users",
+      "help": "Everyone who opens, reviews and reads cases. Give its members a role with entity.read, entity.list and entity.write: a role does not come from a group."
+    }
+  ],
+  "audience": "@param:app_users",
+  "egress": [],
+  "ceiling": {
+    "narrow": {}
+  },
+  "mcp": {
+    "enabled": false
+  },
+  "ui": {
+    "kind": "module",
+    "entry": "ui/index.js",
+    "contract": 1
+  },
+  "launcher": {
+    "entries": [
+      {
+        "key": "cases",
+        "label": {
+          "en": "Cases",
+          "vi": "Hồ sơ"
+        },
+        "icon": "inbox",
+        "target": {
+          "module": "/"
+        }
+      }
+    ]
+  },
+  "tests": []
+}

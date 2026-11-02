@@ -1,0 +1,68 @@
+{
+  "name": "Case",
+  "description": "A case someone opened, and how its review ended.",
+  "icon": "inbox",
+  "accent": "sky",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:case/title",
+    "@obj:entity_field:case/urgent",
+    "@obj:entity_field:case/opened_on",
+    "@obj:entity_field:case/summary",
+    "@obj:entity_field:case/amount",
+    "@obj:entity_field:case/status",
+    "@obj:entity_field:case/opened_by"
+  ],
+  "natural_key": [],
+  "display_field": "title",
+  "create_form": "@obj:form:case",
+  "rules": [
+    {
+      "key": "title_required",
+      "message": "A case needs a title",
+      "field": "title",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "field",
+            "rule": {
+              "field": "title",
+              "op": "is_empty"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "stage_model": {
+    "status_field": "status",
+    "initial_statuses": [
+      "open"
+    ],
+    "transitions": [
+      {
+        "from": "open",
+        "to": "approved",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_field",
+            "field": "opened_by"
+          }
+        ]
+      },
+      {
+        "from": "open",
+        "to": "rejected",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_field",
+            "field": "opened_by"
+          }
+        ]
+      }
+    ]
+  }
+}

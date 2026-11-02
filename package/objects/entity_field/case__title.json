@@ -1,0 +1,6 @@
+{
+  "label": "Title",
+  "type": "text",
+  "required": true,
+  "searchable": true
+}

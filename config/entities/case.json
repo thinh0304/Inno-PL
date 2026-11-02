@@ -1,0 +1,36 @@
+{
+  "key": "case", "name": "Case", "description": "A case someone opened, and how its review ended.", "icon": "inbox", "accent": "sky",
+  "fields": [
+    { "key": "title", "label": "Title", "type": "text", "required": true, "searchable": true },
+    { "key": "urgent", "label": "Urgent", "type": "boolean", "default": { "kind": "literal", "value": false } },
+    { "key": "opened_on", "label": "Opened on", "type": "date" },
+    { "key": "summary", "label": "Summary", "type": "text", "format": "richtext" },
+    { "key": "amount", "label": "Amount", "type": "number" },
+    { "key": "status", "label": "Status", "type": "enum", "facetable": true,
+      "enum_values": [ { "value": "open", "label": "Open", "color": "sky" }, { "value": "approved", "label": "Approved", "color": "emerald" },
+                       { "value": "rejected", "label": "Rejected", "color": "rose" } ],
+      "default": { "kind": "literal", "value": "open" } },
+    { "key": "opened_by", "label": "Opened by", "type": "reference", "target_entity_id": "ffffffff-0000-0000-0000-000000000001",
+      "default": { "kind": "creator" } }
+  ],
+  "natural_key": [], "display_field": "title",
+  "views": [ { "key": "all", "name": "Cases", "columns": ["title", "urgent", "status", "opened_on"] } ],
+  "create_form": { "name": "Case", "schema": { "type": "object", "properties": {
+    "title": { "type": "string", "x-entityField": "title" },
+    "urgent": { "type": "boolean", "x-entityField": "urgent" },
+    "opened_on": { "type": "string", "format": "date", "x-entityField": "opened_on" } } } },
+  "access": { "mode": "restricted", "grants": [
+    { "principal": { "kind": "group", "id": "${param:app_users}" }, "design": false, "operations": [
+      { "operation": "read", "scope": "organization" },
+      { "operation": "list", "scope": "organization" },
+      { "operation": "create", "scope": "organization" },
+      { "operation": "update", "record_scopes": [ { "kind": "field", "field": "opened_by" } ] } ] } ] },
+  "rules": [
+    { "key": "title_required", "message": "A case needs a title", "field": "title",
+      "condition": { "join": "and", "leaves": [ { "kind": "field", "rule": { "field": "title", "op": "is_empty" } } ] } }
+  ],
+  "stage_model": { "status_field": "status", "initial_statuses": ["open"], "transitions": [
+    { "from": "open", "to": "approved", "required_fields": [], "movers": [ { "kind": "in_field", "field": "opened_by" } ] },
+    { "from": "open", "to": "rejected", "required_fields": [], "movers": [ { "kind": "in_field", "field": "opened_by" } ] } ] },
+  "conversation": null
+}

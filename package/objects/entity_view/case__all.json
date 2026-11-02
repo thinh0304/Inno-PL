@@ -1,0 +1,14 @@
+{
+  "name": "Cases",
+  "type": "grid",
+  "columns": [
+    "title",
+    "urgent",
+    "status",
+    "opened_on"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}
