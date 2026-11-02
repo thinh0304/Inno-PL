@@ -1,0 +1,66 @@
+# Góp ý cho đội phát triển AgentFlow SDK
+
+Dự án: `inno/pl` (TeraBox · Hiệu quả đơn hàng P&L) · SDK `sdk-v0.7.0` · Bắt đầu: 02/11/2026
+
+Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang làm tạm, và đề xuất. Mức độ: **Chặn** (không làm được trong package), **Lớn** (phải đi đường vòng tốn công), **Nhỏ** (bất tiện).
+
+| # | Mức | Chủ đề | Tóm tắt |
+|---|---|---|---|
+| F-01 | Lớn | Workflow | Package không mang được fork/join |
+| F-02 | Lớn | Workflow | Package không cho graph có vòng lặp |
+| F-03 | Lớn | Quyền | Grant không có quyền theo trường; package không đánh dấu được trường nhạy cảm |
+| F-04 | Nhỏ | Quyền | Record scope không lọc theo giá trị trường |
+| F-05 | Lớn | SLA | Mục tiêu SLA theo độ ưu tiên, không theo từng bản ghi / loại task |
+| F-06 | Nhỏ | Formula | Formula không đọc được bản ghi cấu hình / tham số; không có hàm tra bậc |
+| F-07 | Nhỏ | Bước workflow | Không có ví dụ cho `webhook`, `extract_text`, `document`, `integration`; builder không kiểm tham số |
+
+---
+
+## F-01 · Package không mang được fork/join
+
+- **Vướng:** quy trình đơn hàng có 15 task chạy song song theo tiền đề (ví dụ t22 Kỹ thuật và t23 Mua hàng cùng mở sau t11; t31 chờ cả hai).
+- **Bằng chứng:** `agentflow-app-authoring/reference/steps.md`, "Steps a package cannot carry": *"`fork` and `join`: merge refuses a plain step with more than one outbound edge … the builder cannot make a parallel branch yet."* Nền tảng (designer) thì có fork/join.
+- **Làm tạm:** mỗi task là một bản ghi entity có `work`; một workflow do trigger chạy, dùng Code step tính task nào được mở.
+- **Đề xuất:** helper `fork(id, name, [edges])` / `join(id, name, { wait: "all" | "any" })` trong builder, và `merge` kiểm tra các nhánh hội tụ đúng.
+
+## F-02 · Package không cho graph có vòng lặp
+
+- **Vướng:** "Trả lại" (t22, t31) đưa đơn về GĐ1 rồi đi lại; "Yêu cầu sửa dự thảo" (t42) mở lại t40/t44.
+- **Bằng chứng:** builder README, mục `merge`: *"… everything is reachable from `start`; no loops"*.
+- **Làm tạm:** như F-01, quay lại bằng cách ghi dữ liệu, không phải cạnh graph.
+- **Đề xuất:** cho phép cạnh quay lui tới một Human step (có giới hạn số vòng), hoặc một bước "go to" có điều kiện.
+
+## F-03 · Không có quyền theo trường
+
+- **Vướng:** Kỹ thuật (TM) được xem thông số dòng hàng nhưng không được xem giá; giá mua đề xuất của Mua hàng chỉ PROC / SD / ACC xem.
+- **Bằng chứng:** `access.md`: grant chỉ có `operations` theo bản ghi; `entities.md`: `sensitive` bị builder từ chối (*"not a member the package's entity_field lists"*); `lint-problems.md`: `field_secured`.
+- **Làm tạm:** tách entity: `order_line` (không giá), `order_line_price`, `purchase_proposal`, `order_pl` — thêm 3 entity 1–1, nhiều lần đọc/ghi hơn.
+- **Đề xuất:** grant có `fields` (cho phép / loại trừ trường theo nhóm), hoặc cho package khai báo trường nhạy cảm kèm nhóm được xem, để Admin xác nhận khi cài.
+
+## F-04 · Record scope không lọc theo giá trị trường
+
+- **Vướng:** TM chỉ nên thấy "đơn có dịch vụ", PROC chỉ "đơn có TB / license".
+- **Bằng chứng:** `access.md`, "Record scopes": chỉ `field` (người), `parent_field`, `work`.
+- **Làm tạm:** TM / PROC đọc mọi đơn (phần không có tiền); module tự lọc hiển thị.
+- **Đề xuất:** scope `{ "kind": "condition", "where": [{ field, op, value }] }`.
+
+## F-05 · SLA theo từng loại task
+
+- **Vướng:** mỗi task có SLA riêng (1, 2, 3, 7 ngày làm việc), Admin sửa được.
+- **Bằng chứng:** `work.md`, `deadline`: mục tiêu lấy từ `sla_policy` theo `work_surface.priority`.
+- **Làm tạm:** tự tính `due_at` bằng code (ngày làm việc T2–T6), workflow theo lịch quét quá hạn; không dùng đồng hồ của nền tảng.
+- **Đề xuất:** clock nhận mục tiêu từ một trường số / thời lượng của bản ghi (`target_field`), vẫn tính theo lịch làm việc của tổ chức.
+
+## F-06 · Formula không đọc tham số
+
+- **Vướng:** P&L cần ngưỡng / tỷ lệ theo loại hợp đồng và bậc r theo hạng KH (Admin cấu hình).
+- **Bằng chứng:** `entities.md`, "Formulas and rollups": formula đọc trường của chính bản ghi; rollup chỉ count/sum bản ghi con.
+- **Làm tạm:** toàn bộ P&L bằng TypeScript (module) + Code step (workflow).
+- **Đề xuất:** formula đọc được trường của bản ghi tham chiếu (`customer.tier`) và một bản ghi cấu hình đơn (singleton); hàm `lookup_tier(value, [thresholds], [rates])`.
+
+## F-07 · Thiếu ví dụ cho các bước dùng dịch vụ ngoài
+
+- **Vướng:** cần `webhook` (tra MST), `extract_text` (đọc báo giá / hợp đồng), `document` (sinh .docx hợp đồng).
+- **Bằng chứng:** `steps.md`: *"There is no shipped example of a `webhook`, `integration`, `signature`, `extract_text` … and the builder does not check their parameters."*
+- **Làm tạm:** dựng thử trong designer, Pack, đọc bước đã chuyển đổi.
+- **Đề xuất:** helper có kiểu cho từng bước + một ví dụ trong `examples/`.
