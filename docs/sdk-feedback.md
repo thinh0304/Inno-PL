@@ -12,7 +12,8 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 | F-04 | Nhỏ | Quyền | Record scope không lọc theo giá trị trường |
 | F-05 | Lớn | SLA | Mục tiêu SLA theo độ ưu tiên, không theo từng bản ghi / loại task |
 | F-06 | Nhỏ | Formula | Formula không đọc được bản ghi cấu hình / tham số; không có hàm tra bậc |
-| F-07 | Nhỏ | Bước workflow | Không có ví dụ cho `webhook`, `extract_text`, `document`, `integration`; builder không kiểm tham số |
+| F-07 | Nhỏ | Bước workflow | Không có ví dụ cho `webhook`, `extract_text`, `integration`; builder không kiểm tham số |
+| F-08 | Lớn | UI module | Module chỉ đếm được bản ghi; phép cộng số chỉ qua dashboard |
 
 ---
 
@@ -60,7 +61,14 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 
 ## F-07 · Thiếu ví dụ cho các bước dùng dịch vụ ngoài
 
-- **Vướng:** cần `webhook` (tra MST), `extract_text` (đọc báo giá / hợp đồng), `document` (sinh .docx hợp đồng).
+- **Vướng:** cần `webhook` (tra MST), `extract_text` (đọc báo giá / hợp đồng). (`document` thì đã có hướng dẫn trong `steps.md`.)
 - **Bằng chứng:** `steps.md`: *"There is no shipped example of a `webhook`, `integration`, `signature`, `extract_text` … and the builder does not check their parameters."*
 - **Làm tạm:** dựng thử trong designer, Pack, đọc bước đã chuyển đổi.
 - **Đề xuất:** helper có kiểu cho từng bước + một ví dụ trong `examples/`.
+
+## F-08 · UI module không cộng được số
+
+- **Vướng:** màn hình KPI / Dashboard cần tổng doanh thu, LN thuần… theo kỳ, theo người, theo loại; Kỹ thuật và Mua hàng chỉ được thấy tổng phần dịch vụ / hàng hóa.
+- **Bằng chứng:** `agentflow-ui-module/reference/records-api.md`, "Counting, and figures over many records": module đếm được bản ghi; phép cộng chỉ có ở `/dashboards/{id}/compute`, trong phạm vi quyền người xem.
+- **Làm tạm:** khai báo dashboard trong package cho từng phép tổng; tách các con số theo vai trò ra entity riêng (`order_pl_service`, `order_pl_goods`) để mỗi vai trò cộng trên phần mình được đọc.
+- **Đề xuất:** API aggregate (`sum` / `avg` / `group_by`) cho module, cùng quy tắc quyền như list.

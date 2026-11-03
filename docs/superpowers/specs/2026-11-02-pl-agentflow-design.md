@@ -2,7 +2,7 @@
 
 Ngày: 02/11/2026 · Package: `inno/pl` · SDK: `sdk-v0.7.0`
 
-Nguồn yêu cầu (theo thứ tự ưu tiên khi mâu thuẫn — xem mục 13 về các điểm còn chờ xác nhận):
+Nguồn yêu cầu (theo thứ tự ưu tiên khi mâu thuẫn — **Đặc tả thắng Excel về công thức P&L**, trừ các điểm mục 13 ghi rõ theo Excel):
 
 1. Đặc tả chức năng "TeraBox – Hiệu quả đơn hàng (P&L)" (Claude Doc, rev 27, theo mockup v44) — gọi tắt **Đặc tả**. Bản chép: `docs/source/spec.md`.
 2. Mockup tương tác (artifact HTML, ~440 KB) — tham chiếu bố cục màn hình. Bản lưu: `docs/source/mockup.html`.
@@ -20,6 +20,7 @@ Song song, dự án ghi lại mọi chỗ SDK AgentFlow còn thiếu hoặc vư�
 
 **Mục tiêu**
 - Phủ đủ 10 module của Đặc tả trong một bản phát hành; chia thành các phần code tuần tự (mục 12), không phát hành dần từng phase.
+- Thêm (ngoài Đặc tả, theo yêu cầu 03/11/2026): **nhập đơn cũ từ file Excel P&L** (mục 9.1) và **quỹ chi phí dự phòng theo AM / SA** (mục 6.5).
 - Một bộ công thức P&L duy nhất, dùng chung cho màn hình (tính tức thời khi sửa) và cho workflow (tính chính thức, chốt số liệu khi phê duyệt).
 - Phân quyền kiểm tra ở máy chủ theo ma trận 2.5 (NFR-04), không chỉ ẩn trên giao diện.
 - Mọi kết quả AI chỉ là gợi ý; người phụ trách xác nhận trước khi ghi vào đơn (NFR-06). Mọi cảnh báo bị bỏ qua được ghi lịch sử (BR-4C).
@@ -41,7 +42,8 @@ Song song, dự án ghi lại mọi chỗ SDK AgentFlow còn thiếu hoặc vư�
 - C4. Formula của entity chỉ đọc trường của chính bản ghi; rollup chỉ count/sum bản ghi con; formula không gọi `today()`. ⇒ P&L (cần tham số cấu hình, bậc tra cứu, nhiều bước) phải tính bằng code.
 - C5. Đồng hồ SLA của `work.deadline` lấy mục tiêu từ một SLA policy của tổ chức theo **độ ưu tiên**, không theo từng bản ghi. Đặc tả cần SLA khác nhau cho từng task (1/2/3/7 ngày, Admin sửa được — FR-10.6).
 - C6. Trigger luôn ship ở trạng thái tắt; Admin phải bật sau khi cài.
-- C7. Bước `webhook` / `integration` / `extract_text` / `document` không có ví dụ trong SDK; builder không kiểm tham số. Phải lấy mẫu bằng cách dựng trong designer rồi Pack, hoặc hỏi đội AgentFlow.
+- C7. Bước `webhook` / `integration` / `extract_text` không có ví dụ trong SDK; builder không kiểm tham số. Phải lấy mẫu bằng cách dựng trong designer rồi Pack, hoặc hỏi đội AgentFlow. (Bước `document` và template có hướng dẫn: `steps.md`, "A document step and its template".)
+- C8. UI module chỉ **đếm** được bản ghi qua API; phép **cộng** số chỉ có ở `/dashboards/{id}/compute`, trong phạm vi quyền của người xem. ⇒ dashboard cộng tiền dùng dashboard của package; mỗi vai trò chỉ cộng được trên các entity mình đọc được.
 
 **Từ nền tảng / môi trường**
 - Agent cần nhà cung cấp AI trên deployment; Code step cần code runner JS; document / extract_text cần dịch vụ render / parse của deployment.
@@ -99,13 +101,17 @@ Tên entity / trường dưới đây là đề xuất; người dựng được
 ### 6.2 Đơn hàng
 | Entity | Nội dung chính | Đọc được bởi |
 |---|---|---|
-| `order` | mã đơn (TM-/DV-, BR-53), trạng thái (Nháp / Đang xử lý / Hoàn tất / Close-lost), giai đoạn hiện tại (1–7, BR-4B), đã phê duyệt (bool), thông tin KH & giao nhận (bản sao, FR-1.6), phiếu khảo sát (FR-2.1–2.5: số HĐ nội bộ, số HĐ/PO KH, nội dung, ngày ký, đơn mới?, số liệu năm trước, nguồn KH, hạng KH, công nợ, CPBH, dự phòng, số lần thanh toán, KH tạm ứng trước?, nhân sự triển khai / tư vấn + Proposal / POC), loại HĐ áp dụng ngưỡng (FR-2.6), `deal_stages` (list 6 giai đoạn: hệ số %, người), cờ nội dung (có dịch vụ / có TB-LIC, do code đặt), người: `am`, `sa`, `inside_sales`, `pending_roles` (multi_select vai trò đang có task chờ — cho huy hiệu FR-1.4) | Mọi vai trò (theo scope 7.2). **Không chứa số tiền** |
+| `order` | mã đơn (TM-/DV-, BR-53), trạng thái (Nháp / Đang xử lý / Hoàn tất / Close-lost), giai đoạn hiện tại (1–7, BR-4B), đã phê duyệt (bool), thông tin KH & giao nhận (bản sao, FR-1.6), phiếu khảo sát phần không có tiền (FR-2.1–2.5: số HĐ nội bộ, số HĐ/PO KH, nội dung, ngày ký, đơn mới?, KH mới (new logo)?, số HĐ/PO năm trước, nguồn KH, hạng KH, công nợ, có CPBH?, sử dụng dự phòng?, số lần thanh toán, KH tạm ứng trước?, nhân sự triển khai / tư vấn + Proposal / POC), loại HĐ áp dụng ngưỡng (FR-2.6), `deal_stages` (list 6 giai đoạn: hệ số %, người), cờ nội dung (có dịch vụ / có TB-LIC, do code đặt), người: `am`, `sa`, `inside_sales`, `pending_roles` (multi_select vai trò đang có task chờ — cho huy hiệu FR-1.4) | Mọi vai trò (theo scope 7.2). **Không chứa số tiền** |
 | `order_line` | ref `order`, mã loại, CO/CQ, tên hàng, ĐVT, SL, thời hạn/bảo hành (tháng), SKU, thông số kỹ thuật, ngày bắt đầu/kết thúc, thời gian giao, End User | Mọi vai trò xem được đơn (TM cần thông số, FR-4.5). **Không chứa giá** |
-| `order_line_price` | ref `order_line` (1–1) và `order`, đơn giá bán, chiết khấu %, VAT, đơn giá mua dự kiến (của Sale), ref `supplier` | AM, SA, SD, ACC, Admin |
-| `purchase_proposal` | ref `order_line` (1–1, chỉ dòng TB/LIC/LIC-DK), giá mua đề xuất, NCC đề xuất, ghi chú | PROC, SD, ACC (FR-4.6) |
-| `order_pl` | ref `order` (1–1), các tổng chính (doanh thu, giá vốn, LN gộp, CPBH, CPTC, chi phí khác, LN thuần, tỷ suất, ngưỡng, kết quả Đạt / Không đạt), `detail` (JSON: từng dòng P&L, phân tích theo loại, cơ cấu 1 lần / định kỳ), `kpi_split` (JSON: người → chỉ tiêu KD), `config_snapshot` (JSON), `computed_at`, `locked` | AM, SA, SD, ACC, Admin |
+| `order_finance` | ref `order` (1–1): các trường tiền của phiếu khảo sát (CPBH, dự phòng, số liệu năm trước) | AM, SA, SD, ACC, Admin |
+| `goods_line_price` | ref `order_line` (1–1) và `order`, cho dòng **hàng hóa** (TB, LIC, LIC-DK — theo `item_type.purchase_group = goods`): đơn giá bán, chiết khấu %, VAT, đơn giá mua dự kiến của Sale, ref `supplier` | AM, SA, SD, ACC, Admin, **PROC** |
+| `service_line_price` | như trên, cho dòng **dịch vụ** (DVTK-*, DVDK-*, Cloud, Colocation, Veeam, Manage Service, Other, LIC-NTNN — `purchase_group = service`, theo FR-4.3) | AM, SA, SD, ACC, Admin, **TM** |
+| `purchase_proposal` | ref `order_line` (1–1, dòng hàng hóa), giá mua đề xuất, NCC đề xuất, giá mua thực tế (khi có HĐ NCC), ghi chú | PROC, SD, ACC (FR-4.6) |
+| `order_pl` | ref `order` (1–1), các tổng chính (doanh thu, giá vốn, LN gộp, CPBH, CPTC, chi phí khác, dự phòng, LN thuần, tỷ suất, ngưỡng, kết quả Đạt / Không đạt), `detail` (JSON: từng dòng P&L, phân tích theo loại, cơ cấu 1 lần / định kỳ), `kpi_split` (JSON: người → chỉ tiêu KD), `config_snapshot` (JSON), `computed_at`, `source` (tính / nhập từ Excel), `locked` | AM, SA, SD, ACC, Admin |
+| `order_pl_service` | ref `order` (1–1): doanh thu, giá vốn, LN gộp **phần dịch vụ**, tách theo loại (1 lần / định kỳ, nội bộ / thuê ngoài, từng mã loại) | như `order_pl` + **TM** |
+| `order_pl_goods` | ref `order` (1–1): giá vốn hàng hóa (TB / license) theo loại; tổng giá đề xuất của Sale, tổng giá Mua hàng đề xuất, tổng giá mua thực tế, chênh lệch (KPI Mua hàng) | như `order_pl` + **PROC** |
 
-Các trường số trên `order_pl` là `number` thật (không chỉ JSON) để dashboard đếm/cộng được.
+Lý do tách (do C2, C3, C8): TM chỉ được xem chỉ số phần dịch vụ, PROC chỉ xem giá vốn hàng hóa và KPI Mua hàng (người dùng, 03/11/2026). Mỗi phần tiền nằm ở entity mà đúng các vai trò đó đọc được; dashboard của TM / PROC cộng trên `order_pl_service` / `order_pl_goods`. `compute_pl` ghi cả ba entity P&L trong một lần chạy. Các trường số là `number` thật (không chỉ JSON) để dashboard cộng được.
 
 ### 6.3 Quy trình
 | Entity | Nội dung chính |
@@ -128,7 +134,21 @@ Bảng 15 task (vai trò, tiền đề, điều kiện áp dụng, SLA mặc đ�
 | `business_plan` | theo năm: doanh thu, LN thuần kế hoạch (FR-10.7) |
 | `kpi_target` | theo năm × người: doanh thu, LN thuần, số đơn, chỉ tiêu KD được chia, new logo (FR-10.8) |
 
-Giá trị mặc định nạp bằng `seed` theo Đặc tả 4.3 / sheet Define. "Khôi phục mặc định" (FR-10.10) là một workflow ghi lại các giá trị seed.
+| `deal_stage_weight` | 4 bộ hệ số theo sheet Define B79:F86 — New-TM, New-DVDK, TMDK (tái ký thương mại), DVDK (tái ký dịch vụ) × 7 dòng (Lead / new logo, Opportunities, Requirement Clarification, Quotation, Negotiation, Close Deal, Contract·Payment·Support) |
+
+Giá trị mặc định nạp bằng `seed` theo Đặc tả 4.3 / sheet Define. "Khôi phục mặc định" (FR-10.10) là một workflow ghi lại các giá trị seed. "Thưởng kinh doanh" và "Thưởng hỗ trợ KT định kỳ" theo loại HĐ được lưu trong cấu hình nhưng không vào công thức nào (Đặc tả cũng không dùng) — quyết định của người dựng.
+
+### 6.5 Quỹ chi phí dự phòng (CPDP) theo AM / SA
+
+Theo người dùng (03/11/2026): chi phí dự phòng được trích từ các đơn và góp vào **quỹ riêng của từng AM / SA**. Khi một đơn không đạt ngưỡng LN, Sale chọn "Sử dụng chi phí dự phòng = Có" để lấy tiền từ quỹ đó bù cho đơn đạt ngưỡng cần duyệt.
+
+| Entity | Nội dung | Đọc được bởi |
+|---|---|---|
+| `provision_entry` | người (AM / SA chủ quỹ), ref `order`, loại (góp / sử dụng / điều chỉnh của Admin), số tiền, trạng thái (dự kiến / ghi nhận / hủy), thời điểm. **Chỉ tạo**, không sửa / xóa | chủ quỹ, SD, ACC, Admin |
+
+- Số dư quỹ = Σ góp đã ghi nhận − Σ sử dụng đã ghi nhận (tính trong module / dashboard theo người).
+- Góp: mỗi đơn trích `giá vốn × tỷ lệ dự phòng theo loại HĐ` (Define dòng 33; như Excel PL!K53). Ghi nhận khi nào và dấu của khoản sử dụng trong công thức: **xem mục 14**.
+- Không cho sử dụng vượt số dư (kiểm ở module và ở `advance_order` khi gửi duyệt); SD thấy khoản sử dụng quỹ khi duyệt t31.
 
 ## 7. Phân quyền
 
@@ -139,7 +159,10 @@ Giá trị mặc định nạp bằng `seed` theo Đặc tả 4.3 / sheet Define
 | Entity | AM | SA | TM | SD | PROC | ACC | Admin |
 |---|---|---|---|---|---|---|---|
 | `order`, `order_line` | đọc/sửa đơn có `am` = mình | đọc/sửa đơn có `sa` = mình | đọc toàn bộ ⚑ | đọc toàn bộ | đọc toàn bộ ⚑ | đọc toàn bộ | đọc, xóa |
-| `order_line_price`, `order_pl` | như `order` | như `order` | — | đọc | — | đọc | đọc |
+| `order_finance`, `order_pl` | như `order` | như `order` | — | đọc | — | đọc | đọc |
+| `service_line_price`, `order_pl_service` | như `order` | như `order` | đọc ⚑ | đọc | — | đọc | đọc |
+| `goods_line_price`, `order_pl_goods` | như `order` | như `order` | — | đọc | đọc ⚑ | đọc | đọc |
+| `provision_entry` | quỹ của mình | quỹ của mình | — | đọc | — | đọc | đọc, tạo điều chỉnh |
 | `purchase_proposal` | — | — | — | đọc | đọc/sửa | đọc | — |
 | `order_task` | đọc qua đơn + làm task của mình | như AM | đọc + làm task | như TM | như TM | như TM | đọc |
 | `order_event` | tạo + đọc qua đơn | như AM | như AM | như AM | như AM | như AM | đọc |
@@ -147,9 +170,9 @@ Giá trị mặc định nạp bằng `seed` theo Đặc tả 4.3 / sheet Define
 | `customer`, `supplier` | đọc/sửa | đọc/sửa | đọc | đọc | đọc | đọc | đọc/sửa |
 | Cấu hình (6.4) | đọc | đọc | đọc | đọc | đọc | đọc | sửa |
 
-"Chỉ sửa ở GĐ1 hoặc khi bị trả lại" (2.5) và "khóa nguồn KH khi không phải đơn mới" (BR-23) viết bằng **rules** trên `order` / `order_line` / `order_line_price`: chặn update khi `order.stage > 1`, trừ automation group.
+"Chỉ sửa ở GĐ1 hoặc khi bị trả lại" (2.5) và "khóa nguồn KH khi không phải đơn mới" (BR-23) viết bằng **rules** trên `order` / `order_line` / `order_finance` / hai entity giá dòng: chặn update khi `order.stage > 1`, trừ automation group.
 
-⚑ **Quyết định của người dựng (do C3):** TM và PROC đọc được phần không có tiền của mọi đơn, thay vì chỉ "đơn có dịch vụ" / "đơn có TB/LIC". Danh sách đơn trong module vẫn lọc theo cờ nội dung. Giá và P&L vẫn khóa ở máy chủ. Ghi vào sdk-feedback (record scope theo điều kiện trường).
+⚑ **Quyết định của người dựng (do C3):** TM và PROC đọc được phần không có tiền của mọi đơn, và phần tiền dịch vụ / hàng hóa của mọi đơn (đơn không có dịch vụ thì không có bản ghi `service_line_price`, nên thực tế TM chỉ thấy tiền của đơn có dịch vụ). Danh sách đơn trong module lọc theo cờ nội dung. P&L đầy đủ, giá mua đề xuất và phần còn lại khóa ở máy chủ. Ghi vào sdk-feedback (record scope theo điều kiện trường).
 
 Automation group: đọc/ghi mọi entity cần cho workflow.
 
@@ -185,6 +208,19 @@ Mỗi tính năng là một workflow do module khởi chạy với đơn làm su
 | So khớp bản chính thức | FR-7.6 | agent so bản ký với dự thảo đã duyệt (giá trị, bên ký, thanh toán = lỗi chặn; khác nhỏ = lưu ý); chữ ký / con dấu |
 | Bóc tách & tự điền | FR-7.7 | agent `contract_extractor` → đề xuất số HĐ/PO, ngày ký, công nợ, giao nhận… |
 
+### 9.1 Nhập đơn cũ từ file Excel P&L
+
+Theo người dùng (03/11/2026): import file Excel vào hệ thống, điền sẵn các trường bóc tách được, các trường còn thiếu yêu cầu bổ sung để kiểm tra và duyệt lại.
+
+- **Đọc file:** module đọc `.xlsx` trong trình duyệt (thư viện SheetJS) theo cấu trúc mẫu đã biết: Quotation EN (dòng bán, mã loại cột O), MH&DV (thông tin đơn, KH, giá mua, NCC), Form (phiếu khảo sát, giai đoạn deal), PL (số đã ký). Tìm ô theo **nhãn** chứ không theo tọa độ cứng, vì mẫu có nhiều phiên bản ("Update mẫu ngày …"). Ô nào không tìm thấy → để trống, đánh dấu cần bổ sung. Có thể dùng agent làm phương án dự phòng cho file lệch mẫu nhiều. — quyết định của người dựng.
+- **Tạo đơn:** đơn nháp đủ KH, phiếu khảo sát, danh mục, giá; `order_pl` lưu **số P&L theo Excel** (`source = Excel`) để đối chiếu, cạnh số tính lại theo công thức mới; ghi `order_event` "Nhập từ Excel" kèm danh sách trường thiếu và các chỗ lệch giữa hai cách tính.
+- **Duyệt lại:** đơn nhập đi qua t11 (Sale bổ sung trường thiếu, gửi duyệt) và các bước duyệt như đơn mới; đơn đã đi hết quy trình ngoài đời có thể được Admin đánh dấu "đơn lịch sử" để bỏ qua các task sau t31 — chi tiết luồng do người dựng đề xuất trong kế hoạch.
+- **Đơn chốt số liệu** (FR-5.7): Admin bật `locked` cho đơn lịch sử để giữ số Excel, không tính lại.
+- Hồ sơ KH, NCC trong file được đối chiếu với `customer` / `supplier` hiện có (theo mã KH / MST / tên) trước khi tạo mới.
+- Kiểm thử bằng chính file TM-1040.
+
+### 9.2 Agent và skill
+
 Mỗi agent có một skill (`config/skills/*.SKILL.md`) mô tả nghiệp vụ, và `read_limit` chỉ gồm entity nó cần (không cho agent đọc `purchase_proposal` trừ khi cần). Tham số model của agent do Admin chọn khi cài.
 
 ## 10. Giao diện (UI module)
@@ -205,7 +241,7 @@ Bám bố cục mockup; dùng kit `@reflexify/agentflow-elements`, theo `DESIGN.
 - **advance.js (Vitest)**: bảng tiền đề, điều kiện áp dụng, trả lại, yêu cầu sửa, close-lost, tự duyệt, ngày làm việc.
 - **Kiểm định dạng 4.8 (Vitest)**: mỗi quy tắc, mỗi kiểu tự chuẩn hóa.
 - **Module (Vitest + Testing Library)**: theo test sẵn có của starter (stylesheet, build).
-- **Sandbox** (`deploy --sandbox`, `sandbox.json` có đủ 7 vai trò): một đơn TB+DV đi hết 15 task; trả lại ở t22 và t31; close-lost; kiểm quyền: TM gọi API đọc `order_pl` / `order_line_price` phải bị từ chối. AI chỉ kiểm cấu trúc kết quả, không kiểm câu chữ.
+- **Sandbox** (`deploy --sandbox`, `sandbox.json` có đủ 7 vai trò): một đơn TB+DV đi hết 15 task; trả lại ở t22 và t31; close-lost; kiểm quyền: TM gọi API đọc `order_pl` / `goods_line_price` / `purchase_proposal` phải bị từ chối, PROC đọc `service_line_price` / `order_pl` phải bị từ chối, AM đọc quỹ dự phòng của người khác phải bị từ chối. AI chỉ kiểm cấu trúc kết quả, không kiểm câu chữ.
 
 ## 12. Thứ tự code (cùng một bản phát hành)
 
@@ -215,16 +251,71 @@ Bám bố cục mockup; dùng kit `@reflexify/agentflow-elements`, theo `DESIGN.
 4. **Quy trình**: `order_task`, `order_event`, `advance_order`, `sla_sweep`; tab Quy trình, Lịch sử, Việc của tôi; rules khóa sửa.
 5. **Hợp đồng**: `contract`, upload, t40–t45, template văn bản.
 6. **AI**: các agent / skill / workflow mục 9; khung cảnh báo bỏ qua.
-7. **KPI & Dashboard**.
+6a. **Nhập từ Excel** (9.1).
+7. **KPI & Dashboard**, quỹ dự phòng (6.5), dashboard riêng TM / PROC.
 8. **Cấu hình (Admin)** màn hình, khôi phục mặc định; sandbox test đầy đủ; tài liệu cài đặt cho Admin.
 
 Mỗi phần kết thúc bằng `pnpm build`, `pnpm test`, và (khi có deployment) `lint`. Mỗi vướng mắc SDK gặp được ghi ngay vào `docs/sdk-feedback.md`.
 
-## 13. Điểm cần xác nhận trước khi code
+## 13. Quyết định nghiệp vụ đã chốt (03/11/2026)
 
-*(được điền sau vòng review)*
+### 13.1 Đặc tả thắng Excel về công thức P&L
 
-## 14. Để lại cho người dựng
+Người dùng đồng ý: công thức theo Đặc tả 4.2–4.3 (mockup v44). Các chỗ Excel khác (review phát hiện) **không** làm theo Excel: bậc r tính theo CPBH ÷ giá vốn và hạng KH VIP / Tiềm năng / Phổ thông; bảo hành ⌈tháng ÷ 12⌉ × 0,2%; thưởng triển khai trên doanh thu DVTK-I, không có mức sàn; thưởng tư vấn có max(0) và chỉ cộng 2% khi Proposal / POC được chọn; DVDK-NTNN nhân số tháng; hỗ trợ license gồm LIC, LIC-DK, LIC-NTNN, DVDK-NTNN; hỗ trợ KT = 5% DVDK-I + 2% DVTK-O; ngưỡng cộng 0,5% mỗi 15 ngày công nợ **vượt** 30 (không trừ khi dưới 30).
+
+Ngoại lệ theo Excel: **chi phí dự phòng** (13.2) và **chia KPI** (13.3).
+
+Ca vàng TM-1040: các assert dùng số **tính theo Đặc tả** (với dự phòng theo 13.2); một bảng riêng ghi số Excel và lý do lệch từng dòng, để Ban giám đốc đối chiếu.
+
+### 13.2 Chi phí dự phòng
+
+Xem 6.5. Mỗi đơn luôn trích `giá vốn × tỷ lệ dự phòng theo loại HĐ` (như Excel PL!K53) — khoản này là chi phí của đơn và là phần góp vào quỹ của AM / SA. Khi đơn không đạt ngưỡng, Sale chọn "Có" và nhập số tiền lấy từ quỹ để bù. **Còn chờ xác nhận:** mục 14.
+
+### 13.3 Chia chỉ tiêu KD (KPI) — theo Excel
+
+- Bộ hệ số chọn theo (loại HĐ, đơn mới?) — Define!H80: loại HĐ dịch vụ → New-DVDK / DVDK, còn lại → New-TM / TMDK; "đơn mới = Không" → bộ tái ký (TMDK / DVDK).
+- Giai đoạn và hệ số mặc định (Define B79:F86):
+
+| Giai đoạn | New-TM | New-DVDK | TMDK (tái ký) | DVDK (tái ký) |
+|---|---|---|---|---|
+| Lead (new logo) | 30% | 30% | 0% | 0% |
+| Opportunities | 20% | 20% | 0% | 0% |
+| Requirement Clarification | 30% | 30% | 0% | 0% |
+| Quotation | 10% | 5% | 10% | 5% |
+| Negotiation | 10% | 10% | 10% | 10% |
+| Close Deal | 20% | 20% | 20% | 20% |
+| Contract · Payment · Support | 10% | 15% | 10% | 15% |
+| **Tổng không gồm Lead** | **100%** | **100%** | **50%** | **50%** |
+
+- **Khách hàng mới (new logo):** người mang KH về được cộng thêm hệ số Lead (30%, cấu hình được) — tổng của đơn new logo là 130% LN thuần. Đơn tái ký tổng chỉ 50%.
+- Chỉ tiêu KD được chia của một người = LN thuần × tổng hệ số các giai đoạn người đó đảm nhận (+ Lead nếu là người mang KH về).
+- Thay thế BR-30, BR-32 của Đặc tả; BR-31, BR-33–BR-37 giữ nguyên.
+- Phiếu khảo sát có thêm trường "Khách hàng mới (new logo)?" (Form!E16), khác với "Đơn hàng mới?" (tái ký hay không).
+
+### 13.4 Vai trò TM và PROC xem tiền
+
+- **TM:** chỉ chỉ số phần dịch vụ — doanh thu, giá vốn, LN gộp theo từng loại dịch vụ (một lần / định kỳ, nội bộ / thuê ngoài). Không thấy hàng hóa, CPBH, CPTC, LN thuần đơn, KPI.
+- **PROC:** tổng giá vốn hàng hóa (thiết bị / license) và **KPI Mua hàng** = chênh lệch giữa giá đề xuất và giá mua (định nghĩa chính xác: mục 14).
+- Cài đặt bằng các entity ở 6.2 và dashboard riêng cho TM, PROC.
+
+### 13.5 Fulfillment
+
+Loại HĐ "Fulfillment" chỉ do AM / SA **tự chọn** ở "Loại áp dụng ngưỡng P&L"; không có quy tắc tự nhận. Đơn Fulfillment được giải trình với SD ngoài hệ thống; hệ thống chỉ áp tham số cột Fulfillment và đánh dấu đơn là special case cho SD thấy khi duyệt.
+
+### 13.6 Quyết định của người dựng (người dùng kiểm lại khi đọc)
+
+- **Tính lại P&L:** đơn nháp / bị trả lại tính lại mỗi lần lưu (module gọi `compute_pl`); khi Admin đổi cấu hình, workflow tính lại mọi đơn chưa phê duyệt và chưa `locked`; đơn đã phê duyệt giữ `config_snapshot` (BR-51 + NFR-08).
+- **SLA:** tự tính `due_at` để Admin đặt số ngày bất kỳ cho từng task (FR-10.6), thay vì ép 4 mức ưu tiên của đồng hồ nền tảng.
+- **Thưởng kinh doanh, thưởng hỗ trợ KT định kỳ theo loại HĐ:** lưu trong cấu hình, không vào công thức.
+- **Đọc Excel khi import:** trong trình duyệt bằng SheetJS, tìm ô theo nhãn.
+
+## 14. Còn chờ người dùng xác nhận
+
+1. **Quỹ dự phòng:** khi chọn "Có", số tiền lấy từ quỹ **cộng vào** LN của đơn (làm LN thuần tăng để đạt ngưỡng) hay **thay** khoản trích theo tỷ lệ (Excel PL!K53/K54: trừ số nhập tay thay vì tỷ lệ)? Phần góp vào quỹ được ghi nhận khi đơn được phê duyệt hay khi đơn hoàn tất? Đơn Close-lost có hoàn lại không?
+2. **KPI Mua hàng:** "giá đề xuất" là giá mua dự kiến của Sale hay giá Mua hàng đề xuất ở t23; "giá mua" là giá trên HĐ NCC đã ký (t45)?
+3. **Service tra MST:** địa chỉ, cách xác thực, request / response. Trong lúc chờ, bước gọi được viết với host và khóa là tham số cài đặt, kèm một service giả để test.
+
+## 15. Để lại cho người dựng
 
 - Tên khóa entity / trường cụ thể, bố cục view của nền tảng.
 - Cách sinh mã đơn TM-/DV- (auto_number hay code), miễn đúng BR-53 và không trùng.
