@@ -200,6 +200,24 @@ describe('orders in the sandbox', () => {
     expect(status).toBe(422);
   });
 
+  it('proposal_triggers_recompute', async () => {
+    // Purchasing changes its proposal: request_pl_on_proposal_update sets pl_requested_at, compute_pl recomputes the KPI.
+    const run = await (async () => {
+      const before = (await runsOf(orderId)).length;
+      expect((await patch(as('proc'), 'purchase_proposal', proposalId, { proposed_cost: 17_000_000 })).status).toBeLessThan(300);
+      const deadline = Date.now() + 150_000;
+      for (;;) {
+        const runs = await runsOf(orderId);
+        if (runs.length > before && runs.every((r) => r.completed_at !== null)) return runs[0];
+        if (Date.now() > deadline) throw new Error('compute_pl did not run after the proposal changed');
+        await new Promise((resolve) => setTimeout(resolve, 3_000));
+      }
+    })();
+    expect(run.status).toBe('completed');
+    const [goods] = await ofOrder(as('proc'), 'order_pl_goods', orderId);
+    expect(goods.proc_saving).toBe(24_000_000);
+  });
+
   it('locked_pl_is_kept', async () => {
     const [pl] = await ofOrder(as('am'), 'order_pl', orderId);
     expect((await patch(as('pladmin'), 'order_pl', pl.id, { locked: true })).status).toBeLessThan(300);

@@ -261,3 +261,9 @@
 .pl tr[data-sub] th { padding-inline-start: 32px; color: var(--muted); }
 .pl .formula { color: var(--muted); font-size: 12px; }
 .toggle { display: inline-flex; align-items: center; gap: 4px; font-weight: 400; }
+
+/* The purchase tab */
+.stats.compact { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+.stats.compact .stat-value { font-size: 15px; line-height: 22px; }
+.mh { min-width: 1400px; }
+.mh td { padding: 4px 6px; }

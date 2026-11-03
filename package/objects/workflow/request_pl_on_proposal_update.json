@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0",
+  "name": "Tính lại P&L khi đề xuất mua đổi giá",
+  "description": "Đặt pl_requested_at của đơn có đề xuất mua vừa ghi, để compute_pl tính lại P&L và KPI Mua hàng.",
+  "runAs": "@param:automation_principal",
+  "exposedSteps": [],
+  "start": "start",
+  "end": [
+    "done"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "node_type": "start",
+      "parameters": {
+        "id": "start",
+        "label": "Start",
+        "inputContract": {
+          "subject": {
+            "kind": "entity",
+            "entityId": "@obj:entity:purchase_proposal",
+            "arity": "single"
+          },
+          "params": {
+            "kind": "none"
+          }
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "request",
+      "name": "Yêu cầu tính P&L",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "request",
+        "label": "Yêu cầu tính P&L",
+        "operation": "update",
+        "entityId": "@obj:entity:order",
+        "recordIdExpr": {
+          "kind": "reference",
+          "value": "subject.record.order"
+        },
+        "body": [
+          {
+            "field": "pl_requested_at",
+            "kind": "template",
+            "value": "{{ now() }}"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "done",
+      "name": "Đã yêu cầu",
+      "node_type": "end",
+      "parameters": {
+        "id": "done",
+        "label": "Đã yêu cầu",
+        "outcomeLabel": "Đã yêu cầu"
+      },
+      "settings": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_start",
+      "from": "start",
+      "to": "request"
+    },
+    {
+      "id": "e_done",
+      "from": "request",
+      "to": "done"
+    }
+  ]
+}

@@ -40,6 +40,8 @@ export interface OrderDraftHook {
   setDraft(update: (draft: OrderDraft) => OrderDraft): void;
   save(): Promise<LoadedOrder>;
   reload(): void;
+  /** Reads the order again without showing the loading state (after a write a trigger follows up on). */
+  refresh(): void;
 }
 
 /** A new order: the person is its AM when they are in Sales; an SA names an AM and is the order's SA (plan 02). */
@@ -85,6 +87,14 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
     );
   }, [api, id, me]);
   useEffect(reload, [reload]);
+
+  const refresh = useCallback(() => {
+    if (!id) return;
+    api.load(id).then((loaded) => {
+      setSaved(loaded);
+      setDraftState(loaded.draft);
+    }, () => {});
+  }, [api, id]);
 
   // Until the configuration loads, the defaults stand in (nothing is shown or saved before then).
   const config = ready?.config ?? DEFAULT_CONFIG;
@@ -155,5 +165,6 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
     setDraft: (update) => setDraftState(update),
     save,
     reload,
+    refresh,
   };
 }

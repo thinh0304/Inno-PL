@@ -1,0 +1,17 @@
+{
+  "workflow": "@obj:workflow:request_pl_on_proposal",
+  "kind": "entity_record",
+  "enabled": false,
+  "config": {
+    "entity_id": "@obj:entity:purchase_proposal",
+    "change_kind": "created",
+    "input_mappings": [],
+    "filter": {
+      "!!": [
+        {
+          "var": "order"
+        }
+      ]
+    }
+  }
+}

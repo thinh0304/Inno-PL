@@ -284,13 +284,17 @@ export const OBJECTS = {
   'form:staff': { kind: 'form', contractVersion: '0.1.0' },
   'form:supplier': { kind: 'form', contractVersion: '0.1.0' },
   'trigger:compute_pl_on_request': { kind: 'trigger', contractVersion: null },
+  'trigger:request_pl_on_proposal': { kind: 'trigger', contractVersion: null },
+  'trigger:request_pl_on_proposal_update': { kind: 'trigger', contractVersion: null },
   'workflow:compute_pl': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:pl_selftest': { kind: 'workflow', contractVersion: '0.1.0' },
+  'workflow:request_pl_on_proposal': { kind: 'workflow', contractVersion: '0.1.0' },
+  'workflow:request_pl_on_proposal_update': { kind: 'workflow', contractVersion: '0.1.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
 export type EntityKey = 'business_plan' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
-export type WorkflowKey = 'compute_pl' | 'pl_selftest';
+export type WorkflowKey = 'compute_pl' | 'pl_selftest' | 'request_pl_on_proposal' | 'request_pl_on_proposal_update';
 
 /** The value of each field of each entity, as a record carries it. */
 export interface EntityFields {
@@ -568,4 +572,6 @@ export interface EntityFields {
 export interface WorkflowInputs {
   compute_pl: Record<string, never>;
   pl_selftest: Record<string, never>;
+  request_pl_on_proposal: Record<string, never>;
+  request_pl_on_proposal_update: Record<string, never>;
 }
