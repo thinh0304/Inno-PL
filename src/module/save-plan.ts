@@ -17,7 +17,7 @@ export const isNew = (id: string | undefined) => !id || id.startsWith('new:');
 
 // The order's fields a person writes; the rest (number, code, status, stage, has_goods, has_service) belong to
 // AgentFlow and the workflows.
-const ORDER_KEYS = ['customer', 'customer_name', 'customer_code', 'tax_code', 'address', 'contact_name', 'contact_phone',
+export const ORDER_KEYS = ['customer', 'customer_name', 'customer_code', 'tax_code', 'address', 'contact_name', 'contact_phone',
   'contact_email', 'representative', 'representative_title', 'bank_account', 'bank_name', 'receiver_name', 'receiver_phone',
   'delivery_address', 'delivery_note', 'quote_date', 'quote_valid_until', 'exchange_rate', 'internal_contract_no',
   'customer_po_no', 'content', 'signed_on', 'am', 'sa', 'inside_sales', 'is_new_order', 'is_new_logo', 'prev_contract_no',

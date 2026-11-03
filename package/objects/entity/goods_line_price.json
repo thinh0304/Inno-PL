@@ -26,6 +26,46 @@
   "create_form": "@obj:form:goods_line_price",
   "rules": [
     {
+      "key": "children_locked_after_submit",
+      "message": "Đơn đã gửi duyệt — không sửa được",
+      "field": "order",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "field",
+            "rule": {
+              "field": "order.status",
+              "op": "ne",
+              "value": "draft"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:automation_group"
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:admin_group"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "key": "order_is_fixed",
       "message": "Không chuyển được sang đơn khác",
       "field": "order",

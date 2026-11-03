@@ -49,7 +49,7 @@ describe('order_task and order_event', () => {
     const moves = raw('order_task').stage_model.transitions as Any[];
     const humans = moves.filter((m) => m.movers.some((x: Any) => x.kind === 'is_holder')).map((m) => `${m.from}>${m.to}`);
     expect(humans).toEqual(['open>done', 'open>not_applicable']);
-    expect(moves.find((m) => m.from === 'open' && m.to === 'done').required_fields).toEqual(['outcome']);
+    expect(moves.find((m) => m.from === 'open' && m.to === 'done')!.required_fields).toEqual(['outcome']);
   });
 
   it('order_has_flow_fields', () => {
@@ -57,8 +57,67 @@ describe('order_task and order_event', () => {
   });
 
   it('event_actions_cover_the_flow_events', () => {
-    const actions = (raw('order_event').fields as Any[]).find((f) => f.key === 'action').enum_values.map((v: Any) => v.value);
+    const actions = (raw('order_event').fields as Any[]).find((f) => f.key === 'action')!.enum_values.map((v: Any) => v.value);
     for (const a of ['auto_approved', 'reopened_missing_fields', 'returned_processed', 'revise_processed', 'approved', 'completed_order', 'close_lost',
       'ignored_warnings', 'ignored_suggestion']) expect(actions, a).toContain(a);
+  });
+});
+
+import { ORDER_KEYS } from '../../src/module/save-plan';
+
+const rule = (entityKey: string, key: string): Any => (raw(entityKey).rules as Any[]).find((r) => r.key === key)!;
+const leaves = (r: Any): Any[] => r.condition.leaves;
+const writeOps = (r: Any, op: string): Any[] => leaves(r).filter((l) => l.kind === 'write' && l.write.op === op).map((l) => l.write);
+const notIn = (r: Any): string[] => leaves(r).filter((l) => l.kind === 'write' && l.write.op === 'actor' && l.write.negate).map((l) => l.write.test.group_id);
+
+describe('locks after submit', () => {
+  it('order_locked_after_submit_rule', () => {
+    const r = rule('order', 'locked_after_submit');
+    expect(writeOps(r, 'is_update')).toHaveLength(1);
+    expect(writeOps(r, 'was')[0].rule).toEqual({ field: 'status', op: 'ne', value: 'draft' });
+    expect(writeOps(r, 'changed_any')[0].fields).toEqual(expect.arrayContaining([...ORDER_KEYS, 'pl_requested_at']));
+    expect(notIn(r).sort()).toEqual(['${param:admin_group}', '${param:automation_group}']);
+  });
+
+  it('flow_fields_are_automatic', () => {
+    const r = rule('order', 'flow_fields_are_automatic');
+    expect(writeOps(r, 'changed_any')[0].fields.sort()).toEqual(['approved', 'approved_at', 'contract_signed', 'pending_roles', 'stage']);
+    expect(notIn(r)).toHaveLength(2);
+    for (const key of ['new_order_is_unapproved', 'new_order_is_draft']) {
+      expect(writeOps(rule('order', key), 'is_new'), key).toHaveLength(1);
+      expect(notIn(rule('order', key)), key).toHaveLength(2);
+    }
+  });
+
+  it('children_locked_after_submit_rules', () => {
+    for (const key of ['order_line', 'goods_line_price', 'service_line_price', 'order_finance']) {
+      const r = rule(key, 'children_locked_after_submit');
+      expect(r.field, key).toBe('order');
+      expect(leaves(r).find((l) => l.kind === 'field')!.rule, key).toEqual({ field: 'order.status', op: 'ne', value: 'draft' });
+      expect(notIn(r).sort(), key).toEqual(['${param:admin_group}', '${param:automation_group}']);
+    }
+    // Purchasing keeps writing proposals after submit (t23 comes after it): that entity is not locked.
+    expect(ruleKeys('purchase_proposal')).not.toContain('children_locked_after_submit');
+  });
+
+  it('close_lost_movers_and_reason', () => {
+    const model = raw('order').stage_model;
+    expect(model.status_field).toBe('status');
+    expect(model.initial_statuses).toEqual(['draft']);
+    const move = (from: string, to: string) => model.transitions.find((m: Any) => m.from === from && m.to === to);
+    for (const from of ['draft', 'in_progress']) {
+      const lost = move(from, 'close_lost');
+      expect(lost.required_fields).toEqual(['close_reason']);
+      expect(lost.movers).toEqual(expect.arrayContaining([{ kind: 'in_field', field: 'am' }, { kind: 'in_field', field: 'sa' },
+        { kind: 'in_group', group_id: '${param:admin_group}' }, { kind: 'in_group', group_id: '${param:automation_group}' }]));
+    }
+    for (const [from, to] of [['draft', 'in_progress'], ['in_progress', 'draft'], ['in_progress', 'done']]) {
+      expect(move(from, to).movers, `${from}>${to}`).toEqual([{ kind: 'in_group', group_id: '${param:automation_group}' }]);
+    }
+    expect(model.transitions).toHaveLength(5);
+    const r = rule('order', 'close_lost_before_contract');
+    expect(writeOps(r, 'changed')[0].field).toBe('status');
+    expect(leaves(r).filter((l) => l.kind === 'field').map((l) => l.rule)).toEqual([
+      { field: 'status', op: 'eq', value: 'close_lost' }, { field: 'contract_signed', op: 'eq', value: true }]);
   });
 });

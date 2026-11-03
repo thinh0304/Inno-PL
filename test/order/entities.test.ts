@@ -125,7 +125,7 @@ describe('order and order_line', () => {
     const am = entity('order').fields.find((f) => f.key === 'am') as Field & { default?: unknown };
     expect(am.required).toBe(true);
     expect(am.default).toBeUndefined();
-    expect((entity('order').rules ?? []).map((rule) => rule.key)).toEqual(['am_is_fixed']);
+    expect((entity('order').rules ?? []).map((rule) => rule.key)).toContain('am_is_fixed');
   });
 
   it('both have a create form', () => {

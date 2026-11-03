@@ -681,9 +681,13 @@ var PL = (() => {
 
   // src/order/code-entry.ts
   function runComputeOrderPl(args) {
-    if ((args.existing ?? []).map(fieldsOf).some((pl) => pl.locked === true)) {
-      return { skip: true, order_pl: {}, order_pl_service: {}, order_pl_goods: {}, order: { code: "", has_goods: false, has_service: false } };
-    }
+    const existing = (args.existing ?? []).map(fieldsOf);
+    const skipped = { skip: true, order_pl: {}, order_pl_service: {}, order_pl_goods: {}, order: { code: "", has_goods: false, has_service: false } };
+    if (existing.some((pl) => pl.locked === true)) return skipped;
+    const order = fieldsOf(args.records.order);
+    const approvedAt = Date.parse(String(order.approved_at ?? ""));
+    const computedAt = Math.max(...existing.map((pl) => Date.parse(String(pl.computed_at ?? ""))));
+    if ((order.approved === true || order.approved === "true") && computedAt >= approvedAt) return skipped;
     const config = args.config ? configFromRecords(args.config) : DEFAULT_CONFIG;
     const draft = draftFromRecords(args.records, config);
     const result = computePl(toPlOrderInput(draft), config);
