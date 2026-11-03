@@ -1,0 +1,8 @@
+{
+  "label": "Đang dùng",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": true
+  }
+}

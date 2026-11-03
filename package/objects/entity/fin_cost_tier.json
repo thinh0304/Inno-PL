@@ -1,0 +1,169 @@
+{
+  "name": "Bậc chi phí tài chính",
+  "description": "Tỷ lệ r của chi phí tài chính theo hạng khách hàng và tỷ lệ CPBH / giá vốn (Đặc tả 4.3, FR-10.4).",
+  "icon": "settings",
+  "accent": "slate",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:fin_cost_tier/key",
+    "@obj:entity_field:fin_cost_tier/tier",
+    "@obj:entity_field:fin_cost_tier/from_ratio",
+    "@obj:entity_field:fin_cost_tier/rate"
+  ],
+  "natural_key": [
+    {
+      "id": "by_key",
+      "name": "Khóa",
+      "fields": [
+        "key"
+      ]
+    }
+  ],
+  "display_field": "key",
+  "seed": [
+    {
+      "key": "vip_0",
+      "tier": "vip",
+      "from_ratio": 0,
+      "rate": 0.15
+    },
+    {
+      "key": "vip_10",
+      "tier": "vip",
+      "from_ratio": 0.1,
+      "rate": 0.2
+    },
+    {
+      "key": "vip_20",
+      "tier": "vip",
+      "from_ratio": 0.2,
+      "rate": 0.25
+    },
+    {
+      "key": "vip_30",
+      "tier": "vip",
+      "from_ratio": 0.3,
+      "rate": 0.3
+    },
+    {
+      "key": "vip_40",
+      "tier": "vip",
+      "from_ratio": 0.4,
+      "rate": 0.35
+    },
+    {
+      "key": "vip_50",
+      "tier": "vip",
+      "from_ratio": 0.5,
+      "rate": 0.4
+    },
+    {
+      "key": "vip_60",
+      "tier": "vip",
+      "from_ratio": 0.6,
+      "rate": 0.45
+    },
+    {
+      "key": "vip_70",
+      "tier": "vip",
+      "from_ratio": 0.7,
+      "rate": 0.5
+    },
+    {
+      "key": "potential_0",
+      "tier": "potential",
+      "from_ratio": 0,
+      "rate": 0.2
+    },
+    {
+      "key": "potential_10",
+      "tier": "potential",
+      "from_ratio": 0.1,
+      "rate": 0.25
+    },
+    {
+      "key": "potential_20",
+      "tier": "potential",
+      "from_ratio": 0.2,
+      "rate": 0.3
+    },
+    {
+      "key": "potential_30",
+      "tier": "potential",
+      "from_ratio": 0.3,
+      "rate": 0.35
+    },
+    {
+      "key": "potential_40",
+      "tier": "potential",
+      "from_ratio": 0.4,
+      "rate": 0.4
+    },
+    {
+      "key": "potential_50",
+      "tier": "potential",
+      "from_ratio": 0.5,
+      "rate": 0.45
+    },
+    {
+      "key": "potential_60",
+      "tier": "potential",
+      "from_ratio": 0.6,
+      "rate": 0.5
+    },
+    {
+      "key": "potential_70",
+      "tier": "potential",
+      "from_ratio": 0.7,
+      "rate": 0.55
+    },
+    {
+      "key": "standard_0",
+      "tier": "standard",
+      "from_ratio": 0,
+      "rate": 0.25
+    },
+    {
+      "key": "standard_10",
+      "tier": "standard",
+      "from_ratio": 0.1,
+      "rate": 0.3
+    },
+    {
+      "key": "standard_20",
+      "tier": "standard",
+      "from_ratio": 0.2,
+      "rate": 0.35
+    },
+    {
+      "key": "standard_30",
+      "tier": "standard",
+      "from_ratio": 0.3,
+      "rate": 0.4
+    },
+    {
+      "key": "standard_40",
+      "tier": "standard",
+      "from_ratio": 0.4,
+      "rate": 0.45
+    },
+    {
+      "key": "standard_50",
+      "tier": "standard",
+      "from_ratio": 0.5,
+      "rate": 0.5
+    },
+    {
+      "key": "standard_60",
+      "tier": "standard",
+      "from_ratio": 0.6,
+      "rate": 0.55
+    },
+    {
+      "key": "standard_70",
+      "tier": "standard",
+      "from_ratio": 0.7,
+      "rate": 0.6
+    }
+  ]
+}

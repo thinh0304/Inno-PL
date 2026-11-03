@@ -1,0 +1,42 @@
+{
+  "key": "task_sla",
+  "name": "SLA task",
+  "description": "Số ngày làm việc cho từng task của quy trình; 0 = không theo dõi (FR-10.6).",
+  "icon": "settings",
+  "accent": "slate",
+  "fields": [
+    {"key":"task_code","label":"Mã task","type":"text","required":true},
+    {"key":"name","label":"Tên task","type":"text"},
+    {"key":"role","label":"Vai trò","type":"enum","facetable":true,"enum_values":[{"value":"am","label":"AM"},{"value":"sa","label":"Sales Admin"},{"value":"tm","label":"Technical Manager"},{"value":"sd","label":"Sales Director"},{"value":"proc","label":"Mua hàng"},{"value":"acc","label":"Kế toán bán hàng"}],"required":true},
+    {"key":"sla_days","label":"Số ngày (làm việc)","type":"number"},
+    {"key":"sort_order","label":"Thứ tự","type":"number"}
+  ],
+  "natural_key": [{"id":"by_task","name":"Mã task","fields":["task_code"]}],
+  "display_field": "name",
+  "views": [
+    {"key":"all","name":"SLA task","columns":["task_code","name","role","sla_days"]}
+  ],
+  "seed": [
+    {"task_code":"t11","name":"Lập đơn hàng & gửi duyệt","role":"am","sla_days":1,"sort_order":1},
+    {"task_code":"t22","name":"Duyệt giải pháp & chi phí kỹ thuật","role":"tm","sla_days":1,"sort_order":2},
+    {"task_code":"t23","name":"Đề xuất giá mua & NCC","role":"proc","sla_days":1,"sort_order":3},
+    {"task_code":"t31","name":"Phê duyệt đơn & phương án mua hàng","role":"sd","sla_days":1,"sort_order":4},
+    {"task_code":"t40","name":"Dự thảo HĐ khách hàng","role":"sa","sla_days":2,"sort_order":5},
+    {"task_code":"t44","name":"Dự thảo HĐ nhà cung cấp","role":"proc","sla_days":1,"sort_order":6},
+    {"task_code":"t42","name":"Duyệt dự thảo hợp đồng","role":"sd","sla_days":1,"sort_order":7},
+    {"task_code":"t41","name":"Ký HĐ khách hàng · bản chính thức","role":"sa","sla_days":3,"sort_order":8},
+    {"task_code":"t45","name":"Ký HĐ nhà cung cấp · bản chính thức (SD ký = duyệt tạm ứng)","role":"proc","sla_days":2,"sort_order":9},
+    {"task_code":"t51","name":"Xác nhận KH tạm ứng","role":"acc","sla_days":3,"sort_order":10},
+    {"task_code":"t53","name":"Thanh toán tạm ứng NCC","role":"acc","sla_days":2,"sort_order":11},
+    {"task_code":"t61","name":"Nhận hàng & giao cho KH","role":"proc","sla_days":7,"sort_order":12},
+    {"task_code":"t62","name":"Triển khai & nghiệm thu","role":"tm","sla_days":7,"sort_order":13},
+    {"task_code":"t71","name":"Kiểm tra biên bản, xuất hóa đơn & gửi hồ sơ thanh toán","role":"acc","sla_days":2,"sort_order":14},
+    {"task_code":"t72","name":"Lưu trữ hồ sơ & cập nhật chi phí phát sinh","role":"acc","sla_days":1,"sort_order":15}
+  ],
+  "access": { "mode": "restricted", "grants": [
+    {"principal":{"kind":"group","id":"${param:app_users}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"},{"operation":"delete","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:automation_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"update","scope":"organization"}]}
+  ] },
+  "conversation": null
+}

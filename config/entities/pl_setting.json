@@ -1,0 +1,38 @@
+{
+  "key": "pl_setting",
+  "name": "Tham số P&L",
+  "description": "Tham số chung của bộ tính P&L, một bản ghi (FR-10.3).",
+  "icon": "settings",
+  "accent": "slate",
+  "fields": [
+    {"key":"key","label":"Khóa","type":"text","required":true},
+    {"key":"exchange_rate","label":"Tỷ giá cơ sở (VNĐ/USD)","type":"number"},
+    {"key":"annual_interest","label":"Lãi suất năm","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"foreign_contractor_tax","label":"Hệ số thuế nhà thầu nước ngoài","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"license_support_rate","label":"Tỷ lệ hỗ trợ license","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"tech_support_internal_rate","label":"Tỷ lệ hỗ trợ KT định kỳ nội bộ","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"tech_support_outsource_rate","label":"Tỷ lệ hỗ trợ KT thuê ngoài","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"warranty_rate","label":"Tỷ lệ bảo hành thiết bị (mỗi 12 tháng)","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"auto_approve_limit","label":"Ngưỡng tự duyệt (giá trị đơn)","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"contract_file_limit","label":"Ngưỡng bắt buộc file hợp đồng","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"debt_base_days","label":"Số ngày công nợ cơ sở","type":"number"},
+    {"key":"debt_step_days","label":"Bước ngày công nợ","type":"number"},
+    {"key":"debt_step_rate","label":"Ngưỡng cộng thêm mỗi bước công nợ","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"proposal_bonus","label":"Cộng thưởng tư vấn khi có Proposal","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"poc_bonus","label":"Cộng thưởng tư vấn khi có POC","type":"number","format":"percent","format_options":{"decimal_places":2}}
+  ],
+  "natural_key": [{"id":"by_key","name":"Khóa","fields":["key"]}],
+  "display_field": "key",
+  "views": [
+    {"key":"all","name":"Tham số P&L","columns":["key","exchange_rate","auto_approve_limit","contract_file_limit"]}
+  ],
+  "seed": [
+    {"key":"default","exchange_rate":26000,"annual_interest":0.146,"foreign_contractor_tax":0.12,"license_support_rate":0.005,"tech_support_internal_rate":0.05,"tech_support_outsource_rate":0.02,"warranty_rate":0.002,"auto_approve_limit":300000000,"contract_file_limit":20000000,"debt_base_days":30,"debt_step_days":15,"debt_step_rate":0.005,"proposal_bonus":0.02,"poc_bonus":0.02}
+  ],
+  "access": { "mode": "restricted", "grants": [
+    {"principal":{"kind":"group","id":"${param:app_users}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"},{"operation":"delete","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:automation_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"update","scope":"organization"}]}
+  ] },
+  "conversation": null
+}

@@ -1,0 +1,8 @@
+{
+  "label": "Đang làm",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": true
+  }
+}

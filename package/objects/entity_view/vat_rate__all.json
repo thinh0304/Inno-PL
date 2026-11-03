@@ -1,0 +1,13 @@
+{
+  "name": "Mức VAT",
+  "type": "grid",
+  "columns": [
+    "label",
+    "rate",
+    "is_default"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Kế hoạch kinh doanh năm",
+  "description": "Doanh thu và LN thuần kế hoạch theo năm (FR-10.7).",
+  "icon": "settings",
+  "accent": "slate",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:business_plan/year",
+    "@obj:entity_field:business_plan/revenue",
+    "@obj:entity_field:business_plan/net_profit"
+  ],
+  "natural_key": [
+    {
+      "id": "by_year",
+      "name": "Năm",
+      "fields": [
+        "year"
+      ]
+    }
+  ],
+  "display_field": "year",
+  "seed": [
+    {
+      "year": 2026,
+      "revenue": 25000000000,
+      "net_profit": 5200000000
+    }
+  ]
+}

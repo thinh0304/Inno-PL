@@ -1,0 +1,25 @@
+{
+  "key": "staff",
+  "name": "Nhân sự",
+  "description": "Danh sách AM, SA, nhân sự triển khai / tư vấn, Mua hàng, Kế toán và nguồn khách hàng (BR-52). Nguồn KH không gắn người (Team Marketing, Other) là bản ghi không có người dùng.",
+  "icon": "users",
+  "accent": "indigo",
+  "fields": [
+    {"key":"code","label":"Mã nhân viên","type":"text","required":true,"searchable":true},
+    {"key":"name","label":"Họ tên","type":"text","searchable":true},
+    {"key":"user","label":"Người dùng","type":"reference","target_entity_id":"ffffffff-0000-0000-0000-000000000001"},
+    {"key":"team","label":"Nhóm","type":"enum","facetable":true,"enum_values":[{"value":"sales","label":"Sales Team"},{"value":"sa","label":"SA Team"},{"value":"technical","label":"Technical Team"},{"value":"procurement","label":"Procurement Team"},{"value":"accounting","label":"Kế toán"},{"value":"director","label":"Ban giám đốc"},{"value":"lead_source","label":"Nguồn khách hàng"},{"value":"other","label":"Khác"}]},
+    {"key":"active","label":"Đang làm","type":"boolean","default":{"kind":"literal","value":true}}
+  ],
+  "natural_key": [{"id":"by_code","name":"Mã nhân viên","fields":["code"]}],
+  "display_field": "name",
+  "views": [
+    {"key":"all","name":"Nhân sự","columns":["code","name","team","user","active"]}
+  ],
+  "access": { "mode": "restricted", "grants": [
+    {"principal":{"kind":"group","id":"${param:app_users}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"},{"operation":"delete","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:automation_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"update","scope":"organization"}]}
+  ] },
+  "conversation": null
+}

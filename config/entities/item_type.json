@@ -1,0 +1,51 @@
+{
+  "key": "item_type",
+  "name": "Loại hàng hóa / dịch vụ",
+  "description": "Mã loại của dòng danh mục và quy tắc tính P&L của nó (Đặc tả 4.1, BR-01–BR-07).",
+  "icon": "settings",
+  "accent": "slate",
+  "fields": [
+    {"key":"code","label":"Mã loại","type":"text","required":true,"searchable":true},
+    {"key":"name","label":"Tên loại","type":"text","searchable":true},
+    {"key":"contract_type","label":"Loại hợp đồng","type":"enum","facetable":true,"enum_values":[{"value":"tm_once","label":"Thương mại 1 lần"},{"value":"tmdk","label":"Thương mại định kỳ"},{"value":"dv_once","label":"Dịch vụ 1 lần"},{"value":"dv_recurring","label":"Dịch vụ định kỳ"}],"required":true},
+    {"key":"purchase_group","label":"Nhóm mua","type":"enum","facetable":true,"enum_values":[{"value":"goods","label":"Hàng hóa"},{"value":"service","label":"Dịch vụ"}],"required":true},
+    {"key":"revenue_structure","label":"Cơ cấu doanh thu","type":"enum","facetable":true,"enum_values":[{"value":"one_time","label":"Một lần"},{"value":"recurring","label":"Định kỳ"}],"required":true},
+    {"key":"monthly","label":"Tính theo tháng","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"termed","label":"Có kỳ hạn","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"foreign","label":"Nhà thầu nước ngoài","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"vat_exempt_sale","label":"Miễn VAT đầu ra","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"vat_exempt_purchase","label":"Miễn VAT đầu vào","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"warranty_base","label":"Tính bảo hành","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"license_support_base","label":"Tính hỗ trợ license","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"deploy_bonus_base","label":"Tính thưởng triển khai","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"active","label":"Đang dùng","type":"boolean","default":{"kind":"literal","value":true}},
+    {"key":"tech_support","label":"Hỗ trợ kỹ thuật","type":"enum","facetable":true,"enum_values":[{"value":"none","label":"Không"},{"value":"internal","label":"Nội bộ"},{"value":"outsource","label":"Thuê ngoài"}],"default":{"kind":"literal","value":"none"}},
+    {"key":"sort_order","label":"Thứ tự","type":"number"}
+  ],
+  "natural_key": [{"id":"by_code","name":"Mã loại","fields":["code"]}],
+  "display_field": "code",
+  "views": [
+    {"key":"all","name":"Loại hàng hóa / dịch vụ","columns":["code","name","contract_type","purchase_group","revenue_structure","active"]}
+  ],
+  "seed": [
+    {"code":"TB","name":"Thiết bị","contract_type":"tm_once","purchase_group":"goods","revenue_structure":"one_time","monthly":false,"termed":false,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":false,"warranty_base":true,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"none","sort_order":1},
+    {"code":"LIC","name":"License vĩnh viễn","contract_type":"tm_once","purchase_group":"goods","revenue_structure":"one_time","monthly":false,"termed":false,"foreign":false,"vat_exempt_sale":true,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":true,"deploy_bonus_base":false,"tech_support":"none","sort_order":2},
+    {"code":"LIC-DK","name":"License có kỳ hạn","contract_type":"tmdk","purchase_group":"goods","revenue_structure":"recurring","monthly":false,"termed":true,"foreign":false,"vat_exempt_sale":true,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":true,"deploy_bonus_base":false,"tech_support":"none","sort_order":3},
+    {"code":"LIC-NTNN","name":"License nhà thầu nước ngoài","contract_type":"tmdk","purchase_group":"service","revenue_structure":"recurring","monthly":false,"termed":true,"foreign":true,"vat_exempt_sale":true,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":true,"deploy_bonus_base":false,"tech_support":"none","sort_order":4},
+    {"code":"DVTK-I","name":"Dịch vụ triển khai nội bộ","contract_type":"dv_once","purchase_group":"service","revenue_structure":"one_time","monthly":false,"termed":false,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":true,"tech_support":"none","sort_order":5},
+    {"code":"DVTK-O","name":"Dịch vụ triển khai thuê ngoài","contract_type":"dv_once","purchase_group":"service","revenue_structure":"one_time","monthly":false,"termed":false,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":false,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"outsource","sort_order":6},
+    {"code":"Cloud Server","name":"Cloud Server","contract_type":"dv_recurring","purchase_group":"service","revenue_structure":"recurring","monthly":true,"termed":true,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"internal","sort_order":7},
+    {"code":"Colocation","name":"Colocation","contract_type":"dv_recurring","purchase_group":"service","revenue_structure":"recurring","monthly":true,"termed":true,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"internal","sort_order":8},
+    {"code":"Veeam","name":"Veeam (Backup/DR)","contract_type":"dv_recurring","purchase_group":"service","revenue_structure":"recurring","monthly":true,"termed":true,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"internal","sort_order":9},
+    {"code":"Manage Service","name":"Manage Service","contract_type":"dv_recurring","purchase_group":"service","revenue_structure":"recurring","monthly":true,"termed":true,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"internal","sort_order":10},
+    {"code":"Other Services","name":"Dịch vụ khác","contract_type":"dv_recurring","purchase_group":"service","revenue_structure":"recurring","monthly":true,"termed":true,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":true,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"internal","sort_order":11},
+    {"code":"DVDK-O","name":"Dịch vụ định kỳ thuê ngoài","contract_type":"dv_recurring","purchase_group":"service","revenue_structure":"recurring","monthly":true,"termed":true,"foreign":false,"vat_exempt_sale":false,"vat_exempt_purchase":false,"warranty_base":false,"license_support_base":false,"deploy_bonus_base":false,"tech_support":"none","sort_order":12},
+    {"code":"DVDK-NTNN","name":"Dịch vụ định kỳ nhà thầu nước ngoài","contract_type":"dv_recurring","purchase_group":"service","revenue_structure":"recurring","monthly":true,"termed":true,"foreign":true,"vat_exempt_sale":false,"vat_exempt_purchase":false,"warranty_base":false,"license_support_base":true,"deploy_bonus_base":false,"tech_support":"none","sort_order":13}
+  ],
+  "access": { "mode": "restricted", "grants": [
+    {"principal":{"kind":"group","id":"${param:app_users}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"},{"operation":"delete","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:automation_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"update","scope":"organization"}]}
+  ] },
+  "conversation": null
+}

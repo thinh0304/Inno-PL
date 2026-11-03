@@ -1,0 +1,16 @@
+{
+  "name": "Chỉ tiêu KPI",
+  "type": "grid",
+  "columns": [
+    "year",
+    "staff",
+    "revenue",
+    "net_profit",
+    "order_count",
+    "kpi_amount"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "SLA task",
+  "type": "grid",
+  "columns": [
+    "task_code",
+    "name",
+    "role",
+    "sla_days"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

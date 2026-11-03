@@ -1,0 +1,8 @@
+{
+  "label": "Thưởng tư vấn (cơ sở)",
+  "type": "number",
+  "format": "percent",
+  "format_options": {
+    "decimal_places": 2
+  }
+}

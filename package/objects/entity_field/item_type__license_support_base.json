@@ -1,0 +1,8 @@
+{
+  "label": "Tính hỗ trợ license",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

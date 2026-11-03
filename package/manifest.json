@@ -166,6 +166,26 @@
   "features": {},
   "objects": [
     {
+      "key": "entity:business_plan",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:business_plan/year",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:business_plan/revenue",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:business_plan/net_profit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:business_plan/all",
+      "kind": "entity_view"
+    },
+    {
       "key": "entity:case",
       "kind": "entity"
     },
@@ -206,11 +226,394 @@
       "kind": "form"
     },
     {
+      "key": "entity:contract_type_rate",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:contract_type_rate/code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract_type_rate/name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract_type_rate/threshold",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract_type_rate/tech_support_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract_type_rate/deploy_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract_type_rate/consult_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract_type_rate/sales_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract_type_rate/provision",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:contract_type_rate/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:deal_stage_weight",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:deal_stage_weight/key",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:deal_stage_weight/weight_set",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:deal_stage_weight/stage",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:deal_stage_weight/weight",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:deal_stage_weight/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:fin_cost_tier",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:fin_cost_tier/key",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:fin_cost_tier/tier",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:fin_cost_tier/from_ratio",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:fin_cost_tier/rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:fin_cost_tier/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:item_type",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:item_type/code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/contract_type",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/purchase_group",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/revenue_structure",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/monthly",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/termed",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/foreign",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/vat_exempt_sale",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/vat_exempt_purchase",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/warranty_base",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/license_support_base",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/deploy_bonus_base",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/active",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/tech_support",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:item_type/sort_order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:item_type/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:kpi_target",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:kpi_target/key",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:kpi_target/year",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:kpi_target/staff",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:kpi_target/revenue",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:kpi_target/net_profit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:kpi_target/order_count",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:kpi_target/kpi_amount",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:kpi_target/new_logo_min",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:kpi_target/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:pl_setting",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:pl_setting/key",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/exchange_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/annual_interest",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/foreign_contractor_tax",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/license_support_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/tech_support_internal_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/tech_support_outsource_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/warranty_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/auto_approve_limit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/contract_file_limit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/debt_base_days",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/debt_step_days",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/debt_step_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/proposal_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:pl_setting/poc_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:pl_setting/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:staff",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:staff/code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:staff/name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:staff/user",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:staff/team",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:staff/active",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:staff/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:task_sla",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:task_sla/task_code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task_sla/name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task_sla/role",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task_sla/sla_days",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task_sla/sort_order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:task_sla/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:vat_rate",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:vat_rate/code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:vat_rate/label",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:vat_rate/rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:vat_rate/is_default",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:vat_rate/sort_order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:vat_rate/all",
+      "kind": "entity_view"
+    },
+    {
       "key": "workflow:open_case",
       "kind": "workflow"
     }
   ],
   "grants": [
+    {
+      "key": "business_plan_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:business_plan",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "business_plan_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:business_plan",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "business_plan_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:business_plan",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
     {
       "key": "case_app_users",
       "to": "@param:app_users",
@@ -227,6 +630,285 @@
             "field": "opened_by"
           }
         ]
+      }
+    },
+    {
+      "key": "contract_type_rate_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:contract_type_rate",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "contract_type_rate_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:contract_type_rate",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "contract_type_rate_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:contract_type_rate",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "deal_stage_weight_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:deal_stage_weight",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "deal_stage_weight_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:deal_stage_weight",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "deal_stage_weight_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:deal_stage_weight",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "fin_cost_tier_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:fin_cost_tier",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "fin_cost_tier_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:fin_cost_tier",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "fin_cost_tier_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:fin_cost_tier",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "item_type_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:item_type",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "item_type_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:item_type",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "item_type_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:item_type",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "kpi_target_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:kpi_target",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "kpi_target_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:kpi_target",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "kpi_target_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:kpi_target",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "pl_setting_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:pl_setting",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "pl_setting_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:pl_setting",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "pl_setting_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:pl_setting",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "staff_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:staff",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "staff_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:staff",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "staff_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:staff",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "task_sla_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:task_sla",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "task_sla_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:task_sla",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "task_sla_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:task_sla",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "vat_rate_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:vat_rate",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "vat_rate_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:vat_rate",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "vat_rate_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:vat_rate",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
       }
     },
     {

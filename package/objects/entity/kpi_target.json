@@ -1,0 +1,27 @@
+{
+  "name": "Chỉ tiêu KPI",
+  "description": "Chỉ tiêu theo năm và nhân viên (FR-10.8).",
+  "icon": "settings",
+  "accent": "slate",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:kpi_target/key",
+    "@obj:entity_field:kpi_target/year",
+    "@obj:entity_field:kpi_target/staff",
+    "@obj:entity_field:kpi_target/revenue",
+    "@obj:entity_field:kpi_target/net_profit",
+    "@obj:entity_field:kpi_target/order_count",
+    "@obj:entity_field:kpi_target/kpi_amount",
+    "@obj:entity_field:kpi_target/new_logo_min"
+  ],
+  "natural_key": [
+    {
+      "id": "by_key",
+      "name": "Khóa",
+      "fields": [
+        "key"
+      ]
+    }
+  ],
+  "display_field": "key"
+}

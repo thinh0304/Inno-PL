@@ -1,0 +1,193 @@
+{
+  "name": "Hệ số giai đoạn deal",
+  "description": "Hệ số chia chỉ tiêu KD theo bộ và giai đoạn deal (Thiết kế 13.3, sheet Define B79:F86).",
+  "icon": "settings",
+  "accent": "slate",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:deal_stage_weight/key",
+    "@obj:entity_field:deal_stage_weight/weight_set",
+    "@obj:entity_field:deal_stage_weight/stage",
+    "@obj:entity_field:deal_stage_weight/weight"
+  ],
+  "natural_key": [
+    {
+      "id": "by_key",
+      "name": "Khóa",
+      "fields": [
+        "key"
+      ]
+    }
+  ],
+  "display_field": "key",
+  "seed": [
+    {
+      "key": "new_tm:lead",
+      "weight_set": "new_tm",
+      "stage": "lead",
+      "weight": 0.3
+    },
+    {
+      "key": "new_tm:opportunity",
+      "weight_set": "new_tm",
+      "stage": "opportunity",
+      "weight": 0.2
+    },
+    {
+      "key": "new_tm:clarification",
+      "weight_set": "new_tm",
+      "stage": "clarification",
+      "weight": 0.3
+    },
+    {
+      "key": "new_tm:quotation",
+      "weight_set": "new_tm",
+      "stage": "quotation",
+      "weight": 0.1
+    },
+    {
+      "key": "new_tm:negotiation",
+      "weight_set": "new_tm",
+      "stage": "negotiation",
+      "weight": 0.1
+    },
+    {
+      "key": "new_tm:close",
+      "weight_set": "new_tm",
+      "stage": "close",
+      "weight": 0.2
+    },
+    {
+      "key": "new_tm:contract",
+      "weight_set": "new_tm",
+      "stage": "contract",
+      "weight": 0.1
+    },
+    {
+      "key": "new_dvdk:lead",
+      "weight_set": "new_dvdk",
+      "stage": "lead",
+      "weight": 0.3
+    },
+    {
+      "key": "new_dvdk:opportunity",
+      "weight_set": "new_dvdk",
+      "stage": "opportunity",
+      "weight": 0.2
+    },
+    {
+      "key": "new_dvdk:clarification",
+      "weight_set": "new_dvdk",
+      "stage": "clarification",
+      "weight": 0.3
+    },
+    {
+      "key": "new_dvdk:quotation",
+      "weight_set": "new_dvdk",
+      "stage": "quotation",
+      "weight": 0.05
+    },
+    {
+      "key": "new_dvdk:negotiation",
+      "weight_set": "new_dvdk",
+      "stage": "negotiation",
+      "weight": 0.1
+    },
+    {
+      "key": "new_dvdk:close",
+      "weight_set": "new_dvdk",
+      "stage": "close",
+      "weight": 0.2
+    },
+    {
+      "key": "new_dvdk:contract",
+      "weight_set": "new_dvdk",
+      "stage": "contract",
+      "weight": 0.15
+    },
+    {
+      "key": "tmdk:lead",
+      "weight_set": "tmdk",
+      "stage": "lead",
+      "weight": 0
+    },
+    {
+      "key": "tmdk:opportunity",
+      "weight_set": "tmdk",
+      "stage": "opportunity",
+      "weight": 0
+    },
+    {
+      "key": "tmdk:clarification",
+      "weight_set": "tmdk",
+      "stage": "clarification",
+      "weight": 0
+    },
+    {
+      "key": "tmdk:quotation",
+      "weight_set": "tmdk",
+      "stage": "quotation",
+      "weight": 0.1
+    },
+    {
+      "key": "tmdk:negotiation",
+      "weight_set": "tmdk",
+      "stage": "negotiation",
+      "weight": 0.1
+    },
+    {
+      "key": "tmdk:close",
+      "weight_set": "tmdk",
+      "stage": "close",
+      "weight": 0.2
+    },
+    {
+      "key": "tmdk:contract",
+      "weight_set": "tmdk",
+      "stage": "contract",
+      "weight": 0.1
+    },
+    {
+      "key": "dvdk:lead",
+      "weight_set": "dvdk",
+      "stage": "lead",
+      "weight": 0
+    },
+    {
+      "key": "dvdk:opportunity",
+      "weight_set": "dvdk",
+      "stage": "opportunity",
+      "weight": 0
+    },
+    {
+      "key": "dvdk:clarification",
+      "weight_set": "dvdk",
+      "stage": "clarification",
+      "weight": 0
+    },
+    {
+      "key": "dvdk:quotation",
+      "weight_set": "dvdk",
+      "stage": "quotation",
+      "weight": 0.05
+    },
+    {
+      "key": "dvdk:negotiation",
+      "weight_set": "dvdk",
+      "stage": "negotiation",
+      "weight": 0.1
+    },
+    {
+      "key": "dvdk:close",
+      "weight_set": "dvdk",
+      "stage": "close",
+      "weight": 0.2
+    },
+    {
+      "key": "dvdk:contract",
+      "weight_set": "dvdk",
+      "stage": "contract",
+      "weight": 0.15
+    }
+  ]
+}

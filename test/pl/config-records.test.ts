@@ -1,0 +1,48 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it } from 'vitest';
+import { configFromRecords, type ConfigRecords } from '../../src/pl/config-records';
+import { DEFAULT_CONFIG } from '../../src/pl/defaults';
+
+const ENTITIES = ['item_type', 'contract_type_rate', 'fin_cost_tier', 'vat_rate', 'pl_setting', 'task_sla',
+  'deal_stage_weight'] as const;
+
+function seeds(): ConfigRecords {
+  return Object.fromEntries(ENTITIES.map((key) => {
+    const entity = JSON.parse(readFileSync(new URL(`../../config/entities/${key}.json`, import.meta.url), 'utf8'));
+    return [key, entity.seed];
+  })) as unknown as ConfigRecords;
+}
+
+// Records come back from AgentFlow in no particular order.
+const shuffled = (records: ConfigRecords): ConfigRecords =>
+  Object.fromEntries(Object.entries(records).map(([key, rows]) => [key, [...rows].reverse()])) as unknown as ConfigRecords;
+
+describe('configFromRecords', () => {
+  it('seeds_match_defaults', () => {
+    expect(configFromRecords(seeds())).toEqual(DEFAULT_CONFIG);
+  });
+
+  it('record order does not matter', () => {
+    expect(configFromRecords(shuffled(seeds()))).toEqual(DEFAULT_CONFIG);
+  });
+
+  it('inactive_item_types_are_dropped', () => {
+    const records = seeds();
+    records.item_type = records.item_type.map((row) => row.code === 'Veeam' ? { ...row, active: false } : row);
+    const codes = configFromRecords(records).itemTypes.map((type) => type.code);
+    expect(codes).toHaveLength(12);
+    expect(codes).not.toContain('Veeam');
+  });
+
+  it('missing_setting_falls_back_to_defaults', () => {
+    const records = seeds();
+    records.pl_setting = [];
+    expect(configFromRecords(records).settings).toEqual(DEFAULT_CONFIG.settings);
+  });
+
+  it('a changed setting is read', () => {
+    const records = seeds();
+    records.pl_setting = [{ ...records.pl_setting[0], warranty_rate: 0.003 }];
+    expect(configFromRecords(records).settings.warrantyRate).toBe(0.003);
+  });
+});

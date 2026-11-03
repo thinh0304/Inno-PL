@@ -1,0 +1,5 @@
+{
+  "label": "Mã loại hợp đồng",
+  "type": "text",
+  "required": true
+}

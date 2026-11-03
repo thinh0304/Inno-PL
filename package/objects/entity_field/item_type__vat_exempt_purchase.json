@@ -1,0 +1,8 @@
+{
+  "label": "Miễn VAT đầu vào",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

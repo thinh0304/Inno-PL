@@ -1,0 +1,5 @@
+{
+  "label": "Năm",
+  "type": "number",
+  "required": true
+}

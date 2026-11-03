@@ -1,0 +1,15 @@
+{
+  "name": "Nhân sự",
+  "type": "grid",
+  "columns": [
+    "code",
+    "name",
+    "team",
+    "user",
+    "active"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

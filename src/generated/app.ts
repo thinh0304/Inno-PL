@@ -6,7 +6,20 @@ export const PACKAGE = { id: 'inno/pl', version: '0.1.0' } as const;
 
 /** Every object of the package, with the version of the contract this code was written against. */
 export const OBJECTS = {
+  'entity:business_plan': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:case': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:contract_type_rate': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:deal_stage_weight': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:fin_cost_tier': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:item_type': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:kpi_target': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:pl_setting': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:staff': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:task_sla': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:vat_rate': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity_field:business_plan/net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:business_plan/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:business_plan/year': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:case/amount': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:case/opened_by': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:case/opened_on': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -14,17 +27,102 @@ export const OBJECTS = {
   'entity_field:case/summary': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:case/title': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:case/urgent': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/consult_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/deploy_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/provision': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/sales_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/tech_support_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract_type_rate/threshold': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:deal_stage_weight/key': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:deal_stage_weight/stage': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:deal_stage_weight/weight': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:deal_stage_weight/weight_set': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:fin_cost_tier/from_ratio': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:fin_cost_tier/key': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:fin_cost_tier/rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:fin_cost_tier/tier': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/active': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/contract_type': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/deploy_bonus_base': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/foreign': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/license_support_base': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/monthly': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/purchase_group': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/revenue_structure': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/sort_order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/tech_support': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/termed': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/vat_exempt_purchase': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/vat_exempt_sale': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:item_type/warranty_base': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/key': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/kpi_amount': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/new_logo_min': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/order_count': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/staff': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:kpi_target/year': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/annual_interest': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/auto_approve_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/contract_file_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/debt_base_days': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/debt_step_days': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/debt_step_rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/exchange_rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/foreign_contractor_tax': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/key': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/license_support_rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/poc_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/proposal_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/tech_support_internal_rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/tech_support_outsource_rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:pl_setting/warranty_rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:staff/active': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:staff/code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:staff/name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:staff/team': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:staff/user': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task_sla/name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task_sla/role': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task_sla/sla_days': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task_sla/sort_order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task_sla/task_code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:vat_rate/code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:vat_rate/is_default': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:vat_rate/label': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:vat_rate/rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:vat_rate/sort_order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_view:business_plan/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:case/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:contract_type_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:deal_stage_weight/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:fin_cost_tier/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:item_type/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:kpi_target/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:pl_setting/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:staff/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:task_sla/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:vat_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'form:case': { kind: 'form', contractVersion: '0.1.0' },
   'workflow:open_case': { kind: 'workflow', contractVersion: '0.1.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = 'case';
+export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'deal_stage_weight' | 'fin_cost_tier' | 'item_type' | 'kpi_target' | 'pl_setting' | 'staff' | 'task_sla' | 'vat_rate';
 export type WorkflowKey = 'open_case';
 
 /** The value of each field of each entity, as a record carries it. */
 export interface EntityFields {
+  business_plan: {
+    net_profit?: number | null;
+    revenue?: number | null;
+    year?: number | null;
+  };
   case: {
     amount?: number | null;
     opened_by?: string | null;
@@ -33,6 +131,94 @@ export interface EntityFields {
     summary?: string | null;
     title?: string | null;
     urgent?: boolean | null;
+  };
+  contract_type_rate: {
+    code?: string | null;
+    consult_bonus?: number | null;
+    deploy_bonus?: number | null;
+    name?: string | null;
+    provision?: number | null;
+    sales_bonus?: number | null;
+    tech_support_bonus?: number | null;
+    threshold?: number | null;
+  };
+  deal_stage_weight: {
+    key?: string | null;
+    stage?: 'lead' | 'opportunity' | 'clarification' | 'quotation' | 'negotiation' | 'close' | 'contract' | null;
+    weight?: number | null;
+    weight_set?: 'new_tm' | 'new_dvdk' | 'tmdk' | 'dvdk' | null;
+  };
+  fin_cost_tier: {
+    from_ratio?: number | null;
+    key?: string | null;
+    rate?: number | null;
+    tier?: 'vip' | 'potential' | 'standard' | null;
+  };
+  item_type: {
+    active?: boolean | null;
+    code?: string | null;
+    contract_type?: 'tm_once' | 'tmdk' | 'dv_once' | 'dv_recurring' | null;
+    deploy_bonus_base?: boolean | null;
+    foreign?: boolean | null;
+    license_support_base?: boolean | null;
+    monthly?: boolean | null;
+    name?: string | null;
+    purchase_group?: 'goods' | 'service' | null;
+    revenue_structure?: 'one_time' | 'recurring' | null;
+    sort_order?: number | null;
+    tech_support?: 'none' | 'internal' | 'outsource' | null;
+    termed?: boolean | null;
+    vat_exempt_purchase?: boolean | null;
+    vat_exempt_sale?: boolean | null;
+    warranty_base?: boolean | null;
+  };
+  kpi_target: {
+    key?: string | null;
+    kpi_amount?: number | null;
+    net_profit?: number | null;
+    new_logo_min?: number | null;
+    order_count?: number | null;
+    revenue?: number | null;
+    staff?: string | null;
+    year?: number | null;
+  };
+  pl_setting: {
+    annual_interest?: number | null;
+    auto_approve_limit?: number | null;
+    contract_file_limit?: number | null;
+    debt_base_days?: number | null;
+    debt_step_days?: number | null;
+    debt_step_rate?: number | null;
+    exchange_rate?: number | null;
+    foreign_contractor_tax?: number | null;
+    key?: string | null;
+    license_support_rate?: number | null;
+    poc_bonus?: number | null;
+    proposal_bonus?: number | null;
+    tech_support_internal_rate?: number | null;
+    tech_support_outsource_rate?: number | null;
+    warranty_rate?: number | null;
+  };
+  staff: {
+    active?: boolean | null;
+    code?: string | null;
+    name?: string | null;
+    team?: 'sales' | 'sa' | 'technical' | 'procurement' | 'accounting' | 'director' | 'lead_source' | 'other' | null;
+    user?: string | null;
+  };
+  task_sla: {
+    name?: string | null;
+    role?: 'am' | 'sa' | 'tm' | 'sd' | 'proc' | 'acc' | null;
+    sla_days?: number | null;
+    sort_order?: number | null;
+    task_code?: string | null;
+  };
+  vat_rate: {
+    code?: string | null;
+    is_default?: boolean | null;
+    label?: string | null;
+    rate?: number | null;
+    sort_order?: number | null;
   };
 }
 

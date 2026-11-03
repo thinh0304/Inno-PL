@@ -1,0 +1,8 @@
+{
+  "label": "Từ tỷ lệ CPBH / giá vốn",
+  "type": "number",
+  "format": "percent",
+  "format_options": {
+    "decimal_places": 2
+  }
+}

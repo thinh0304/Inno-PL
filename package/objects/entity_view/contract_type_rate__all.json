@@ -1,0 +1,15 @@
+{
+  "name": "Tỷ lệ theo loại hợp đồng",
+  "type": "grid",
+  "columns": [
+    "name",
+    "threshold",
+    "deploy_bonus",
+    "consult_bonus",
+    "provision"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

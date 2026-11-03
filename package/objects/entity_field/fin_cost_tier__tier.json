@@ -1,0 +1,20 @@
+{
+  "label": "Hạng khách hàng",
+  "type": "enum",
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "vip",
+      "label": "VIP"
+    },
+    {
+      "value": "potential",
+      "label": "Tiềm năng"
+    },
+    {
+      "value": "standard",
+      "label": "Phổ thông"
+    }
+  ],
+  "required": true
+}

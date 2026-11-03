@@ -1,0 +1,24 @@
+{
+  "name": "Nhân sự",
+  "description": "Danh sách AM, SA, nhân sự triển khai / tư vấn, Mua hàng, Kế toán và nguồn khách hàng (BR-52). Nguồn KH không gắn người (Team Marketing, Other) là bản ghi không có người dùng.",
+  "icon": "users",
+  "accent": "indigo",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:staff/code",
+    "@obj:entity_field:staff/name",
+    "@obj:entity_field:staff/user",
+    "@obj:entity_field:staff/team",
+    "@obj:entity_field:staff/active"
+  ],
+  "natural_key": [
+    {
+      "id": "by_code",
+      "name": "Mã nhân viên",
+      "fields": [
+        "code"
+      ]
+    }
+  ],
+  "display_field": "name"
+}

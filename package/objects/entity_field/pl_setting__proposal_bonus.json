@@ -1,0 +1,8 @@
+{
+  "label": "Cộng thưởng tư vấn khi có Proposal",
+  "type": "number",
+  "format": "percent",
+  "format_options": {
+    "decimal_places": 2
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "label": "Tỷ lệ hỗ trợ license",
+  "type": "number",
+  "format": "percent",
+  "format_options": {
+    "decimal_places": 2
+  }
+}

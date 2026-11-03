@@ -1,0 +1,8 @@
+{
+  "label": "Hệ số thuế nhà thầu nước ngoài",
+  "type": "number",
+  "format": "percent",
+  "format_options": {
+    "decimal_places": 2
+  }
+}

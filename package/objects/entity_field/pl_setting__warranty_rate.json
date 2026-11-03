@@ -1,0 +1,8 @@
+{
+  "label": "Tỷ lệ bảo hành thiết bị (mỗi 12 tháng)",
+  "type": "number",
+  "format": "percent",
+  "format_options": {
+    "decimal_places": 2
+  }
+}

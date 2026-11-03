@@ -1,0 +1,13 @@
+{
+  "name": "Kế hoạch kinh doanh năm",
+  "type": "grid",
+  "columns": [
+    "year",
+    "revenue",
+    "net_profit"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

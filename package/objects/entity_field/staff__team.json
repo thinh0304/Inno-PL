@@ -1,0 +1,39 @@
+{
+  "label": "Nhóm",
+  "type": "enum",
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "sales",
+      "label": "Sales Team"
+    },
+    {
+      "value": "sa",
+      "label": "SA Team"
+    },
+    {
+      "value": "technical",
+      "label": "Technical Team"
+    },
+    {
+      "value": "procurement",
+      "label": "Procurement Team"
+    },
+    {
+      "value": "accounting",
+      "label": "Kế toán"
+    },
+    {
+      "value": "director",
+      "label": "Ban giám đốc"
+    },
+    {
+      "value": "lead_source",
+      "label": "Nguồn khách hàng"
+    },
+    {
+      "value": "other",
+      "label": "Khác"
+    }
+  ]
+}

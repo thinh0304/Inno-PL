@@ -1,0 +1,16 @@
+{
+  "label": "Nhóm mua",
+  "type": "enum",
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "goods",
+      "label": "Hàng hóa"
+    },
+    {
+      "value": "service",
+      "label": "Dịch vụ"
+    }
+  ],
+  "required": true
+}

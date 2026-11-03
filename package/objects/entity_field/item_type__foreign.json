@@ -1,0 +1,8 @@
+{
+  "label": "Nhà thầu nước ngoài",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}
