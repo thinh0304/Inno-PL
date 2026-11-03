@@ -77,6 +77,10 @@ describe('checkFormat (Đặc tả 4.8)', () => {
     ok('money', '15.000.000', 15_000_000);
     bad('money', '-1');
     ok('signed_money', '-2.500.000', -2_500_000);
+    // "21,000" pasted from Excel is twenty-one thousand, not 21: a money field takes no decimals.
+    bad('money', '21,000');
+    bad('money', '1,5');
+    bad('signed_money', '-21,000');
   });
   it('parse_counts', () => {
     ok('quantity', '17', 17);

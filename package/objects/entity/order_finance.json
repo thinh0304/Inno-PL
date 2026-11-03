@@ -21,5 +21,30 @@
     }
   ],
   "display_field": "sales_cost",
-  "create_form": "@obj:form:order_finance"
+  "create_form": "@obj:form:order_finance",
+  "rules": [
+    {
+      "key": "order_is_fixed",
+      "message": "Không chuyển được sang đơn khác",
+      "field": "order",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed",
+              "field": "order"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

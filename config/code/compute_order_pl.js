@@ -479,10 +479,11 @@ var PL = (() => {
       has_service: bool2(r.has_service)
     };
   }
-  function linePrice(r) {
+  function linePrice(r, source) {
     if (!r) return { unit_price: null, discount_pct: null, vat_rate: null, unit_cost: null, supplier: null };
     return {
       id: optStr(r.id) ?? void 0,
+      source,
       unit_price: num3(r.unit_price),
       discount_pct: num3(r.discount_pct),
       vat_rate: num3(r.vat_rate),
@@ -508,7 +509,7 @@ var PL = (() => {
       supplier_priority: str2(r.supplier_priority),
       end_user: str2(r.end_user),
       note: str2(r.note),
-      price: linePrice(price)
+      price
     };
   }
   function financeFields(r) {
@@ -520,14 +521,22 @@ var PL = (() => {
       prev_net_profit: num3(r?.prev_net_profit)
     };
   }
-  function draftFromRecords(r) {
-    const prices = /* @__PURE__ */ new Map();
-    for (const price of [...r.goods_prices, ...r.service_prices].map(fieldsOf)) {
-      const line = refId(price.order_line);
-      if (line) prices.set(line, price);
-    }
-    const lines = r.lines.map(fieldsOf).map((line) => lineDraft(line, prices.get(str2(line.id)))).sort((a, b) => a.line_no - b.line_no);
-    return { order: orderFields(fieldsOf(r.order)), lines, finance: financeFields(r.finance.map(fieldsOf)[0]) };
+  var byLine = (prices) => new Map((prices ?? []).map(fieldsOf).map((price) => [refId(price.order_line) ?? "", price]));
+  function draftFromRecords(r, config) {
+    const goods = byLine(r.goods_prices);
+    const service = byLine(r.service_prices);
+    const priceOf = (line) => {
+      const id = str2(line.id);
+      const g = goods.get(id);
+      const s = service.get(id);
+      if (g && s) {
+        const group = config ? lineGroup(str2(line.item_type_code), config) : null;
+        return group === "service" ? linePrice(s, "service") : linePrice(g, "goods");
+      }
+      return g ? linePrice(g, "goods") : linePrice(s, s ? "service" : void 0);
+    };
+    const lines = (r.lines ?? []).map(fieldsOf).map((line) => lineDraft(line, priceOf(line))).sort((a, b) => a.line_no - b.line_no);
+    return { order: orderFields(fieldsOf(r.order)), lines, finance: financeFields((r.finance ?? []).map(fieldsOf)[0]) };
   }
   function toPlOrderInput(draft, provisionFundBalance = 0) {
     const { order } = draft;
@@ -597,6 +606,8 @@ var PL = (() => {
         byPurchaseGroup: result.byPurchaseGroup,
         contractTypes: result.contractTypes,
         unknownItemTypes: result.unknownItemTypes,
+        // A price in the other group's entity is readable by the wrong role (TM / PROC): the screens must move it.
+        misplacedPrices: draft.lines.filter((line, i) => line.price.source && groups[i] && line.price.source !== groups[i]).map((line) => line.id),
         finCostRate: result.finCostRate,
         consultBonusRate: result.consultBonusRate,
         netProfitBeforeFund: result.netProfitBeforeFund,
@@ -674,7 +685,7 @@ var PL = (() => {
       return { skip: true, order_pl: {}, order_pl_service: {}, order_pl_goods: {}, order: { code: "", has_goods: false, has_service: false } };
     }
     const config = args.config ? configFromRecords(args.config) : DEFAULT_CONFIG;
-    const draft = draftFromRecords(args.records);
+    const draft = draftFromRecords(args.records, config);
     const result = computePl(toPlOrderInput(draft), config);
     return { skip: false, ...plRecordsFromResult(draft, result, config, args.proposals ?? [], args.now) };
   }

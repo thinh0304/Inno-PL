@@ -27,6 +27,14 @@ describe('draftFromRecords + toPlOrderInput', () => {
     expect(compute(records).netProfit).toBeCloseTo(46_272_444.44, 2);
   });
 
+  it('a price in both entities: the one matching the line\'s group wins', () => {
+    const records = clone();
+    records.service_prices = [{ ...records.goods_prices[0], id: 'stale', unit_price: 999 }];
+    expect(draftFromRecords(records, DEFAULT_CONFIG).lines[0].price.unit_price).toBe(21_000_000);
+    records.lines[1].item_type_code = 'Cloud Server';
+    expect(draftFromRecords(records, DEFAULT_CONFIG).lines[0].price.unit_price).toBe(999);
+  });
+
   it('line_without_price_counts_zero', () => {
     const records = { ...clone(), goods_prices: [], finance: [] };
     const draft = draftFromRecords(records);

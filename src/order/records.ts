@@ -43,18 +43,18 @@ function orderFields(r: Rec): OrderFields {
   };
 }
 
-function linePrice(r: Rec | undefined): LinePrice {
+function linePrice(r: Rec | undefined, source?: 'goods' | 'service'): LinePrice {
   if (!r) return { unit_price: null, discount_pct: null, vat_rate: null, unit_cost: null, supplier: null };
-  return { id: optStr(r.id) ?? undefined, unit_price: num(r.unit_price), discount_pct: num(r.discount_pct),
+  return { id: optStr(r.id) ?? undefined, source, unit_price: num(r.unit_price), discount_pct: num(r.discount_pct),
     vat_rate: num(r.vat_rate), unit_cost: num(r.unit_cost), supplier: refId(r.supplier) };
 }
 
-function lineDraft(r: Rec, price: Rec | undefined): LineDraft {
+function lineDraft(r: Rec, price: LinePrice): LineDraft {
   return {
     id: str(r.id), line_no: num(r.line_no) ?? 0, item_type_code: str(r.item_type_code), co_cq: bool(r.co_cq),
     name: str(r.name), unit: str(r.unit), quantity: num(r.quantity), months: num(r.months), sku: str(r.sku),
     specs: str(r.specs), start_date: optStr(r.start_date), end_date: optStr(r.end_date), delivery_time: str(r.delivery_time),
-    supplier_priority: str(r.supplier_priority), end_user: str(r.end_user), note: str(r.note), price: linePrice(price),
+    supplier_priority: str(r.supplier_priority), end_user: str(r.end_user), note: str(r.note), price,
   };
 }
 
@@ -63,16 +63,26 @@ function financeFields(r: Rec | undefined): FinanceFields {
     prev_revenue: num(r?.prev_revenue), prev_net_profit: num(r?.prev_net_profit) };
 }
 
-export function draftFromRecords(r: OrderRecords): OrderDraft {
-  // A line's price may sit in either price entity: its item type can move between goods and service after it was priced.
-  const prices = new Map<string, Rec>();
-  for (const price of [...r.goods_prices, ...r.service_prices].map(fieldsOf)) {
-    const line = refId(price.order_line);
-    if (line) prices.set(line, price);
-  }
-  const lines = r.lines.map(fieldsOf).map((line) => lineDraft(line, prices.get(str(line.id))))
+const byLine = (prices: Rec[]) => new Map((prices ?? []).map(fieldsOf).map((price) => [refId(price.order_line) ?? '', price]));
+
+// A line's price may sit in either price entity: its item type can move between goods and service after it was priced.
+// When both hold one (mid-move), the entity matching the line's purchase group wins; without a config, goods.
+export function draftFromRecords(r: OrderRecords, config?: PlConfig): OrderDraft {
+  const goods = byLine(r.goods_prices);
+  const service = byLine(r.service_prices);
+  const priceOf = (line: Rec): LinePrice => {
+    const id = str(line.id);
+    const g = goods.get(id);
+    const s = service.get(id);
+    if (g && s) {
+      const group = config ? lineGroup(str(line.item_type_code), config) : null;
+      return group === 'service' ? linePrice(s, 'service') : linePrice(g, 'goods');
+    }
+    return g ? linePrice(g, 'goods') : linePrice(s, s ? 'service' : undefined);
+  };
+  const lines = (r.lines ?? []).map(fieldsOf).map((line) => lineDraft(line, priceOf(line)))
     .sort((a, b) => a.line_no - b.line_no);
-  return { order: orderFields(fieldsOf(r.order)), lines, finance: financeFields(r.finance.map(fieldsOf)[0]) };
+  return { order: orderFields(fieldsOf(r.order)), lines, finance: financeFields((r.finance ?? []).map(fieldsOf)[0]) };
 }
 
 // Deal-stage weights come from the configuration, not the order; the fund balance (plan 07) defaults to 0.

@@ -26,7 +26,9 @@ export function plRecordsFromResult(draft: OrderDraft, result: PlResult, config:
     applied_contract_type: result.appliedContractType,
     detail: JSON.stringify({ lines: result.lines.map(({ itemType: _itemType, ...line }) => line), byType: result.byType,
       byStructure: result.byStructure, byPurchaseGroup: result.byPurchaseGroup, contractTypes: result.contractTypes,
-      unknownItemTypes: result.unknownItemTypes, finCostRate: result.finCostRate, consultBonusRate: result.consultBonusRate,
+      unknownItemTypes: result.unknownItemTypes,
+      // A price in the other group's entity is readable by the wrong role (TM / PROC): the screens must move it.
+      misplacedPrices: draft.lines.filter((line, i) => line.price.source && groups[i] && line.price.source !== groups[i]).map((line) => line.id), finCostRate: result.finCostRate, consultBonusRate: result.consultBonusRate,
       netProfitBeforeFund: result.netProfitBeforeFund, profitAfterSales: result.profitAfterSales, weightSet: result.weightSet }),
     kpi_split: JSON.stringify(result.kpiSplit),
     config_snapshot: JSON.stringify(config),

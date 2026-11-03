@@ -23,5 +23,73 @@
     }
   ],
   "display_field": "unit_price",
-  "create_form": "@obj:form:goods_line_price"
+  "create_form": "@obj:form:goods_line_price",
+  "rules": [
+    {
+      "key": "order_is_fixed",
+      "message": "Không chuyển được sang đơn khác",
+      "field": "order",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed",
+              "field": "order"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_line_is_fixed",
+      "message": "Không chuyển được sang dòng khác",
+      "field": "order_line",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed",
+              "field": "order_line"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "line_belongs_to_order",
+      "message": "Dòng danh mục không thuộc đơn này",
+      "field": "order_line",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "field",
+            "rule": {
+              "field": "order_line.order",
+              "op": "ne",
+              "value": {
+                "$field": "order"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

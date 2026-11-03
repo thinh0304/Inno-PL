@@ -111,6 +111,23 @@ describe('order and order_line', () => {
     expect(grantOf('order_pl_goods', 'tm_group')).toBeUndefined();
   });
 
+  it('children cannot move to another order or line, and a price belongs to its line\'s order', () => {
+    const rules = (key: string) => (entity(key).rules ?? []).map((rule) => rule.key);
+    for (const key of ['order_line', 'goods_line_price', 'service_line_price', 'order_finance', 'purchase_proposal']) {
+      expect(rules(key), key).toContain('order_is_fixed');
+    }
+    for (const key of ['goods_line_price', 'service_line_price', 'purchase_proposal']) {
+      expect(rules(key), key).toEqual(expect.arrayContaining(['order_line_is_fixed', 'line_belongs_to_order']));
+    }
+  });
+
+  it('the AM is named on create (no creator default: an SA must not become the AM) and fixed after', () => {
+    const am = entity('order').fields.find((f) => f.key === 'am') as Field & { default?: unknown };
+    expect(am.required).toBe(true);
+    expect(am.default).toBeUndefined();
+    expect((entity('order').rules ?? []).map((rule) => rule.key)).toEqual(['am_is_fixed']);
+  });
+
   it('both have a create form', () => {
     expect(entity('order').create_form).toBeTruthy();
     expect(entity('order_line').create_form).toBeTruthy();

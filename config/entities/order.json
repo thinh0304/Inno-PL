@@ -32,7 +32,7 @@
     {"key":"customer_po_no","label":"Số HĐ/PO ký với KH","type":"text"},
     {"key":"content","label":"Nội dung đơn","type":"text","searchable":true},
     {"key":"signed_on","label":"Ngày ký","type":"date"},
-    {"key":"am","label":"AM phụ trách","type":"reference","target_entity_id":"ffffffff-0000-0000-0000-000000000001","default":{"kind":"creator"}},
+    {"key":"am","label":"AM phụ trách","type":"reference","target_entity_id":"ffffffff-0000-0000-0000-000000000001","required":true},
     {"key":"sa","label":"Sales Admin","type":"reference","target_entity_id":"ffffffff-0000-0000-0000-000000000001"},
     {"key":"inside_sales","label":"Inside Sales","type":"reference","target_entity_id":"ffffffff-0000-0000-0000-000000000001"},
     {"key":"is_new_order","label":"Đơn hàng mới","type":"boolean","default":{"kind":"literal","value":true}},

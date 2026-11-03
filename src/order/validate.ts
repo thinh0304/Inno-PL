@@ -1,8 +1,11 @@
 // Required fields and cross-field rules of an order: Đặc tả FR-1.6c, FR-2.1–2.8, FR-3.5, BR-21, BR-23, 4.8.
 // 'draft' checks formats only (a draft may be incomplete); 'submit' (t11) adds what sending for approval needs;
 // 'customer_contract' (t41, plan 03) adds the fields that come from the signed contract.
-import type { PlConfig } from '../pl/types';
+import { computePl } from '../pl/compute';
+import { chooseWeightSet } from '../pl/kpi';
+import type { DealStage, PlConfig } from '../pl/types';
 import { checkFormat, type FormatKind } from './formats';
+import { toPlOrderInput } from './records';
 import type { LineDraft, OrderDraft } from './types';
 
 export interface FieldIssue { path: string; message: string; severity: 'error' | 'warning' }
@@ -76,12 +79,16 @@ export function validateOrder(draft: OrderDraft, config: PlConfig, stage: Valida
   field({ path: 'order.customer_tier', value: order.customer_tier, required: true });
   integer('order.debt_days', order.debt_days, 0, 365, true, 'Công nợ là số nguyên 0–365 ngày');
   integer('order.payment_count', order.payment_count, 1, 12, contract, 'Số lần thanh toán là số nguyên 1–12');
+  // FR-2.7 with Thiết kế 13.3: the weights come from the configuration's set for this order (new / renewal, TM / DV),
+  // so every stage that set weights needs a person; the order's own weights are not used.
   if (submit) {
-    const total = order.deal_stages.reduce((sum, s) => sum + (s.weight ?? 0), 0);
-    if (Math.abs(total - 1) > 1e-9) error('order.deal_stages', 'Tổng hệ số các giai đoạn deal phải bằng 100%');
-    order.deal_stages.forEach((s, i) => {
-      if ((s.weight ?? 0) > 0 && !s.person) missing(`order.deal_stages[${i}].person`);
-    });
+    const set = chooseWeightSet(computePl(toPlOrderInput(draft), config).appliedContractType, order.is_new_order);
+    for (const [stage, weight] of Object.entries(config.dealStageWeights[set]) as [DealStage, number][]) {
+      if (stage === 'lead' || weight <= 0) continue;
+      const i = order.deal_stages.findIndex((s) => s.stage === stage);
+      if (i < 0) missing(`order.deal_stages.${stage}`);
+      else if (!order.deal_stages[i].person) missing(`order.deal_stages[${i}].person`);
+    }
   }
 
   const money = (path: string, value: number | null, required: boolean, signed = false) => {

@@ -39,6 +39,14 @@ describe('plRecordsFromResult', () => {
     expect(b.order_pl_service.internal_cost).toBe(72_000_000);
   });
 
+  it('a price sitting in the other group\'s entity is reported', () => {
+    const records = structuredClone(TM1040_RECORDS);
+    records.service_prices = [records.goods_prices.shift()!];
+    const out = runComputeOrderPl({ records, proposals: [], existing: [], config: null, now: NOW });
+    expect(JSON.parse(out.order_pl.detail as string).misplacedPrices).toEqual(['seagate']);
+    expect(JSON.parse(bodies(TM1040_RECORDS).order_pl.detail as string).misplacedPrices).toEqual([]);
+  });
+
   it('an order with no lines has no code yet', () => {
     expect(bodies({ ...structuredClone(TM1040_RECORDS), lines: [], goods_prices: [] }).order.code).toBe('');
   });

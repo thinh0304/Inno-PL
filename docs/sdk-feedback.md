@@ -86,3 +86,20 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 - **Bằng chứng:** `steps.md` ghi `end(id, name, outcome?, outputs?)` với `outputs` là `{ name: ref(...) | lit(...) }`; deploy sandbox 03/11/2026 từ chối như trên; bỏ output thì cài được.
 - **Làm tạm:** chỉ dùng `ref(...)` trong output của End.
 - **Đề xuất:** builder từ chối `lit` trong output của End (hoặc nền tảng nhận nó), và tài liệu nói rõ.
+
+## F-11 · Rule không gắn được một trường với người đang ghi khi tạo bản ghi; không chặn được giá nằm sai entity
+
+- **Vướng:**
+  - Muốn chặn AM tạo đơn với `am` là người khác, và bắt Sales Admin là `sa` của đơn mình tạo.
+  - Hai cách theo tài liệu đều không dùng được:
+    - `{ "field": "am", "op": "ne", "value": { "$bind": "viewer.id" } }` bị từ chối lúc cài: `ENTITY_VALIDATION_RULE_INVALID: 'am' compares against a binding, which a write cannot resolve`.
+    - Phép thử người ghi `in_field` không thấy giá trị mới khi tạo, nên rule chặn cả AM tạo đơn cho chính mình.
+  - Cũng không viết được rule "giá dòng phải nằm ở entity đúng nhóm của mã loại", vì cần hai bước tham chiếu (giá → dòng → `item_type` theo mã chữ). Một giá nằm sai entity khiến TM / PROC đọc được tiền không thuộc phần mình (Thiết kế C2 / C3).
+- **Bằng chứng:** deploy sandbox 03/11/2026, `e2e/orders.sandbox.test.ts`.
+- **Làm tạm:**
+  - `order.am` bắt buộc, không mặc định là người tạo, và khóa sau khi tạo (`am_is_fixed`).
+  - Màn hình đặt `am` / `sa` đúng người.
+  - `compute_pl` liệt kê giá nằm sai entity trong `order_pl.detail.misplacedPrices` để màn hình chuyển lại.
+- **Đề xuất:**
+  - Cho rule so một trường người với người đang ghi khi tạo (`$bind: viewer.id` trên write, hoặc `in_field` đọc giá trị mới).
+  - Cho rule đi nhiều bước tham chiếu, hoặc tra cứu theo khóa tự nhiên.

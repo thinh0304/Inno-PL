@@ -40,11 +40,21 @@ describe('validateOrder', () => {
       'order.debt_days', 'finance.sales_cost']);
   });
 
-  it('FR-2.7 deal stage weights total 100% and each weighted stage has a person', () => {
+  it('FR-2.7 every stage the configuration weights has a person; the order\'s own weights are not used', () => {
     const draft = base();
     draft.order.deal_stages[0].weight = 0.3;
     draft.order.deal_stages[5].person = null;
-    expect(paths(draft)).toEqual(['order.deal_stages', 'order.deal_stages[5].person']);
+    expect(paths(draft)).toEqual(['order.deal_stages[5].person']);
+    draft.order.deal_stages = draft.order.deal_stages.slice(0, 5);
+    expect(paths(draft)).toEqual(['order.deal_stages.contract']);
+  });
+
+  it('FR-2.7 a renewal needs people only for the stages its set weights (TMDK: quotation onwards)', () => {
+    const draft = base();
+    Object.assign(draft.order, { is_new_order: false, prev_contract_no: 'TM-0900' });
+    Object.assign(draft.finance, { prev_sales_cost: 0, prev_revenue: 100, prev_net_profit: 10 });
+    draft.order.deal_stages = draft.order.deal_stages.slice(2);
+    expect(paths(draft)).toEqual([]);
   });
 
   it('an order needs at least one line to submit', () => {

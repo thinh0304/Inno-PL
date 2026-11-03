@@ -13,7 +13,7 @@ export function runComputeOrderPl(args: { records: OrderRecords; proposals: Rec[
     return { skip: true, order_pl: {}, order_pl_service: {}, order_pl_goods: {}, order: { code: '', has_goods: false, has_service: false } };
   }
   const config = args.config ? configFromRecords(args.config) : DEFAULT_CONFIG;
-  const draft = draftFromRecords(args.records);
+  const draft = draftFromRecords(args.records, config);
   const result = computePl(toPlOrderInput(draft), config);
   return { skip: false, ...plRecordsFromResult(draft, result, config, args.proposals ?? [], args.now) };
 }

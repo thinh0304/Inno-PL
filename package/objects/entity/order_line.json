@@ -24,5 +24,30 @@
   ],
   "natural_key": [],
   "display_field": "name",
-  "create_form": "@obj:form:order_line"
+  "create_form": "@obj:form:order_line",
+  "rules": [
+    {
+      "key": "order_is_fixed",
+      "message": "Không chuyển được sang đơn khác",
+      "field": "order",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed",
+              "field": "order"
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

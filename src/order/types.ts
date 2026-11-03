@@ -18,7 +18,8 @@ export interface OrderFields { id?: string; number?: string; code?: string; stat
   deal_stages: { stage: Exclude<DealStage, 'lead'>; weight: number | null; person: string | null }[];
   has_goods: boolean; has_service: boolean; }
 
-export interface LinePrice { id?: string; unit_price: number | null; discount_pct: number | null; vat_rate: number | null;
+// source: the entity the price was read from; it should match the line's purchase group.
+export interface LinePrice { id?: string; source?: 'goods' | 'service'; unit_price: number | null; discount_pct: number | null; vat_rate: number | null;
   unit_cost: number | null; supplier: string | null; }
 
 export interface LineDraft { id: string; line_no: number; item_type_code: string; co_cq: boolean; name: string; unit: string;

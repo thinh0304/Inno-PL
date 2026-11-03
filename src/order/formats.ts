@@ -96,13 +96,14 @@ export function checkFormat(kind: FormatKind, raw: string): FormatResult {
       const s = collapse(raw);
       return s.length <= 20 && /\p{L}/u.test(s) ? pass(s) : fail('ĐVT 1–20 ký tự, có chữ');
     }
+    // VND has no decimals: a comma in a money field is a thousands separator pasted from elsewhere ("21,000"), so refuse it.
     case 'money': {
-      const n = parseNumberVi(raw);
-      return n !== null && n >= 0 ? pass(n) : fail('Số tiền ≥ 0, dấu chấm phân cách nghìn');
+      const n = raw.includes(',') ? null : parseNumberVi(raw);
+      return n !== null && n >= 0 && Number.isInteger(n) ? pass(n) : fail('Số tiền ≥ 0, dấu chấm phân cách nghìn');
     }
     case 'signed_money': {
-      const n = parseNumberVi(raw);
-      return n !== null ? pass(n) : fail('Số tiền, có thể âm');
+      const n = raw.includes(',') ? null : parseNumberVi(raw);
+      return n !== null && Number.isInteger(n) ? pass(n) : fail('Số tiền, có thể âm, dấu chấm phân cách nghìn');
     }
     case 'quantity': {
       const n = parseNumberVi(raw);
