@@ -57,6 +57,13 @@ export function advanceOrder(input: AdvanceInput): AdvanceResult {
     created.push(d.code);
   }
   const get = (code: TaskCode) => cur.get(code)!;
+  // A task is passed when it is done, or skipped, or does not apply and everything before it is passed (so a task whose
+  // predecessors all do not apply still waits for t11); a person's "not applicable" (t53) is a real finish.
+  const passed = (code: TaskCode): boolean => {
+    const t = get(code);
+    if (t.status === 'done' || t.status === 'skipped') return true;
+    return t.status === 'not_applicable' && (t.outcome === 'not_applicable' || predecessors(code, flow()).every(passed));
+  };
   const snapshot = () => JSON.stringify([[...cur.values()], ord, events.length]);
 
   for (let pass = 0; pass < 20; pass++) {
@@ -111,7 +118,7 @@ export function advanceOrder(input: AdvanceInput): AdvanceResult {
     // Open what has all its predecessors finished; t31 approves itself when the order does not need SD (BR-40).
     for (const d of TASKS) {
       const t = get(d.code);
-      if (t.status !== 'blocked' || !predecessors(d.code, flow()).every((p) => FINISHED.has(get(p).status))) continue;
+      if (t.status !== 'blocked' || !predecessors(d.code, flow()).every(passed)) continue;
       open(t);
       if (d.code === 't31' && !needsApproval(flow(), autoApproveLimit)) {
         t.status = 'skipped';

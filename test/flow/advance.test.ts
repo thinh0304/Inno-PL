@@ -19,6 +19,17 @@ describe('advanceOrder', () => {
     expect(result.order).toEqual({ pending_roles: ['am'] });
   });
 
+  it('tasks_wait_for_t11_even_when_their_predecessors_do_not_apply', () => {
+    // Before the first P&L the order has neither goods nor service: nothing but t11 may open.
+    const ord = order({ has_goods: false, has_service: false });
+    const { next } = step(input({ order: ord }));
+    expect(Object.entries(statuses(next.tasks)).filter(([, v]) => v === 'open').map(([k]) => k)).toEqual(['t11']);
+    expect(next.order.pending_roles).toEqual(['am']);
+    // Once t11 is done the chain of tasks that do not apply is passed through to t31.
+    const sent = step(input({ order: ord, tasks: tasksWith({ t11: ['done', 'submitted'] }, ord) }));
+    expect(statuses(sent.next.tasks)).toMatchObject({ t31: 'open', t40: 'blocked', t71: 'blocked' });
+  });
+
   it('submit_opens_t23_and_requests_pl', () => {
     const { result, next } = step(input({ tasks: tasksWith({ t11: ['done', 'submitted'] }) }));
     expect(next.order).toMatchObject({ status: 'in_progress', pl_requested_at: NOW, stage: 2, pending_roles: ['proc'] });
