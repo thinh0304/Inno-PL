@@ -8,6 +8,10 @@ import type { ContractRec, ContractTask, GateIssue, Party, Slot, Step } from './
 
 export type { ContractRec, ContractTask, GateIssue, Party, Slot, Step } from './types';
 
+/** BR-45: the order's fields that come from the signed customer contract. SA fills them at t41, after submission, so they stay
+ * open until the contract is signed (rule signing_fields_locked_after_signing on order). */
+export const SIGNING_FIELDS = ['address', 'receiver_name', 'receiver_phone', 'delivery_address', 'signed_on', 'payment_count', 'customer_po_no'] as const;
+
 export const slotKey = (party: Party, supplier: string | null): string => (party === 'customer' ? 'customer' : `supplier:${supplier}`);
 
 const ofSlot = (list: ContractRec[], party: Party, supplier: string | null) =>

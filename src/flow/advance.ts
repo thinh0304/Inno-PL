@@ -1,10 +1,12 @@
 // The order's flow, as one pure step: the tasks and the order as they are -> what to create, change and log.
 // It is idempotent (a second run over its own result changes nothing), so a trigger that fires on its own writes ends there.
+import type { ContractTask, GateIssue } from '../contract/types';
 import { addWorkingDays, dueState } from './calendar';
 import { applies, FINISHED, needsApproval, predecessors, TASKS, type FlowOrder, type TaskCode, type TaskOutcome, type TaskRole,
   type TaskStatus } from './tasks';
 
-export type EventAction = 'auto_approved' | 'reopened_missing_fields' | 'returned_processed' | 'revise_processed' | 'approved' | 'completed_order';
+export type EventAction = 'auto_approved' | 'reopened_missing_fields' | 'returned_processed' | 'revise_processed' | 'approved' | 'completed_order'
+  | 'reopened_missing_contract';
 
 export interface TaskRec { id: string; task_code: TaskCode; stage: number; role: TaskRole; status: TaskStatus; outcome: TaskOutcome | null;
   reason: string; opened_at: string | null; due_at: string | null; done_at: string | null; sla_days: number | null;
@@ -16,6 +18,8 @@ export interface AdvanceInput {
   tasks: TaskRec[]; slaDays: Record<TaskCode, number>; autoApproveLimit: number; now: string;
   /** Issues of validateOrder(..., 'submit'): the server's own check of a submission (BR-42). */
   submitIssues: { path: string; message: string }[];
+  /** What still stops each contract task (contractGate, BR-44 / BR-45): a done task with issues opens again. */
+  contractIssues?: Partial<Record<ContractTask, GateIssue[]>>;
 }
 
 export interface TaskChange { id: string | null; task_code: TaskCode; expect_status: TaskStatus | null; set: Partial<TaskRec> }
@@ -107,6 +111,16 @@ export function advanceOrder(input: AdvanceInput): AdvanceResult {
         ord.status = 'in_progress';
         ord.pl_requested_at = now;
       }
+    }
+
+    // A contract task finished while its file or the signed contract's fields are missing opens again: the screen locks the
+    // button, and this keeps the API from getting around it (BR-44, BR-45).
+    for (const code of ['t40', 't44', 't41', 't45'] as const) {
+      const t = get(code);
+      const issues = input.contractIssues?.[code] ?? [];
+      if (t.status !== 'done' || !issues.length) continue;
+      open(t);
+      events.push({ task_code: code, action: 'reopened_missing_contract', note: issues.map((i) => i.message).join('; ') });
     }
 
     // What applies depends on the order's content, so tasks not yet reached are judged again (a person's "not applicable" stands).

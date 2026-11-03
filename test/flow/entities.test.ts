@@ -64,6 +64,7 @@ describe('order_task and order_event', () => {
   });
 });
 
+import { SIGNING_FIELDS } from '../../src/contract/rules';
 import { ORDER_KEYS } from '../../src/module/save-plan';
 
 const rule = (entityKey: string, key: string): Any => (raw(entityKey).rules as Any[]).find((r) => r.key === key)!;
@@ -76,7 +77,20 @@ describe('locks after submit', () => {
     const r = rule('order', 'locked_after_submit');
     expect(writeOps(r, 'is_update')).toHaveLength(1);
     expect(writeOps(r, 'was')[0].rule).toEqual({ field: 'status', op: 'ne', value: 'draft' });
-    expect(writeOps(r, 'changed_any')[0].fields).toEqual(expect.arrayContaining([...ORDER_KEYS, 'pl_requested_at']));
+    // Every field the screens write, except the signing fields (next test), is locked once the order is sent.
+    expect(writeOps(r, 'changed_any')[0].fields).toEqual(expect.arrayContaining([...ORDER_KEYS.filter((k) => !(SIGNING_FIELDS as readonly string[]).includes(k)), 'pl_requested_at']));
+    expect(notIn(r).sort()).toEqual(['${param:admin_group}', '${param:automation_group}']);
+  });
+
+  it('signing_fields_stay_open_until_the_customer_contract_is_signed', () => {
+    // BR-45: SA fills these at t41, after submission; they lock once t41 is done (contract_signed).
+    const locked = writeOps(rule('order', 'locked_after_submit'), 'changed_any')[0].fields as string[];
+    for (const key of SIGNING_FIELDS) expect(locked, key).not.toContain(key);
+    expect(locked).toEqual(expect.arrayContaining([...ORDER_KEYS.filter((k) => !(SIGNING_FIELDS as readonly string[]).includes(k)), 'pl_requested_at']));
+    const r = rule('order', 'signing_fields_locked_after_signing');
+    expect(writeOps(r, 'is_update')).toHaveLength(1);
+    expect(writeOps(r, 'was')[0].rule).toEqual({ field: 'contract_signed', op: 'eq', value: true });
+    expect(writeOps(r, 'changed_any')[0].fields).toEqual([...SIGNING_FIELDS]);
     expect(notIn(r).sort()).toEqual(['${param:admin_group}', '${param:automation_group}']);
   });
 

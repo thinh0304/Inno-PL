@@ -424,6 +424,30 @@ var PL = (() => {
     return config.itemTypes.find((type) => type.code === code)?.purchaseGroup ?? null;
   }
 
+  // src/contract/records.ts
+  var str3 = (value) => value == null ? "" : String(value);
+  function contractFromRecord(record) {
+    const r = fieldsOf(record);
+    const files = Array.isArray(r.file) ? r.file : r.file ? [r.file] : [];
+    const first = files.map((f) => f && typeof f === "object" ? f.id : f).find((f) => f != null && f !== "");
+    return {
+      id: str3(r.id),
+      order: refId(r.order) ?? "",
+      party: str3(r.party),
+      supplier: refId(r.supplier),
+      step: str3(r.step),
+      file: first == null ? null : String(first),
+      uploaded_by: refId(r.uploaded_by),
+      uploaded_at: str3(r.uploaded_at ?? r.created_at),
+      source: str3(r.source) || "upload",
+      value: parseNumber(r.value) ?? null,
+      advance_percent: parseNumber(r.advance_percent) ?? null,
+      version: parseNumber(r.version) ?? 1,
+      ai_check: r.ai_check ?? null,
+      skip_reason: str3(r.skip_reason)
+    };
+  }
+
   // src/pl/kpi.ts
   function chooseWeightSet(applied, isNewOrder) {
     const service = applied === "dv_once" || applied === "dv_recurring";
@@ -823,6 +847,78 @@ var PL = (() => {
     return { issues, missingRequired };
   }
 
+  // src/contract/rules.ts
+  var slotKey = (party, supplier) => party === "customer" ? "customer" : `supplier:${supplier}`;
+  var ofSlot = (list, party, supplier) => list.filter((c) => c.party === party && (party === "customer" || c.supplier === supplier));
+  function latest(list, party, supplier, step) {
+    let best = null;
+    for (const c of ofSlot(list, party, supplier)) if (c.step === step && c.file && (!best || c.version > best.version)) best = c;
+    return best;
+  }
+  function newest(list, party, supplier, step) {
+    let best = null;
+    for (const c of ofSlot(list, party, supplier)) if (c.step === step && (!best || c.version > best.version)) best = c;
+    return best;
+  }
+  var needsFile = (value, limit) => value > limit;
+  function contractSlots(draft, revenue, contracts) {
+    const costs = /* @__PURE__ */ new Map();
+    for (const line of draft.lines) {
+      const supplier = line.price.supplier;
+      if (!supplier) continue;
+      costs.set(supplier, (costs.get(supplier) ?? 0) + (line.price.unit_cost ?? 0) * (line.quantity ?? 0));
+    }
+    const slot = (party, supplier, expectedValue, present) => {
+      const history = [...ofSlot(contracts, party, supplier)].sort((a, b) => b.version - a.version || (a.step < b.step ? -1 : 1));
+      return {
+        key: slotKey(party, supplier),
+        party,
+        supplier,
+        expectedValue,
+        present,
+        history,
+        draft: latest(contracts, party, supplier, "draft"),
+        final: latest(contracts, party, supplier, "final"),
+        orphan: !present
+      };
+    };
+    const slots = [slot("customer", null, revenue, true), ...[...costs].map(([s, cost]) => slot("supplier", s, cost, true))];
+    const orphans = new Set(contracts.filter((c) => c.party === "supplier" && c.supplier && !costs.has(c.supplier)).map((c) => c.supplier));
+    for (const s of orphans) slots.push(slot("supplier", s, 0, false));
+    return slots;
+  }
+  var STEP_OF = { t40: "draft", t44: "draft", t41: "final", t45: "final" };
+  var PARTY_OF = { t40: "customer", t41: "customer", t44: "supplier", t45: "supplier" };
+  var label = (slot) => slot.party === "customer" ? "h\u1EE3p \u0111\u1ED3ng kh\xE1ch h\xE0ng" : `h\u1EE3p \u0111\u1ED3ng nh\xE0 cung c\u1EA5p ${slot.supplier}`;
+  function contractGate(task, ctx) {
+    const issues = [];
+    const step = STEP_OF[task];
+    if (step === "final" && !(ctx.t42.status === "done" && ctx.t42.outcome === "agreed")) {
+      issues.push({ code: "draft_not_approved", slot: null, message: "SD ch\u01B0a \u0111\u1ED3ng \xFD tr\xECnh k\xFD d\u1EF1 th\u1EA3o (t42)" });
+    }
+    if (task === "t41") {
+      for (const issue of validateOrder(ctx.draft, ctx.config, "customer_contract").issues) {
+        if (issue.severity === "error") issues.push({ code: "order_fields", slot: null, message: `${issue.path}: ${issue.message}` });
+      }
+    }
+    for (const slot of ctx.slots) {
+      if (slot.party !== PARTY_OF[task] || slot.orphan) continue;
+      const entered = newest(slot.history, slot.party, slot.supplier, step)?.value;
+      const value = entered ?? slot.expectedValue;
+      if (needsFile(value, ctx.config.settings.contractFileLimit) && !(step === "draft" ? slot.draft : slot.final)) {
+        issues.push({
+          code: step === "draft" ? "draft_missing" : "final_missing",
+          slot: slot.key,
+          message: `Thi\u1EBFu ${step === "draft" ? "d\u1EF1 th\u1EA3o" : "b\u1EA3n ch\xEDnh th\u1EE9c"} ${label(slot)}`
+        });
+      }
+      if ((ctx.blockingFindings?.[slot.key] ?? 0) > 0) {
+        issues.push({ code: "ai_blocking", slot: slot.key, message: `Ki\u1EC3m tra AI c\xF2n l\u1ED7i nghi\xEAm tr\u1ECDng \u1EDF ${label(slot)}` });
+      }
+    }
+    return issues;
+  }
+
   // src/pl/time.ts
   var ISO = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:[.,](\d+))?)?)?\s*(Z|[+-]\d{2}(?::?\d{2})?)?$/i;
   function parseTime(value) {
@@ -1004,6 +1100,13 @@ var PL = (() => {
           ord.pl_requested_at = now;
         }
       }
+      for (const code of ["t40", "t44", "t41", "t45"]) {
+        const t = get(code);
+        const issues = input.contractIssues?.[code] ?? [];
+        if (t.status !== "done" || !issues.length) continue;
+        open(t);
+        events.push({ task_code: code, action: "reopened_missing_contract", note: issues.map((i) => i.message).join("; ") });
+      }
       for (const d of TASKS) {
         const t = get(d.code);
         if (t.status === "blocked" || t.status === "not_applicable" && t.outcome !== "not_applicable") {
@@ -1129,7 +1232,13 @@ var PL = (() => {
     const slaDays = Object.fromEntries(config.taskSlas.map((s) => [s.taskCode, s.slaDays]));
     const tasks = (args.tasks ?? []).map(taskFromRecord);
     const submitIssues = validateOrder(draft, config, "submit").issues.filter((i) => i.severity === "error");
-    const result = advanceOrder({ order, tasks, slaDays, autoApproveLimit: config.settings.autoApproveLimit, now: args.now, submitIssues });
+    const slots = contractSlots(draft, order.revenue, (args.contracts ?? []).map(contractFromRecord));
+    const t42 = tasks.find((t) => t.task_code === "t42");
+    const contractIssues = Object.fromEntries(["t40", "t44", "t41", "t45"].map((code) => [
+      code,
+      contractGate(code, { slots, draft, config, t42: { status: t42?.status ?? "blocked", outcome: t42?.outcome ?? null } })
+    ]));
+    const result = advanceOrder({ order, tasks, slaDays, autoApproveLimit: config.settings.autoApproveLimit, now: args.now, submitIssues, contractIssues });
     const idOf = (code) => tasks.find((t) => t.task_code === code)?.id ?? null;
     const roleOf = (code) => TASKS.find((t) => t.code === code)?.role ?? null;
     const now = { ...order, ...result.order };

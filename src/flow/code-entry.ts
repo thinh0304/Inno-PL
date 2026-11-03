@@ -1,5 +1,8 @@
 // What the flow workflows' Code steps run: config/code/advance_order.js and config/code/sla_sweep.js bundle this file
 // (scripts/build-code.mjs). Records go in as the platform returns them; flat lists come out for the For Each steps.
+import { contractFromRecord } from '../contract/records';
+import { contractGate, contractSlots } from '../contract/rules';
+import type { ContractTask, GateIssue } from '../contract/types';
 import { draftFromRecords, fieldsOf } from '../order/records';
 import type { OrderRecords, Rec } from '../order/types';
 import { validateOrder } from '../order/validate';
@@ -35,7 +38,7 @@ export interface AdvanceOutput extends AdvanceResult {
   event_list: Rec[];
 }
 
-export function runAdvance(args: { order: Rec; tasks: Rec[]; pl: Rec[]; lines: Rec[]; goods_prices: Rec[]; service_prices: Rec[]; finance: Rec[];
+export function runAdvance(args: { order: Rec; tasks: Rec[]; pl: Rec[]; contracts?: Rec[]; lines: Rec[]; goods_prices: Rec[]; service_prices: Rec[]; finance: Rec[];
   config: ConfigRecords | null; now: string }): AdvanceOutput {
   const config = args.config ? configFromRecords(args.config) : DEFAULT_CONFIG;
   const records: OrderRecords = { order: args.order, lines: args.lines ?? [], goods_prices: args.goods_prices ?? [],
@@ -52,7 +55,12 @@ export function runAdvance(args: { order: Rec; tasks: Rec[]; pl: Rec[]; lines: R
   const slaDays = Object.fromEntries(config.taskSlas.map((s) => [s.taskCode, s.slaDays])) as Record<TaskCode, number>;
   const tasks = (args.tasks ?? []).map(taskFromRecord);
   const submitIssues = validateOrder(draft, config, 'submit').issues.filter((i) => i.severity === 'error');
-  const result = advanceOrder({ order, tasks, slaDays, autoApproveLimit: config.settings.autoApproveLimit, now: args.now, submitIssues });
+  // The contract gate (BR-44, BR-45) on the contracts as read: a done contract task that does not pass it opens again.
+  const slots = contractSlots(draft, order.revenue, (args.contracts ?? []).map(contractFromRecord));
+  const t42 = tasks.find((t) => t.task_code === 't42');
+  const contractIssues = Object.fromEntries((['t40', 't44', 't41', 't45'] as const).map((code) => [code,
+    contractGate(code, { slots, draft, config, t42: { status: t42?.status ?? 'blocked', outcome: t42?.outcome ?? null } })])) as Record<ContractTask, GateIssue[]>;
+  const result = advanceOrder({ order, tasks, slaDays, autoApproveLimit: config.settings.autoApproveLimit, now: args.now, submitIssues, contractIssues });
 
   const idOf = (code: TaskCode | null) => tasks.find((t) => t.task_code === code)?.id ?? null;
   const roleOf = (code: TaskCode | null) => TASKS.find((t) => t.code === code)?.role ?? null;

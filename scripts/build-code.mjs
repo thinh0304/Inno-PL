@@ -38,7 +38,8 @@ const ENTRIES = {
     main: 'function main(inputs) {\n'
       + CONFIG_MAIN
       + '  return PL.runAdvance({\n'
-      + '    order: inputs.order, tasks: inputs.tasks, pl: inputs.pl, lines: inputs.lines, goods_prices: inputs.goods_prices,\n'
+      + '    order: inputs.order, tasks: inputs.tasks, pl: inputs.pl, contracts: inputs.contracts, lines: inputs.lines,\n'
+      + '    goods_prices: inputs.goods_prices,\n'
       + '    service_prices: inputs.service_prices, finance: inputs.finance, config: none ? null : config, now: inputs.now,\n'
       + '  });\n}\n',
   },
