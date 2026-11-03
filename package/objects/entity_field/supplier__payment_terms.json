@@ -1,0 +1,25 @@
+{
+  "label": "Điều khoản thanh toán",
+  "type": "list",
+  "sortable": false,
+  "item_fields": [
+    {
+      "key": "label",
+      "label": "Tên đợt",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "percent",
+      "label": "Tỷ lệ (%)",
+      "type": "number",
+      "required": true
+    },
+    {
+      "key": "days",
+      "label": "Số ngày",
+      "type": "number",
+      "required": false
+    }
+  ]
+}

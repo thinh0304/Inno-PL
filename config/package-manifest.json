@@ -27,7 +27,9 @@
       {
         "key": "user",
         "access": "read",
-        "fields": {}
+        "fields": {
+          "name": "text"
+        }
       }
     ],
     "permissions": [

@@ -1,0 +1,15 @@
+{
+  "name": "Khách hàng",
+  "type": "grid",
+  "columns": [
+    "code",
+    "name",
+    "tax_code",
+    "tier",
+    "representative"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

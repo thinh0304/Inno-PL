@@ -1,0 +1,6 @@
+{
+  "label": "Tên nhà cung cấp",
+  "type": "text",
+  "required": true,
+  "searchable": true
+}

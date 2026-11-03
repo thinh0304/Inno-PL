@@ -1,0 +1,5 @@
+{
+  "label": "Số điện thoại",
+  "type": "text",
+  "format": "phone"
+}

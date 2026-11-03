@@ -1,0 +1,29 @@
+{
+  "key": "supplier",
+  "name": "Nhà cung cấp",
+  "description": "Nhà cung cấp, người liên hệ và điều khoản thanh toán theo đợt (FR-4.1).",
+  "icon": "truck",
+  "accent": "amber",
+  "fields": [
+    {"key":"name","label":"Tên nhà cung cấp","type":"text","required":true,"searchable":true},
+    {"key":"contact_name","label":"Người liên hệ","type":"text"},
+    {"key":"phone","label":"Số điện thoại","type":"text","format":"phone"},
+    {"key":"email","label":"Email","type":"text","format":"email"},
+    {"key":"payment_terms","label":"Điều khoản thanh toán","type":"list","sortable":false,"item_fields":[{"key":"label","label":"Tên đợt","type":"text","required":true},{"key":"percent","label":"Tỷ lệ (%)","type":"number","required":true},{"key":"days","label":"Số ngày","type":"number","required":false}]},
+    {"key":"debt_days","label":"Công nợ (ngày)","type":"number"},
+    {"key":"active","label":"Đang giao dịch","type":"boolean","default":{"kind":"literal","value":true}}
+  ],
+  "natural_key": [{"id":"by_name","name":"Tên nhà cung cấp","fields":["name"]}],
+  "display_field": "name",
+  "views": [
+    {"key":"all","name":"Nhà cung cấp","columns":["name","contact_name","phone","email","debt_days","active"]}
+  ],
+  "access": { "mode": "restricted", "grants": [
+    {"principal":{"kind":"group","id":"${param:app_users}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:am_group}"},"design":false,"operations":[{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:sa_group}"},"design":false,"operations":[{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"},{"operation":"delete","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:automation_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"update","scope":"organization"}]}
+  ] },
+  "conversation": null
+}

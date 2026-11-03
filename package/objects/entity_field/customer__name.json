@@ -1,0 +1,6 @@
+{
+  "label": "Tên khách hàng",
+  "type": "text",
+  "required": true,
+  "searchable": true
+}

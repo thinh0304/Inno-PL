@@ -9,12 +9,14 @@ export const OBJECTS = {
   'entity:business_plan': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:case': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:contract_type_rate': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:customer': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:deal_stage_weight': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:fin_cost_tier': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:item_type': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:kpi_target': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:pl_setting': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:staff': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:supplier': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:task_sla': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:vat_rate': { kind: 'entity', contractVersion: '0.1.0' },
   'entity_field:business_plan/net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -35,6 +37,22 @@ export const OBJECTS = {
   'entity_field:contract_type_rate/sales_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/tech_support_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/threshold': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/address': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/bank_account': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/bank_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/contacts': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/delivery_address': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/delivery_note': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/receiver_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/receiver_phone': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/representative': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/representative_title': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/tax_code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/tax_lookup': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/tax_status': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:customer/tier': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:deal_stage_weight/key': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:deal_stage_weight/stage': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:deal_stage_weight/weight': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -87,6 +105,13 @@ export const OBJECTS = {
   'entity_field:staff/name': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:staff/team': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:staff/user': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:supplier/active': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:supplier/contact_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:supplier/debt_days': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:supplier/email': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:supplier/name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:supplier/payment_terms': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:supplier/phone': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:task_sla/name': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:task_sla/role': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:task_sla/sla_days': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -100,12 +125,14 @@ export const OBJECTS = {
   'entity_view:business_plan/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:case/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:contract_type_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:customer/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:deal_stage_weight/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:fin_cost_tier/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:item_type/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:kpi_target/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:pl_setting/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:staff/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:supplier/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:task_sla/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:vat_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'form:case': { kind: 'form', contractVersion: '0.1.0' },
@@ -113,7 +140,7 @@ export const OBJECTS = {
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'deal_stage_weight' | 'fin_cost_tier' | 'item_type' | 'kpi_target' | 'pl_setting' | 'staff' | 'task_sla' | 'vat_rate';
+export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'item_type' | 'kpi_target' | 'pl_setting' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
 export type WorkflowKey = 'open_case';
 
 /** The value of each field of each entity, as a record carries it. */
@@ -141,6 +168,24 @@ export interface EntityFields {
     sales_bonus?: number | null;
     tech_support_bonus?: number | null;
     threshold?: number | null;
+  };
+  customer: {
+    address?: string | null;
+    bank_account?: string | null;
+    bank_name?: string | null;
+    code?: string | null;
+    contacts?: unknown;
+    delivery_address?: string | null;
+    delivery_note?: string | null;
+    name?: string | null;
+    receiver_name?: string | null;
+    receiver_phone?: string | null;
+    representative?: string | null;
+    representative_title?: string | null;
+    tax_code?: string | null;
+    tax_lookup?: string | null;
+    tax_status?: string | null;
+    tier?: 'vip' | 'potential' | 'standard' | null;
   };
   deal_stage_weight: {
     key?: string | null;
@@ -205,6 +250,15 @@ export interface EntityFields {
     name?: string | null;
     team?: 'sales' | 'sa' | 'technical' | 'procurement' | 'accounting' | 'director' | 'lead_source' | 'other' | null;
     user?: string | null;
+  };
+  supplier: {
+    active?: boolean | null;
+    contact_name?: string | null;
+    debt_days?: number | null;
+    email?: string | null;
+    name?: string | null;
+    payment_terms?: unknown;
+    phone?: string | null;
   };
   task_sla: {
     name?: string | null;

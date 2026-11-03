@@ -26,7 +26,9 @@
       {
         "key": "user",
         "access": "read",
-        "fields": {}
+        "fields": {
+          "name": "text"
+        }
       }
     ],
     "permissions": [
@@ -263,6 +265,78 @@
     },
     {
       "key": "entity_view:contract_type_rate/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:customer",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:customer/code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/tax_code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/address",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/tier",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/representative",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/representative_title",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/bank_account",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/bank_name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/contacts",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/receiver_name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/receiver_phone",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/delivery_address",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/delivery_note",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/tax_lookup",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:customer/tax_status",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:customer/all",
       "kind": "entity_view"
     },
     {
@@ -522,6 +596,42 @@
       "kind": "entity_view"
     },
     {
+      "key": "entity:supplier",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:supplier/name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:supplier/contact_name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:supplier/phone",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:supplier/email",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:supplier/payment_terms",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:supplier/debt_days",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:supplier/active",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:supplier/all",
+      "kind": "entity_view"
+    },
+    {
       "key": "entity:task_sla",
       "kind": "entity"
     },
@@ -657,6 +767,55 @@
       "key": "contract_type_rate_automation_group",
       "to": "@param:automation_group",
       "entity": "@obj:entity:contract_type_rate",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "customer_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:customer",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "customer_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:customer",
+      "operations": {
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "customer_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:customer",
+      "operations": {
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "customer_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:customer",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "customer_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:customer",
       "operations": {
         "read": "organization",
         "list": "organization",
@@ -843,6 +1002,55 @@
       "key": "staff_automation_group",
       "to": "@param:automation_group",
       "entity": "@obj:entity:staff",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "supplier_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:supplier",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "supplier_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:supplier",
+      "operations": {
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "supplier_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:supplier",
+      "operations": {
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "supplier_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:supplier",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "supplier_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:supplier",
       "operations": {
         "read": "organization",
         "list": "organization",

@@ -1,0 +1,42 @@
+{
+  "name": "Khách hàng",
+  "description": "Hồ sơ khách hàng dùng lại giữa các đơn (FR-1.6a–c); mỗi đơn vẫn lưu bản sao thông tin tại thời điểm lập.",
+  "icon": "building",
+  "accent": "sky",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:customer/code",
+    "@obj:entity_field:customer/name",
+    "@obj:entity_field:customer/tax_code",
+    "@obj:entity_field:customer/address",
+    "@obj:entity_field:customer/tier",
+    "@obj:entity_field:customer/representative",
+    "@obj:entity_field:customer/representative_title",
+    "@obj:entity_field:customer/bank_account",
+    "@obj:entity_field:customer/bank_name",
+    "@obj:entity_field:customer/contacts",
+    "@obj:entity_field:customer/receiver_name",
+    "@obj:entity_field:customer/receiver_phone",
+    "@obj:entity_field:customer/delivery_address",
+    "@obj:entity_field:customer/delivery_note",
+    "@obj:entity_field:customer/tax_lookup",
+    "@obj:entity_field:customer/tax_status"
+  ],
+  "natural_key": [
+    {
+      "id": "by_code",
+      "name": "Mã khách hàng",
+      "fields": [
+        "code"
+      ]
+    },
+    {
+      "id": "by_tax",
+      "name": "Mã số thuế",
+      "fields": [
+        "tax_code"
+      ]
+    }
+  ],
+  "display_field": "name"
+}

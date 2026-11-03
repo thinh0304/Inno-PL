@@ -1,0 +1,5 @@
+{
+  "label": "Email",
+  "type": "text",
+  "format": "email"
+}
