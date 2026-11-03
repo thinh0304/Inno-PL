@@ -36,6 +36,12 @@ describe('savePlan', () => {
     expect(savePlan(draftOf(saved()), saved(), C)).toEqual([]);
   });
 
+  it('a list item without an empty member is unchanged', () => {
+    const records = saved();
+    records.order.deal_stages = (records.order.deal_stages as { stage: string; person: string }[]).map(({ stage, person }) => ({ id: `i-${stage}`, stage, person }));
+    expect(savePlan(draftOf(records), records, C)).toEqual([]);
+  });
+
   it('only_changed_fields_are_patched', () => {
     const draft = draftOf(saved());
     draft.order.customer_name = 'Tên mới';

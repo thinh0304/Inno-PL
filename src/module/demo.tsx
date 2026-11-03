@@ -5,7 +5,7 @@ import { mountApp, type ScreenHost } from './mount.js';
 /**
  * The module on its in-memory demo data, in a shadow root as AgentFlow gives it one, following the browser's language
  * and colour scheme. This is the page's code, not the module's, so it may listen on the window. The path lives in the
- * address bar's hash, so back and forward work. `?empty` starts with no orders; `?role=tm|proc|sd|admin` shows what that
+ * address bar's hash, so back and forward work. `?empty` starts with no orders, `?lang=vi|en` overrides the browser's language; `?role=tm|proc|sd|admin` shows what that
  * role sees.
  */
 function mountDemo(element: HTMLElement): void {
@@ -26,7 +26,7 @@ function mountDemo(element: HTMLElement): void {
   const paths = new Set<(path: string) => void>();
   const path = () => location.hash.slice(1) || '/';
   const host: ScreenHost = {
-    context: { person: { id: 'u-am', name: 'Nguyễn Thuận', email: null }, org: { id: 'demo', name: 'TeraBox' }, locale: navigator.language, theme: theme() },
+    context: { person: { id: 'u-am', name: 'Nguyễn Thuận', email: null }, org: { id: 'demo', name: 'TeraBox' }, locale: query.get('lang') ?? navigator.language, theme: theme() },
     navigate(next) {
       location.hash = next;
     },

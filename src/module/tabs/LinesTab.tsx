@@ -101,13 +101,13 @@ export function LinesTab({ hook, api, lang }: TabProps) {
             </button>
             <span>{n}</span>
           </td>
-          <td>
+          <td className="col-type">
             <Choice hook={hook} path={`${at(i)}.item_type_code`} label={t.colOfLine(c.type, n)} value={line.item_type_code}
               options={type ? types : [{ value: line.item_type_code, label: line.item_type_code }, ...types]} />
             {!type && <div className="tag" data-tone="warn">{t.unknownType}</div>}
             {misplaced && hook.editor && <div className="tag" data-tone="info">{t.misplaced}</div>}
           </td>
-          <td>
+          <td className="col-cocq">
             {line.item_type_code === 'TB' ? (
               <Choice hook={hook} path={`${at(i)}.co_cq`} label={t.colOfLine(c.coCq, n)} value={line.co_cq ? 'yes' : 'no'}
                 options={[{ value: 'no', label: t.no }, { value: 'yes', label: t.yes }]} onPick={(v) => hook.set(`${at(i)}.co_cq`, v === 'yes')} />

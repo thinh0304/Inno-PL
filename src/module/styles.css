@@ -62,7 +62,7 @@
 .head .af-button { white-space: nowrap; }
 .af-button .icon { margin-inline-start: -2px; }
 
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: clip; }
+.panel { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: clip; }
 
 .table { width: 100%; border-collapse: collapse; }
 .table th { height: 36px; padding: 0 12px; text-align: start; font-size: 12px; font-weight: 500; color: var(--muted);
@@ -223,7 +223,7 @@
 .summary th[scope='row'] { font-weight: 500; text-align: start; }
 .summary td, .summary th { height: 36px; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 12px 0; }
-.scroll-x { overflow-x: auto; }
+.scroll-x { position: relative; overflow-x: auto; }
 .lines { min-width: 1500px; }
 .lines td { height: 44px; padding: 4px 6px; }
 .lines th { padding: 0 6px; }
@@ -267,3 +267,14 @@
 .stats.compact .stat-value { font-size: 15px; line-height: 22px; }
 .mh { min-width: 1400px; }
 .mh td { padding: 4px 6px; }
+
+/* The grid's inputs keep a readable width; the table scrolls inside its panel instead. */
+.lines .col-type .cell { min-width: 136px; }
+.lines .col-cocq .cell { min-width: 80px; }
+.lines .col-name .cell { min-width: 220px; }
+.lines .col-unit .cell { min-width: 72px; }
+.lines .col-qty .cell { min-width: 72px; }
+.lines .col-money .cell { min-width: 128px; }
+.lines .col-supplier .cell { min-width: 180px; }
+.lines .col-note .cell { min-width: 140px; }
+.mh .cell { min-width: 120px; }

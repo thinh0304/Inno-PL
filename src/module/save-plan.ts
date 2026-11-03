@@ -34,7 +34,9 @@ function comparable(value: unknown): unknown {
   if (Array.isArray(value)) return value.map((item) => {
     if (!item || typeof item !== 'object') return item;
     const { id: _id, ...rest } = item as Rec;
-    return Object.fromEntries(Object.entries(rest).map(([k, v]) => [k, toWrite(v)]));
+    // A member left empty and a member not stored at all are the same item.
+    return Object.fromEntries(Object.entries(rest).map(([k, v]) => [k, toWrite(v)]).filter(([, v]) => v !== null)
+      .sort(([a], [b]) => String(a).localeCompare(String(b))));
   });
   const v = toWrite(value);
   // A boolean left unset reads as false: writing false over nothing changes nothing.
