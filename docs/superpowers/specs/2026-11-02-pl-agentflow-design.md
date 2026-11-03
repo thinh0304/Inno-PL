@@ -268,7 +268,7 @@ Người dùng đồng ý: công thức theo Đặc tả 4.2–4.3 (mockup v44).
 
 Ngoại lệ theo Excel: **chi phí dự phòng** (13.2) và **chia KPI** (13.3).
 
-Ca vàng TM-1040: các assert dùng số **tính theo Đặc tả** (với dự phòng theo 13.2); một bảng riêng ghi số Excel và lý do lệch từng dòng, để Ban giám đốc đối chiếu.
+Ca vàng TM-1040 (`test/pl/golden-tm1040.test.ts`): các assert dùng số **tính theo Đặc tả** (với dự phòng theo 13.2), và TM-1040 **khớp file Excel từng dòng** (doanh thu, giá vốn, VAT, bảo hành, dự phòng, LN thuần, tỷ suất, ngưỡng, kết luận, chia KPI) vì đơn này không có CPBH, dịch vụ, tư vấn hay triển khai. Các điểm lệch giữa Excel và Đặc tả nêu ở trên chỉ hiện ra ở đơn có những khoản đó.
 
 ### 13.2 Chi phí dự phòng
 
