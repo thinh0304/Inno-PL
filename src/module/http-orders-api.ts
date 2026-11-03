@@ -1,5 +1,6 @@
 // The orders over AgentFlow's published record operations, through the host's client, as the signed-in person.
 import { AgentFlowError, getAppObjects, ok, type AppHost } from '@reflexify/agentflow-sdk';
+import { byNewest, contractBody, contractFromRecord, nextVersion } from '../contract/records';
 import { statusFor } from '../flow/actions';
 import { TASKS } from '../flow/tasks';
 import { draftFromRecords, fieldsOf, lineGroup, refId } from '../order/records';
@@ -47,7 +48,7 @@ function taskOf(record: Rec): OrderTask {
     claimedBy: refId(t.claimed_by) };
 }
 
-export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): OrdersApi & { canRead(entity: string): Promise<boolean> } {
+export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'> & Partial<Pick<AppHost, 'apiUrl'>>): OrdersApi & { canRead(entity: string): Promise<boolean> } {
   const api = host.api;
   const objects = getAppObjects(api);
   // Each record's updated_at as last read, for the next PATCH (a stale one is 409 STALE_VERSION).
@@ -298,6 +299,41 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
         if (NOT_FOR_THEM(toOrdersError(error))) return null;
         throw error;
       }
+    },
+    async contracts(orderId: string) {
+      const list = (await ofOrder('contract', orderId)).map(contractFromRecord).sort(byNewest);
+      // The record holds only the file's id (F-26): its name comes from the file's own metadata.
+      await Promise.all(list.map(async (c) => {
+        if (!c.file) { c.file_name = null; return; }
+        try {
+          const meta = await call(api.GET('/attachments/{attachment_id}', { params: { path: { attachment_id: c.file } } }) as never) as { original_filename?: string };
+          c.file_name = meta.original_filename ?? null;
+        } catch {
+          c.file_name = null;
+        }
+      }));
+      return list;
+    },
+    async uploadContract(orderId, input) {
+      const form = new FormData();
+      form.append('file', input.file, input.file.name);
+      let meta: { id: string; original_filename?: string };
+      try {
+        meta = await call(api.POST('/attachments', { body: form as never, bodySerializer: (body: unknown) => body as FormData } as never) as never);
+      } catch (error) {
+        const known = toOrdersError(error);
+        // F-25: AgentFlow does not let an installed app upload files.
+        if (known.code === 'APP_CEILING_DENIED') throw new OrdersError('UPLOAD_NOT_ALLOWED', known.reason, {}, known.status);
+        throw new OrdersError('UPLOAD_FAILED', known.reason, {}, known.status);
+      }
+      const existing = (await ofOrder('contract', orderId)).map(contractFromRecord);
+      const version = nextVersion(existing, input.party, input.supplier, input.step);
+      const made = contractFromRecord(await writer.create('contract' as never,
+        contractBody(orderId, input, meta.id, self.me().id, new Date().toISOString(), version)));
+      return { ...made, file_name: meta.original_filename ?? input.file.name };
+    },
+    contractFileUrl(contract) {
+      return contract.file && host.apiUrl ? host.apiUrl(`/attachments/${encodeURIComponent(contract.file)}/download`) : null;
     },
     async logEvent(orderId: string, event) {
       await writer.create('order_event' as never, { order: orderId, ...event, actor: self.me().id, at: new Date().toISOString() });

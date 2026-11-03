@@ -1,5 +1,6 @@
 // The orders in memory, for the demo and the screen tests. Records have AgentFlow's shape ({ id, body, updated_at }),
 // saving runs the real save plan, and setting pl_requested_at runs the same computation compute_pl runs.
+import { byNewest, contractBody, contractFromRecord, nextVersion } from '../contract/records';
 import { statusFor, needsReason } from '../flow/actions';
 import { runAdvance } from '../flow/code-entry';
 import { TASKS, type TaskRole } from '../flow/tasks';
@@ -15,7 +16,7 @@ import { OrdersError, type Access, type LoadedOrder, type OrderEvent, type Order
 import { executeSavePlan, savePlan, type WriteEntity } from './save-plan.js';
 
 type Stored = { id: string; body: Rec; updated_at: string };
-const ENTITIES = ['order', 'order_line', 'goods_line_price', 'service_line_price', 'order_finance', 'purchase_proposal',
+const ENTITIES = ['contract', 'order', 'order_line', 'goods_line_price', 'service_line_price', 'order_finance', 'purchase_proposal',
   'order_pl', 'order_pl_service', 'order_pl_goods', 'order_task', 'order_event', 'customer', 'supplier'] as const;
 const TASK_VALUES = ['status', 'outcome', 'reason', 'opened_at', 'due_at', 'finished_at', 'due_state', 'late_days'];
 const ALL_ROLES: TaskRole[] = ['am', 'sa', 'tm', 'sd', 'proc', 'acc'];
@@ -31,6 +32,8 @@ export interface MemoryOptions {
   computeDelayMs?: number;
   /** The task roles this person is in (My work offers them the open tasks of these roles). */
   roles?: TaskRole[];
+  /** Uploads are refused as AgentFlow refuses them for an installed app (F-25). */
+  refuseUploads?: boolean;
 }
 
 const ALL: Access = { seesPl: true, seesGoodsPrices: true, seesServicePrices: true, seesProposals: false, seesPlService: true,
@@ -99,7 +102,7 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       const out = runAdvance({ order: order as unknown as Rec, tasks: rows('order_task', orderId) as unknown as Rec[],
         pl: rows('order_pl', orderId) as unknown as Rec[], lines: rows('order_line', orderId) as unknown as Rec[],
         goods_prices: rows('goods_line_price', orderId) as unknown as Rec[], service_prices: rows('service_line_price', orderId) as unknown as Rec[],
-        finance: rows('order_finance', orderId) as unknown as Rec[], config, now: now() });
+        finance: rows('order_finance', orderId) as unknown as Rec[], contracts: rows('contract', orderId) as unknown as Rec[], config, now: now() });
       for (const item of out.create_list) put('order_task', item as Rec);
       for (const item of out.update_list) {
         const row = table('order_task').get(String(item.id));
@@ -116,6 +119,10 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
     }
   };
   for (const [id, row] of table('order')) if (row.body.status === 'draft') reconcile(id);
+
+  // Uploaded files by attachment id, and the download link made for each (once).
+  const files = new Map<string, File>();
+  const links = new Map<string, string | null>();
 
   let failAfter = options.failAfter;
   const failIfDue = () => {
@@ -278,6 +285,30 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
     },
     async actionable(orderId) {
       return new Set((await api.myWork()).filter((w) => w.task.order === orderId).map((w) => w.task.id));
+    },
+    async contracts(orderId) {
+      await wait();
+      return rows('contract', orderId).map((row) => {
+        const c = contractFromRecord(row);
+        return { ...c, file_name: c.file ? files.get(c.file)?.name ?? null : null };
+      }).sort(byNewest);
+    },
+    async uploadContract(orderId, input) {
+      await wait();
+      if (options.refuseUploads) throw new OrdersError('UPLOAD_NOT_ALLOWED', null, {}, 403);
+      const id = `att-${++n}`;
+      files.set(id, input.file);
+      const version = nextVersion(rows('contract', orderId).map(contractFromRecord), input.party, input.supplier, input.step);
+      const row = put('contract', contractBody(orderId, input, id, who().id, now(), version));
+      reconcile(orderId);
+      return { ...contractFromRecord(row), file_name: input.file.name };
+    },
+    contractFileUrl(contract) {
+      if (!contract.file || !files.has(contract.file)) return null;
+      if (!links.has(contract.file)) {
+        links.set(contract.file, typeof URL.createObjectURL === 'function' ? URL.createObjectURL(files.get(contract.file)!) : null);
+      }
+      return links.get(contract.file)!;
     },
     async closeLost(orderId, reason) {
       await wait();

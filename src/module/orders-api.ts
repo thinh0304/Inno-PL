@@ -1,5 +1,6 @@
 // What the order screens need from AgentFlow. The module talks to AgentFlow through it (http-orders-api.ts), and the
 // demo and the tests through a fake (memory-orders-api.ts).
+import type { ContractRec, Party, Step } from '../contract/types';
 import type { TaskRec } from '../flow/advance';
 import type { TaskOutcome } from '../flow/tasks';
 import type { FinanceFields, OrderDraft, OrderFields, OrderRecords, Rec } from '../order/types';
@@ -66,7 +67,18 @@ export interface OrdersApi {
   logEvent(orderId: string, event: { action: string; note?: string; reason?: string; warnings?: IgnoredWarning[] }): Promise<void>;
   /** Close-lost: needs a reason, and is refused once the customer's contract is signed (BR-4A). */
   closeLost(orderId: string, reason: string): Promise<void>;
+  /** The order's contracts, every version, newest first, with their file names; [] for a person who may not read them. */
+  contracts(orderId: string): Promise<ContractRec[]>;
+  /**
+   * Uploads the file, then records it as the next version of its party, supplier and step. A refused upload records nothing
+   * (UPLOAD_FAILED, or UPLOAD_NOT_ALLOWED when AgentFlow does not let the app upload files, F-25).
+   */
+  uploadContract(orderId: string, input: ContractUpload): Promise<ContractRec>;
+  /** A link the browser opens to download the contract's file; null when it has none. */
+  contractFileUrl(contract: ContractRec): string | null;
 }
+
+export interface ContractUpload { party: Party; supplier: string | null; step: Step; file: File; value: number | null; advance_percent: number | null; }
 
 /**
  * A refused or failed call. `reason` is AgentFlow's own sentence when it gave one, shown to the person as it is.

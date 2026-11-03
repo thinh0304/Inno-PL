@@ -7,7 +7,7 @@ type Row = { id: string; body: Record<string, unknown>; updated_at: string };
 export type Refuse = (method: string, entity: string, id?: string) => { status: number; type: string; detail?: string } | null;
 
 export const ENTITY_KEYS = ['order', 'order_line', 'goods_line_price', 'service_line_price', 'order_finance', 'purchase_proposal',
-  'order_pl', 'order_pl_service', 'order_pl_goods', 'order_task', 'order_event', 'customer', 'supplier', 'staff', 'item_type', 'contract_type_rate',
+  'order_pl', 'order_pl_service', 'order_pl_goods', 'order_task', 'order_event', 'contract', 'customer', 'supplier', 'staff', 'item_type', 'contract_type_rate',
   'fin_cost_tier', 'vat_rate', 'pl_setting', 'task_sla', 'deal_stage_weight'];
 
 export function fakeBackend(refuse: Refuse = () => null) {
@@ -19,6 +19,8 @@ export function fakeBackend(refuse: Refuse = () => null) {
   const fail = (status: number, type: string, detail?: string) =>
     ({ error: { type, status, detail }, response: new Response(null, { status }) });
   const entityOf = (entityId: string) => entityId.slice(2);
+  // Uploaded files: their metadata as POST /attachments answers it.
+  const files = new Map<string, { id: string; original_filename: string; content_type: string; byte_size: number; uploaded_at: string }>();
 
   const GET = vi.fn(async (path: string, init?: { params?: { path?: Record<string, string> } }) => {
     if (path === '/app/objects') {
@@ -32,6 +34,10 @@ export function fakeBackend(refuse: Refuse = () => null) {
         && (view === 'mine' ? row.body.claimed_by === 'u-am' : !row.body.claimed_by));
       return answer({ items: open.map((row) => ({ entity_id: 'e-order_task', id: row.id })) });
     }
+    if (path === '/attachments/{attachment_id}') {
+      const meta = files.get(init!.params!.path!.attachment_id);
+      return meta ? answer(meta) : fail(404, 'NOT_FOUND');
+    }
     const { entity_id, record_id } = init!.params!.path!;
     const refused = refuse('GET', entityOf(entity_id), record_id);
     if (refused) return fail(refused.status, refused.type, refused.detail);
@@ -40,6 +46,14 @@ export function fakeBackend(refuse: Refuse = () => null) {
   });
 
   const POST = vi.fn(async (path: string, init: { params: { path: Record<string, string> }; body: Record<string, any> }) => {
+    if (path === '/attachments') {
+      const refusedUpload = refuse('UPLOAD', 'attachments');
+      if (refusedUpload) return fail(refusedUpload.status, refusedUpload.type, refusedUpload.detail);
+      const file = (init.body as unknown as FormData).get('file') as File;
+      const meta = { id: `att-${++n}`, original_filename: file.name, content_type: file.type, byte_size: file.size, uploaded_at: stamp() };
+      files.set(meta.id, meta);
+      return answer(meta, 201);
+    }
     const { entity_id } = init.params.path;
     const refused = refuse(path.endsWith('/query') ? 'QUERY' : 'POST', entityOf(entity_id));
     if (refused) return fail(refused.status, refused.type, refused.detail);
@@ -93,11 +107,14 @@ export function fakeBackend(refuse: Refuse = () => null) {
     row.updated_at = stamp();
   };
   const all = (entity: string) => [...rows.get(`e-${entity}`)!.values()];
+  const seedFile = (id: string, original_filename: string) =>
+    files.set(id, { id, original_filename, content_type: 'application/pdf', byte_size: 4, uploaded_at: stamp() });
 
   const host = {
     api: { GET, POST, PATCH, DELETE } as unknown as AppHost['api'],
+    apiUrl: (path: string) => `https://af.test/api${path}`,
     context: { person: { id: 'u-am', name: 'Nguyễn Thuận', email: null }, org: { id: 'org', name: 'TeraBox' }, locale: 'vi',
       theme: { mode: 'light', brand: 'agentflow' } },
-  } as Pick<AppHost, 'api' | 'context'>;
-  return { host, GET, POST, PATCH, DELETE, seed, touch, all };
+  } as Pick<AppHost, 'api' | 'context' | 'apiUrl'>;
+  return { host, GET, POST, PATCH, DELETE, seed, seedFile, touch, all };
 }
