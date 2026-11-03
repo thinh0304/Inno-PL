@@ -4,7 +4,7 @@ import type { ContractType, CustomerTier, PlConfig, PlOrderInput, PurchaseGroup 
 import type { FinanceFields, LineDraft, LinePrice, OrderDraft, OrderFields, OrderRecords, Rec } from './types';
 
 // A record's fields may sit at its top level (list calls), or under body / fields.
-function fieldsOf(record: unknown): Rec {
+export function fieldsOf(record: unknown): Rec {
   const r = (record ?? {}) as Rec;
   const inner = (r.body ?? r.fields) as Rec | undefined;
   return inner && typeof inner === 'object' ? { id: r.id, ...inner } : r;
@@ -15,13 +15,13 @@ const optStr = (value: unknown) => (value == null || value === '' ? null : str(v
 const num = (value: unknown) => parseNumber(value) ?? null;
 const bool = (value: unknown) => value === true || value === 'true';
 // A reference reads as the id, or as an object carrying one.
-const ref = (value: unknown) => (value && typeof value === 'object' ? optStr((value as Rec).id) : optStr(value));
+export const refId = (value: unknown) => (value && typeof value === 'object' ? optStr((value as Rec).id) : optStr(value));
 
 function orderFields(r: Rec): OrderFields {
   const stages = Array.isArray(r.deal_stages) ? (r.deal_stages as Rec[]) : [];
   return {
     id: optStr(r.id) ?? undefined, number: optStr(r.number) ?? undefined, code: optStr(r.code) ?? undefined,
-    status: (optStr(r.status) ?? 'draft') as OrderFields['status'], stage: num(r.stage) ?? 1, customer: ref(r.customer),
+    status: (optStr(r.status) ?? 'draft') as OrderFields['status'], stage: num(r.stage) ?? 1, customer: refId(r.customer),
     customer_name: str(r.customer_name), customer_code: str(r.customer_code), tax_code: str(r.tax_code), address: str(r.address),
     contact_name: str(r.contact_name), contact_phone: str(r.contact_phone), contact_email: str(r.contact_email),
     representative: str(r.representative), representative_title: str(r.representative_title),
@@ -29,13 +29,13 @@ function orderFields(r: Rec): OrderFields {
     receiver_phone: str(r.receiver_phone), delivery_address: str(r.delivery_address), delivery_note: str(r.delivery_note),
     quote_date: optStr(r.quote_date), quote_valid_until: optStr(r.quote_valid_until), exchange_rate: num(r.exchange_rate),
     internal_contract_no: str(r.internal_contract_no), customer_po_no: str(r.customer_po_no), content: str(r.content),
-    signed_on: optStr(r.signed_on), am: ref(r.am), sa: ref(r.sa), inside_sales: ref(r.inside_sales),
+    signed_on: optStr(r.signed_on), am: refId(r.am), sa: refId(r.sa), inside_sales: refId(r.inside_sales),
     // "Có phải đơn hàng mới?" defaults to yes (BR-20).
     is_new_order: r.is_new_order == null ? true : bool(r.is_new_order), is_new_logo: bool(r.is_new_logo),
     prev_contract_no: str(r.prev_contract_no), lead_source: optStr(r.lead_source),
     customer_tier: optStr(r.customer_tier) as CustomerTier | null, debt_days: num(r.debt_days),
     use_provision_fund: bool(r.use_provision_fund), payment_count: num(r.payment_count), customer_prepays: bool(r.customer_prepays),
-    deploy_staff: ref(r.deploy_staff), consult_staff: ref(r.consult_staff), proposal: bool(r.proposal), poc: bool(r.poc),
+    deploy_staff: refId(r.deploy_staff), consult_staff: refId(r.consult_staff), proposal: bool(r.proposal), poc: bool(r.poc),
     contract_type_override: optStr(r.contract_type_override) as ContractType | null,
     deal_stages: stages.map((s) => ({ stage: str(s.stage) as OrderFields['deal_stages'][number]['stage'],
       weight: num(s.weight), person: optStr(s.person) })),
@@ -46,7 +46,7 @@ function orderFields(r: Rec): OrderFields {
 function linePrice(r: Rec | undefined): LinePrice {
   if (!r) return { unit_price: null, discount_pct: null, vat_rate: null, unit_cost: null, supplier: null };
   return { id: optStr(r.id) ?? undefined, unit_price: num(r.unit_price), discount_pct: num(r.discount_pct),
-    vat_rate: num(r.vat_rate), unit_cost: num(r.unit_cost), supplier: ref(r.supplier) };
+    vat_rate: num(r.vat_rate), unit_cost: num(r.unit_cost), supplier: refId(r.supplier) };
 }
 
 function lineDraft(r: Rec, price: Rec | undefined): LineDraft {
@@ -67,7 +67,7 @@ export function draftFromRecords(r: OrderRecords): OrderDraft {
   // A line's price may sit in either price entity: its item type can move between goods and service after it was priced.
   const prices = new Map<string, Rec>();
   for (const price of [...r.goods_prices, ...r.service_prices].map(fieldsOf)) {
-    const line = ref(price.order_line);
+    const line = refId(price.order_line);
     if (line) prices.set(line, price);
   }
   const lines = r.lines.map(fieldsOf).map((line) => lineDraft(line, prices.get(str(line.id))))

@@ -11,7 +11,7 @@ const main = new Function(`${committed}; return main;`)() as Main;
 
 describe('config/code/compute_pl.js', () => {
   it('bundle_is_fresh', async () => {
-    expect(await bundle()).toBe(committed);
+    expect(await bundle('compute_pl')).toBe(committed);
   });
 
   it('bundle_main_matches_engine', () => {

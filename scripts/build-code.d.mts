@@ -1,2 +1,2 @@
-// The bundled text of config/code/compute_pl.js, as scripts/build-code.mjs writes it.
-export function bundle(): Promise<string>;
+// The bundled text of config/code/<name>.js, as scripts/build-code.mjs writes it.
+export function bundle(name: 'compute_pl' | 'compute_order_pl'): Promise<string>;
