@@ -1,24 +1,29 @@
 import { useId, useRef, useState } from 'react';
+import type { ContractTask, GateIssue } from '../contract/types';
 import { actionsFor, needsReason } from '../flow/actions';
 import { FINISHED, type TaskOutcome } from '../flow/tasks';
 import { needsWhy, taskWarnings, warningsApply, type FlowWarning } from '../flow/warnings';
+import { formatMoney } from './format.js';
 import { Dialog, useToasts, type ThemeMode } from './kit.js';
 import { OrdersError, type IgnoredWarning, type OrderTask } from './orders-api.js';
 import { errorText, TEXT, type Lang } from './text.js';
+import type { ContractsHook } from './useContracts.js';
 import type { FlowHook } from './useFlow.js';
 import type { OrderDraftHook } from './useOrderDraft.js';
 
-interface Props { hook: OrderDraftHook; flow: FlowHook; lang: Lang; locale: string; theme: ThemeMode; name(code: string): string }
+interface Props { hook: OrderDraftHook; flow: FlowHook; contracts: ContractsHook; lang: Lang; locale: string; theme: ThemeMode; name(code: string): string }
 
 const notLogged = (error: unknown) => error instanceof OrdersError && error.code === 'EVENT_NOT_LOGGED';
+const CONTRACT_TASKS: readonly string[] = ['t40', 't44', 't41', 't45'];
 
 /**
  * "Việc của bạn" (mockup `wfact`): the open tasks this person may act on, each with its outcome buttons and its own note
  * for the reason, the warnings that will be logged if they go on (FR-6.10), and Close-lost for the order's Sales Admin.
  */
-export function ActionPanel({ hook, flow, lang, locale, theme, name }: Props) {
+export function ActionPanel({ hook, flow, contracts, lang, locale, theme, name }: Props) {
   const T = TEXT[lang];
   const t = T.flow;
+  const C = T.contracts;
   const toasts = useToasts({ locale, theme });
   const base = useId();
   const pressed = useRef(false);
@@ -33,14 +38,36 @@ export function ActionPanel({ hook, flow, lang, locale, theme, name }: Props) {
   const { order } = hook.draft;
   const mine = flow.tasks.filter((task) => task.status === 'open' && flow.actionable.has(task.id) && actionsFor(task, hook.me.id, [task.role]).length > 0);
   const passed = hook.saved?.official.order_pl?.passed;
-  const ctx = { tasks: flow.tasks, now: new Date().toISOString(), passed: typeof passed === 'boolean' ? passed : null, customerPrepays: order.customer_prepays };
+  const ctx = { tasks: flow.tasks, now: new Date().toISOString(), passed: typeof passed === 'boolean' ? passed : null, customerPrepays: order.customer_prepays,
+    prepayAmount: contracts.prepay };
   const errors = hook.issues.filter((issue) => issue.severity === 'error').length;
   const submitLock = hook.dirty ? t.saveFirst : errors > 0 ? t.incomplete(errors) : null;
   const t41 = flow.tasks.find((task) => task.task_code === 't41');
   const canCloseLost = order.sa === hook.me.id && (order.status === 'draft' || order.status === 'in_progress') && !(t41 && FINISHED.has(t41.status));
   const lostId = `${base}-lost`;
 
-  const wording = (w: FlowWarning) => (w.code === 'late' ? t.warnings.late(w.days ?? 0) : t.warnings[w.code]);
+  const wording = (w: FlowWarning) => (w.code === 'late' ? t.warnings.late(w.days ?? 0)
+    : w.code === 'prepay_before_customer' && w.amount ? `${t.warnings[w.code]} (${C.prepayAmount(formatMoney(w.amount))})` : t.warnings[w.code]);
+
+  // The contract gate (BR-44, BR-45, BR-46), worded: the same rules advance_order applies, shown before the person presses.
+  const slotName = (key: string | null) => {
+    const slot = contracts.slots.find((x) => x.key === key);
+    return !slot || slot.party === 'customer' ? C.gate.customer : C.gate.supplier(contracts.supplierName(slot.supplier));
+  };
+  const fieldLabel = (path?: string) => {
+    const key = (path ?? '').replace(/^order./, '');
+    return key in C.signingLabels ? C.signingLabels[key as keyof typeof C.signingLabels] : key;
+  };
+  const worded = (i: GateIssue) => (i.code === 'order_fields' ? C.gate.field(fieldLabel(i.path), i.message.replace(/^[^:]*:s*/, ''))
+    : i.code === 'draft_not_approved' ? C.gate.draft_not_approved : C.gate[i.code](slotName(i.slot)));
+  const gateFor = (task: OrderTask, outcome: TaskOutcome): string | null => {
+    let issues: GateIssue[] = [];
+    if (outcome === 'completed' && CONTRACT_TASKS.includes(task.task_code)) issues = contracts.gate(task.task_code as ContractTask);
+    // SD agrees to sign only drafts that are all there.
+    if (task.task_code === 't42' && outcome === 'agreed') issues = [...contracts.gate('t40'), ...contracts.gate('t44')].filter((i) => i.code === 'draft_missing');
+    return issues.length ? issues.map(worded).join('; ') : null;
+  };
+  const lockOf = (task: OrderTask, outcome: TaskOutcome) => (outcome === 'submitted' ? submitLock : gateFor(task, outcome));
   const ignored = (w: FlowWarning): IgnoredWarning => ({ source: 'system', level: w.level, text: wording(w) });
   const say = (kind: 'ok' | 'error', text: string) => {
     setMessage({ kind, text });
@@ -50,7 +77,7 @@ export function ActionPanel({ hook, flow, lang, locale, theme, name }: Props) {
 
   const press = async (task: OrderTask, outcome: TaskOutcome) => {
     if (pressed.current || flow.busy) return;
-    if (outcome === 'submitted' && submitLock) return;
+    if (lockOf(task, outcome)) return;
     const reason = (notes[task.id] ?? '').trim();
     const warnings = warningsApply(outcome) ? taskWarnings(task, ctx) : [];
     if (needsReason(outcome) && !reason) return void setError({ task: task.id, text: t.reasonRequired });
@@ -115,6 +142,17 @@ export function ActionPanel({ hook, flow, lang, locale, theme, name }: Props) {
             return (
               <li key={task.id} className="mytask">
                 <p className="tcard-name"><b className="code">{task.task_code.toUpperCase()}</b> {name(task.task_code)}</p>
+                {task.task_code === 't42' && (
+                  <ul className="drafts" aria-label={C.draftsToReview}>
+                    {contracts.slots.filter((slot) => !slot.orphan && slot.draft).map((slot) => {
+                      const url = contracts.fileUrl(slot.draft!);
+                      const label = slot.draft!.file_name ?? slot.draft!.file ?? '';
+                      return <li key={slot.key}>{slot.party === 'customer' ? C.customerTitle : C.supplierTitle(contracts.supplierName(slot.supplier))}:{' '}
+                        {url ? <a href={url} target="_blank" rel="noopener noreferrer" className="link">{label}</a> : label}</li>;
+                    })}
+                  </ul>
+                )}
+                {task.task_code === 't53' && <p className="hint">{C.prepay(formatMoney(contracts.prepay))}</p>}
                 {warnings.length > 0 && (
                   <div className="warnbox" role="group" aria-label={t.warnTitle(warnings.length)} data-tone={needsWhy(warnings) ? 'danger' : 'warn'}>
                     <b>{t.warnTitle(warnings.length)}</b>
@@ -127,8 +165,8 @@ export function ActionPanel({ hook, flow, lang, locale, theme, name }: Props) {
                 )}
                 {flow.busy !== task.id && <div className="actions">
                   {outcomes.map((outcome) => {
-                    const locked = flow.busy !== null || (outcome === 'submitted' && submitLock !== null);
-                    const why = outcome === 'submitted' ? submitLock : null;
+                    const why = lockOf(task, outcome);
+                    const locked = flow.busy !== null || why !== null;
                     const whyId = `${noteId}-${outcome}-why`;
                     return (
                       <span key={outcome} className="action">

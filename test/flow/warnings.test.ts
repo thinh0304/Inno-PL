@@ -27,6 +27,15 @@ describe('taskWarnings', () => {
     expect(taskWarnings(task('t61', 'open'), without)).toEqual([]);
   });
 
+  it('t53_warning_shows_the_prepay_amount', () => {
+    const without = ctx({ customerPrepays: true, tasks: [task('t51', 'open')], prepayAmount: 1_050_000 });
+    expect(taskWarnings(task('t53', 'open'), without)).toEqual([{ code: 'prepay_before_customer', level: 'warning', amount: 1_050_000 }]);
+  });
+
+  it('t53_warning_clears_when_the_customer_prepaid', () => {
+    expect(taskWarnings(task('t53', 'open'), ctx({ customerPrepays: true, tasks: [task('t51', 'done')], prepayAmount: 1_050_000 }))).toEqual([]);
+  });
+
   it('below_threshold_is_critical_at_t31_and_a_warning_at_t11', () => {
     expect(taskWarnings(task('t31', 'open'), ctx({ passed: false }))).toEqual([{ code: 'below_threshold', level: 'critical' }]);
     expect(taskWarnings(task('t11', 'open'), ctx({ passed: false }))).toEqual([{ code: 'below_threshold', level: 'warning' }]);

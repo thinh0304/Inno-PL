@@ -6,6 +6,7 @@ import { OrderPage } from './OrderPage.js';
 import type { OrdersApi } from './orders-api.js';
 import { parseRoute, routePath, usePath } from './routes.js';
 import { LinesTab } from './tabs/LinesTab.js';
+import { ContractsTab } from './tabs/ContractsTab.js';
 import { FlowTab } from './tabs/FlowTab.js';
 import { HistoryTab } from './tabs/HistoryTab.js';
 import { PlTab } from './tabs/PlTab.js';
@@ -14,7 +15,7 @@ import { SuppliersTab } from './tabs/SuppliersTab.js';
 import { SurveyTab } from './tabs/SurveyTab.js';
 import type { Lang } from './text.js';
 
-const TABS = { form: SurveyTab, lines: LinesTab, suppliers: SuppliersTab, pl: PlTab, purchase: PurchaseTab, flow: FlowTab, history: HistoryTab };
+const TABS = { form: SurveyTab, lines: LinesTab, suppliers: SuppliersTab, pl: PlTab, purchase: PurchaseTab, contracts: ContractsTab, flow: FlowTab, history: HistoryTab };
 
 export interface AppProps { host: ScreenHost; api: OrdersApi; lang: Lang; locale: string; theme: ThemeMode }
 

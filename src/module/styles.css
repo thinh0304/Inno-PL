@@ -347,3 +347,17 @@
 .workitem { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
 .workitem:last-child { border-bottom: 0; }
 .workitem-main { min-width: 0; flex: 1 1 260px; }
+
+/* Contracts (FR-7.1, FR-7.9): a card per contract, draft and signed copy side by side, one above the other when narrow. */
+.contracts { display: grid; gap: 12px; }
+.contract-meta { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin: 0 0 12px; }
+.contract-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; }
+.contract-step { display: grid; gap: 8px; align-content: start; min-width: 0; overflow-wrap: anywhere; }
+.contract-step p { margin: 0; }
+.step-title { margin: 0; font-size: 13px; font-weight: 600; }
+.upload { display: grid; gap: 8px; padding: 10px 12px; border: 1px dashed var(--line); border-radius: var(--r); }
+.upload input[type='file'] { height: auto; padding: 6px 8px; max-width: 100%; }
+.contract-history { margin-top: 12px; }
+.contract-history summary { cursor: pointer; }
+.contract-history ul, .drafts { margin: 6px 0 0; padding-inline-start: 18px; overflow-wrap: anywhere; }
+@container pl (width < 640px) { .contract-steps { grid-template-columns: minmax(0, 1fr); } }

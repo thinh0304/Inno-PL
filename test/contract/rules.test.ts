@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { contractGate, contractSlots, latest, needsFile, prepayAmount, slotKey } from '../../src/contract/rules';
+import { contractGate, contractSlots, latest, needsFile, prepayAmount, prepayTotal, slotKey } from '../../src/contract/rules';
 import type { ContractRec, Party, Step } from '../../src/contract/types';
 import { draftFromRecords } from '../../src/order/records';
 import type { LineDraft, OrderDraft } from '../../src/order/types';
@@ -129,7 +129,7 @@ describe('contractGate', () => {
     const draft = order();
     draft.order.receiver_name = '';
     expect(gate('t41', draft, 5 * M, [])).toEqual([
-      { code: 'order_fields', slot: null, message: expect.stringContaining('order.receiver_name') }]);
+      { code: 'order_fields', slot: null, path: 'order.receiver_name', message: expect.stringContaining('order.receiver_name') }]);
   });
 
   it('t41_needs_a_customer_final_above_the_limit', () => {
@@ -154,5 +154,18 @@ describe('prepayAmount', () => {
     expect(prepayAmount(3_500_000, 0.3)).toBe(1_050_000);
     expect(prepayAmount(3_500_000, null)).toBe(0);
     expect(prepayAmount(1_000_001, 0.5)).toBe(500_001);
+  });
+
+  it('prepay_total_sums_the_suppliers_from_their_latest_contract', () => {
+    const draft = order([['s1', 1, 10 * M], ['s2', 1, 20 * M]]);
+    const slots = contractSlots(draft, 0, [
+      rec('supplier', 's1', 'draft', { advance_percent: 0.3 }),
+      rec('supplier', 's2', 'draft', { advance_percent: 0.1, value: 30 * M }),
+      rec('supplier', 's2', 'final', { advance_percent: 0.5, value: 40 * M }),
+      rec('supplier', 's9', 'final', { advance_percent: 1, value: 99 * M }),
+    ]);
+    // s1: 10 tr × 30%; s2: the final's 40 tr × 50%; s9 is no longer on the order.
+    expect(prepayTotal(slots)).toBe(3 * M + 20 * M);
+    expect(prepayTotal(contractSlots(draft, 0, []))).toBe(0);
   });
 });

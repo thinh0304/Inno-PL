@@ -14,7 +14,7 @@ afterEach(cleanup);
 const PROC: MemoryOptions = { me: { id: 'u-proc', name: 'Mua hàng' }, access: { seesPl: false, seesServicePrices: false, seesPlService: false,
   seesProposals: true, canCreateOrder: false } };
 const TM: MemoryOptions = { me: { id: 'u-tm', name: 'Kỹ thuật' }, access: { seesPl: false, seesGoodsPrices: false, seesPlGoods: false,
-  seesProposals: false, canCreateOrder: false } };
+  seesProposals: false, seesContracts: false, canCreateOrder: false } };
 const SD: MemoryOptions = { me: { id: 'u-sd', name: 'SD' }, access: { seesProposals: true, canCreateOrder: false } };
 
 async function open(options: MemoryOptions, id = 'o1') {
@@ -26,7 +26,7 @@ async function open(options: MemoryOptions, id = 'o1') {
 describe('the purchase tab', () => {
   it('procurement_edits_proposals_and_sees_saving', async () => {
     await open(PROC);
-    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Đơn mua hàng', 'Quy trình', 'Lịch sử']);
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Đơn mua hàng', 'Hợp đồng', 'Quy trình', 'Lịch sử']);
     const cost = await screen.findByLabelText('Đơn giá mua đề xuất — Mua hàng dòng 1');
     fireEvent.change(cost, { target: { value: '18.000.000' } });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu đề xuất dòng 1' }));

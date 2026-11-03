@@ -6,9 +6,9 @@ import type { TabKey } from './routes.js';
 export interface AccessSource { canRead(entity: string): Promise<boolean>; staff(): Promise<StaffMember[]>; me(): Person }
 
 export async function probeAccess(source: AccessSource): Promise<Access> {
-  const [seesPl, seesGoodsPrices, seesServicePrices, seesProposals, seesPlService, seesPlGoods, staff] = await Promise.all([
+  const [seesPl, seesGoodsPrices, seesServicePrices, seesProposals, seesPlService, seesPlGoods, seesContracts, staff] = await Promise.all([
     source.canRead('order_pl'), source.canRead('goods_line_price'), source.canRead('service_line_price'),
-    source.canRead('purchase_proposal'), source.canRead('order_pl_service'), source.canRead('order_pl_goods'),
+    source.canRead('purchase_proposal'), source.canRead('order_pl_service'), source.canRead('order_pl_goods'), source.canRead('contract'),
     source.staff().catch(() => [] as StaffMember[]),
   ]);
   const me = source.me().id;
@@ -17,15 +17,15 @@ export async function probeAccess(source: AccessSource): Promise<Access> {
   // Reads all P&L, no purchase proposals, not a salesperson: the app's admin. Only shows the Delete button;
   // AgentFlow still decides the delete.
   const isAdmin = seesPl && !seesProposals && !canCreateOrder;
-  return { seesPl, seesGoodsPrices, seesServicePrices, seesProposals, seesPlService, seesPlGoods, canCreateOrder, isAdmin };
+  return { seesPl, seesGoodsPrices, seesServicePrices, seesProposals, seesPlService, seesPlGoods, seesContracts, canCreateOrder, isAdmin };
 }
 
 /**
- * The order page's tabs, in the mockup's order for each role (ROLETABS), then the flow and the history for every saved
- * order (a new order has neither yet).
+ * The order page's tabs, in the mockup's order for each role (ROLETABS), then the contracts, the flow and the history for every
+ * saved order (a new order has none of them yet).
  */
 export function tabsFor(access: Access, editor: boolean, saved = true): TabKey[] {
-  const flow: TabKey[] = saved ? ['flow', 'history'] : [];
+  const flow: TabKey[] = saved ? [...(access.seesContracts ? ['contracts' as const] : []), 'flow', 'history'] : [];
   if (editor) return ['form', 'lines', 'suppliers', 'pl', ...flow];
   if (access.seesPl && access.seesProposals) return ['pl', 'lines', 'purchase', 'suppliers', 'form', ...flow];
   if (access.seesPl) return ['pl', 'lines', 'suppliers', 'form', ...flow];

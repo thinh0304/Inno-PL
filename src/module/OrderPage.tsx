@@ -9,10 +9,11 @@ import type { OrdersApi } from './orders-api.js';
 import { routePath, type TabKey } from './routes.js';
 import { StageBar } from './StageBar.js';
 import { errorText, TEXT, type Lang } from './text.js';
+import { useContracts, type ContractsHook } from './useContracts.js';
 import { useFlow, type FlowHook } from './useFlow.js';
 import { useOrderDraft, type OrderDraftHook } from './useOrderDraft.js';
 
-export interface TabProps { hook: OrderDraftHook; flow: FlowHook; api: OrdersApi; lang: Lang; locale: string; theme: ThemeMode }
+export interface TabProps { hook: OrderDraftHook; flow: FlowHook; contracts: ContractsHook; api: OrdersApi; lang: Lang; locale: string; theme: ThemeMode }
 export type TabComponent = (props: TabProps) => ReactElement;
 
 interface Props {
@@ -44,6 +45,8 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
   const hook = useOrderDraft(api, id);
   // The flow is read again as the order is whenever a task changes it (a return unlocks the order, a submission locks it).
   const flow = useFlow(api, id, hook.refresh);
+  const revenue = Number(hook.saved?.official.order_pl?.revenue ?? 0) || 0;
+  const contracts = useContracts(api, id, hook.draft, revenue, hook.config, flow.tasks, hook.refresh);
   const toasts = useToasts({ locale, theme });
   const reasonId = useId();
   const pressed = useRef(false);
@@ -128,7 +131,7 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
         ))}
       </div>
       <section role="tabpanel" id={`panel-${current}`} aria-labelledby={`tab-${current}`} className="tab-panel">
-        {Tab && <Tab hook={hook} flow={flow} api={api} lang={lang} locale={locale} theme={theme} />}
+        {Tab && <Tab hook={hook} flow={flow} contracts={contracts} api={api} lang={lang} locale={locale} theme={theme} />}
       </section>
       {toasts.region}
     </main>

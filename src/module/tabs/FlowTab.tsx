@@ -8,7 +8,7 @@ import { TaskCard } from '../TaskCard.js';
 import { TEXT } from '../text.js';
 
 /** The flow tab (mockup `renderWorkflow`, `renderBoard`): where the order stands, the board, and this person's work. */
-export function FlowTab({ hook, lang, locale, theme, flow }: TabProps) {
+export function FlowTab({ hook, lang, locale, theme, flow, contracts }: TabProps) {
   const t = TEXT[lang].flow;
   const { order } = hook.draft;
   if (flow.state === 'loading') {
@@ -50,7 +50,7 @@ export function FlowTab({ hook, lang, locale, theme, flow }: TabProps) {
           {t.returnedBanner(person(by.actor) ?? t.system, formatDateTime(by.at), by.task_code?.toUpperCase() ?? '', by.reason)}
         </div>
       )}
-      {!closed && <ActionPanel hook={hook} flow={flow} lang={lang} locale={locale} theme={theme} name={nameOf} />}
+      {!closed && <ActionPanel hook={hook} flow={flow} contracts={contracts} lang={lang} locale={locale} theme={theme} name={nameOf} />}
       <section className="board" aria-label={t.boardLabel}>
         {columns.map((stage) => (
           <div key={stage.stage} className="bcol" data-state={stage.state}>

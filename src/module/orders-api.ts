@@ -1,5 +1,6 @@
 // What the order screens need from AgentFlow. The module talks to AgentFlow through it (http-orders-api.ts), and the
 // demo and the tests through a fake (memory-orders-api.ts).
+import type { SigningField } from '../contract/rules';
 import type { ContractRec, Party, Step } from '../contract/types';
 import type { TaskRec } from '../flow/advance';
 import type { TaskOutcome } from '../flow/tasks';
@@ -24,7 +25,8 @@ export interface OrderSummary { id: string; code: string; customerName: string; 
 
 /** What this person may read, as AgentFlow answers it (a 403 or 404 means no). */
 export interface Access { seesPl: boolean; seesGoodsPrices: boolean; seesServicePrices: boolean; seesProposals: boolean;
-  seesPlService: boolean; seesPlGoods: boolean; canCreateOrder: boolean; isAdmin: boolean; }
+  seesPlService: boolean; seesPlGoods: boolean; /** Reads the order's contracts (everyone but TM, Thiết kế 7.2). */ seesContracts: boolean;
+  canCreateOrder: boolean; isAdmin: boolean; }
 
 export interface OfficialPl { order_pl: Rec | null; order_pl_service: Rec | null; order_pl_goods: Rec | null; }
 export interface Person { id: string; name: string; }
@@ -74,6 +76,11 @@ export interface OrdersApi {
    * (UPLOAD_FAILED, or UPLOAD_NOT_ALLOWED when AgentFlow does not let the app upload files, F-25).
    */
   uploadContract(orderId: string, input: ContractUpload): Promise<ContractRec>;
+  /**
+   * BR-45: SA writes the order's signing fields at t41, after submission (they lock once the contract is signed). Any other
+   * field is refused here (NOT_SIGNING_FIELD).
+   */
+  saveSigning(orderId: string, fields: Partial<Pick<OrderFields, SigningField>>): Promise<void>;
   /** A link the browser opens to download the contract's file; null when it has none. */
   contractFileUrl(contract: ContractRec): string | null;
 }

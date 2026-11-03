@@ -19,5 +19,6 @@ export interface Slot { key: string; party: Party; supplier: string | null; expe
   /** A supplier no longer on any line of the order. */ orphan: boolean; }
 
 export type GateCode = 'draft_missing' | 'final_missing' | 'draft_not_approved' | 'order_fields' | 'ai_blocking';
-export interface GateIssue { code: GateCode; slot: string | null; message: string; }
+export interface GateIssue { code: GateCode; slot: string | null; message: string;
+  /** The order field an 'order_fields' issue is about (order.signed_on). */ path?: string; }
 export type ContractTask = 't40' | 't44' | 't41' | 't45';

@@ -1,6 +1,7 @@
 // The orders in memory, for the demo and the screen tests. Records have AgentFlow's shape ({ id, body, updated_at }),
 // saving runs the real save plan, and setting pl_requested_at runs the same computation compute_pl runs.
 import { byNewest, contractBody, contractFromRecord, nextVersion } from '../contract/records';
+import { isSigningField } from '../contract/rules';
 import { statusFor, needsReason } from '../flow/actions';
 import { runAdvance } from '../flow/code-entry';
 import { TASKS, type TaskRole } from '../flow/tasks';
@@ -37,7 +38,7 @@ export interface MemoryOptions {
 }
 
 const ALL: Access = { seesPl: true, seesGoodsPrices: true, seesServicePrices: true, seesProposals: false, seesPlService: true,
-  seesPlGoods: true, canCreateOrder: true, isAdmin: false };
+  seesPlGoods: true, seesContracts: true, canCreateOrder: true, isAdmin: false };
 
 // "Sở Giao" finds "So giao": search ignores case and Vietnamese diacritics.
 const fold = (s: unknown) => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase();
@@ -302,6 +303,16 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       const row = put('contract', contractBody(orderId, input, id, who().id, now(), version));
       reconcile(orderId);
       return { ...contractFromRecord(row), file_name: input.file.name };
+    },
+    async saveSigning(orderId, fields) {
+      await wait();
+      if (!Object.keys(fields).every(isSigningField)) throw new OrdersError('NOT_SIGNING_FIELD', null);
+      const order = table('order').get(orderId);
+      if (!order) throw new OrdersError('ENTITY_RECORD_NOT_FOUND', null, {}, 404);
+      // The rule on order: signed is signed (signing_fields_locked_after_signing).
+      if (order.body.contract_signed === true) throw new OrdersError('ENTITY_VALIDATION_RULE_FAILED', 'Hợp đồng khách hàng đã ký — thông tin ký không sửa được', {}, 422);
+      Object.assign(order.body, fields);
+      order.updated_at = now();
     },
     contractFileUrl(contract) {
       if (!contract.file || !files.has(contract.file)) return null;

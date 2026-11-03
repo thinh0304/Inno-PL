@@ -195,6 +195,8 @@ describe('Minors that corrupt data or break the plan', () => {
     await base.act(await taskOf(base, 't11'), 'submitted', '', []);
     await base.act(await taskOf(base, 't23'), 'completed', '', []);
     await base.act(await taskOf(base, 't31'), 'approved', '', []);
+    // Plan 04: t40 completes only with the customer's draft (BR-44).
+    await base.uploadContract('o1', { party: 'customer', supplier: null, step: 'draft', file: new File(['%PDF'], 'kh.pdf'), value: null, advance_percent: null });
     const failing: OrdersApi = { ...base, act: async (...args) => { await base.act(...args); throw new OrdersError('EVENT_NOT_LOGGED', null, {}, 403); } };
     page(failing);
     fireEvent.change(await screen.findByLabelText('Ý kiến / ghi chú'), { target: { value: 'Ghi chú của T40' } });

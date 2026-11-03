@@ -76,6 +76,24 @@ describe('contracts through the HTTP API', () => {
   });
 });
 
+describe('the signing fields (BR-45)', () => {
+  it('save_signing_patches_only_the_signing_fields', async () => {
+    const b = fakeBackend();
+    b.seed('order', { status: 'in_progress', receiver_name: '', content: 'Thiết bị' }, 'o1');
+    await createHttpOrdersApi(b.host).saveSigning('o1', { receiver_name: 'Nguyễn An', signed_on: '2026-11-05' });
+    const patch = b.PATCH.mock.calls.at(-1)![1] as { body: { changes: Record<string, unknown> } };
+    expect(patch.body.changes).toEqual({ receiver_name: 'Nguyễn An', signed_on: '2026-11-05' });
+    expect(b.all('order')[0].body).toMatchObject({ receiver_name: 'Nguyễn An', content: 'Thiết bị' });
+  });
+
+  it('save_signing_refuses_other_fields', async () => {
+    const b = fakeBackend();
+    b.seed('order', { status: 'in_progress' }, 'o1');
+    await expect(createHttpOrdersApi(b.host).saveSigning('o1', { content: 'x' } as never)).rejects.toMatchObject({ code: 'NOT_SIGNING_FIELD' });
+    await expect(createMemoryOrdersApi().saveSigning('o1', { am: 'x' } as never)).rejects.toMatchObject({ code: 'NOT_SIGNING_FIELD' });
+  });
+});
+
 describe('contracts in the memory API', () => {
   it('upload_keeps_the_file_name_and_versions', async () => {
     const api = createMemoryOrdersApi({ me: { id: 'u-sa', name: 'Trần Sa' } });

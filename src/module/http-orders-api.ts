@@ -1,6 +1,7 @@
 // The orders over AgentFlow's published record operations, through the host's client, as the signed-in person.
 import { AgentFlowError, getAppObjects, ok, type AppHost } from '@reflexify/agentflow-sdk';
 import { byNewest, contractBody, contractFromRecord, nextVersion } from '../contract/records';
+import { isSigningField } from '../contract/rules';
 import { statusFor } from '../flow/actions';
 import { TASKS } from '../flow/tasks';
 import { draftFromRecords, fieldsOf, lineGroup, refId } from '../order/records';
@@ -331,6 +332,11 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'> & Par
       const made = contractFromRecord(await writer.create('contract' as never,
         contractBody(orderId, input, meta.id, self.me().id, new Date().toISOString(), version)));
       return { ...made, file_name: meta.original_filename ?? input.file.name };
+    },
+    async saveSigning(orderId, fields) {
+      if (!Object.keys(fields).every(isSigningField)) throw new OrdersError('NOT_SIGNING_FIELD', null);
+      await getRecord('order', orderId);
+      await patch('order', orderId, fields as Rec);
     },
     contractFileUrl(contract) {
       return contract.file && host.apiUrl ? host.apiUrl(`/attachments/${encodeURIComponent(contract.file)}/download`) : null;

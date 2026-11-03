@@ -6,7 +6,7 @@ import { blankDraft } from '../../src/module/save-plan.js';
 import { fakeBackend } from './fake-backend.js';
 
 const none: Access = { seesPl: false, seesGoodsPrices: false, seesServicePrices: false, seesProposals: false, seesPlService: false,
-  seesPlGoods: false, canCreateOrder: false, isAdmin: false };
+  seesPlGoods: false, seesContracts: false, canCreateOrder: false, isAdmin: false };
 
 describe('access', () => {
   it('probe_maps_403_and_404_to_false', async () => {
@@ -14,20 +14,22 @@ describe('access', () => {
       if (method !== 'QUERY') return null;
       if (entity === 'order_pl') return { status: 403, type: 'FORBIDDEN' };
       if (entity === 'purchase_proposal') return { status: 404, type: 'ENTITY_NOT_FOUND' };
+      if (entity === 'contract') return { status: 404, type: 'ENTITY_NOT_FOUND' };
       return null;
     });
     b.seed('staff', { code: 'ThuanNG', user: 'u-am', team: 'sales' });
     const access = await probeAccess(createHttpOrdersApi(b.host));
-    expect(access).toMatchObject({ seesPl: false, seesProposals: false, seesGoodsPrices: true, canCreateOrder: true, isAdmin: false });
+    expect(access).toMatchObject({ seesPl: false, seesProposals: false, seesGoodsPrices: true, seesContracts: false, canCreateOrder: true, isAdmin: false });
+    expect((await probeAccess(createHttpOrdersApi(fakeBackend().host))).seesContracts).toBe(true);
   });
 
   it('tabs_by_role', () => {
-    const am = { ...none, seesPl: true, seesGoodsPrices: true, seesServicePrices: true, seesPlService: true, seesPlGoods: true, canCreateOrder: true };
-    // The flow and the history follow the role's own tabs on every saved order.
-    expect(tabsFor(am, true)).toEqual(['form', 'lines', 'suppliers', 'pl', 'flow', 'history']);
-    expect(tabsFor({ ...am, seesProposals: true, canCreateOrder: false }, false)).toEqual(['pl', 'lines', 'purchase', 'suppliers', 'form', 'flow', 'history']);
-    expect(tabsFor({ ...am, canCreateOrder: false, isAdmin: true }, false)).toEqual(['pl', 'lines', 'suppliers', 'form', 'flow', 'history']);
-    expect(tabsFor({ ...none, seesGoodsPrices: true, seesProposals: true, seesPlGoods: true }, false)).toEqual(['purchase', 'flow', 'history']);
+    const am = { ...none, seesPl: true, seesGoodsPrices: true, seesServicePrices: true, seesPlService: true, seesPlGoods: true, seesContracts: true, canCreateOrder: true };
+    // The contracts (for whoever may read them, not TM: Thiết kế 7.2), the flow and the history follow the role's own tabs on every saved order.
+    expect(tabsFor(am, true)).toEqual(['form', 'lines', 'suppliers', 'pl', 'contracts', 'flow', 'history']);
+    expect(tabsFor({ ...am, seesProposals: true, canCreateOrder: false }, false)).toEqual(['pl', 'lines', 'purchase', 'suppliers', 'form', 'contracts', 'flow', 'history']);
+    expect(tabsFor({ ...am, canCreateOrder: false, isAdmin: true }, false)).toEqual(['pl', 'lines', 'suppliers', 'form', 'contracts', 'flow', 'history']);
+    expect(tabsFor({ ...none, seesGoodsPrices: true, seesProposals: true, seesPlGoods: true, seesContracts: true }, false)).toEqual(['purchase', 'contracts', 'flow', 'history']);
     expect(tabsFor({ ...none, seesServicePrices: true, seesPlService: true }, false)).toEqual(['purchase', 'flow', 'history']);
     expect(tabsFor(none, false)).toEqual(['form', 'flow', 'history']);
     // A new order has no flow yet.

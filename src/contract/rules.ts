@@ -12,6 +12,9 @@ export type { ContractRec, ContractTask, GateIssue, Party, Slot, Step } from './
  * open until the contract is signed (rule signing_fields_locked_after_signing on order). */
 export const SIGNING_FIELDS = ['address', 'receiver_name', 'receiver_phone', 'delivery_address', 'signed_on', 'payment_count', 'customer_po_no'] as const;
 
+export type SigningField = (typeof SIGNING_FIELDS)[number];
+export const isSigningField = (key: string): key is SigningField => (SIGNING_FIELDS as readonly string[]).includes(key);
+
 export const slotKey = (party: Party, supplier: string | null): string => (party === 'customer' ? 'customer' : `supplier:${supplier}`);
 
 const ofSlot = (list: ContractRec[], party: Party, supplier: string | null) =>
@@ -71,7 +74,7 @@ export function contractGate(task: ContractTask, ctx: GateContext): GateIssue[] 
   }
   if (task === 't41') {
     for (const issue of validateOrder(ctx.draft, ctx.config, 'customer_contract').issues) {
-      if (issue.severity === 'error') issues.push({ code: 'order_fields', slot: null, message: `${issue.path}: ${issue.message}` });
+      if (issue.severity === 'error') issues.push({ code: 'order_fields', slot: null, path: issue.path, message: `${issue.path}: ${issue.message}` });
     }
   }
   for (const slot of ctx.slots) {
@@ -92,4 +95,15 @@ export function contractGate(task: ContractTask, ctx: GateContext): GateIssue[] 
 /** BR-48: what is paid to a supplier in advance, in whole VND. */
 export function prepayAmount(cost: number, percent: number | null): number {
   return percent === null ? 0 : Math.round(cost * percent);
+}
+
+/** FR-6.8: the advance owed to the order's suppliers, each from its latest contract (the final, else the draft). */
+export function prepayTotal(slots: Slot[]): number {
+  let total = 0;
+  for (const slot of slots) {
+    if (slot.party !== 'supplier' || slot.orphan) continue;
+    const terms = slot.history.find((c) => c.step === 'final') ?? slot.history.find((c) => c.step === 'draft');
+    if (terms) total += prepayAmount(terms.value ?? slot.expectedValue, terms.advance_percent);
+  }
+  return total;
 }
