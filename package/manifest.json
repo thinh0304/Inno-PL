@@ -196,6 +196,78 @@
       "kind": "entity_view"
     },
     {
+      "key": "entity:contract",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:contract/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/party",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/supplier",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/step",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/file",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/uploaded_by",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/uploaded_at",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/source",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/value",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/advance_percent",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/version",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/ai_check",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/clause_review",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/extracted",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:contract/skip_reason",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:contract/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:contract",
+      "kind": "form"
+    },
+    {
       "key": "entity:contract_type_rate",
       "kind": "entity"
     },
@@ -1513,6 +1585,103 @@
       "operations": {
         "read": "organization",
         "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "contract_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:contract",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "contract_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:contract",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "contract_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:contract",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "contract_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:contract",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization"
+      }
+    },
+    {
+      "key": "contract_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:contract",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "contract_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:contract",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "contract_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:contract",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
         "update": "organization"
       }
     },

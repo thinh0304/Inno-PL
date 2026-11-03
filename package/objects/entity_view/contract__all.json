@@ -1,0 +1,17 @@
+{
+  "name": "Hợp đồng",
+  "type": "grid",
+  "columns": [
+    "order",
+    "party",
+    "supplier",
+    "step",
+    "version",
+    "uploaded_by",
+    "uploaded_at"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

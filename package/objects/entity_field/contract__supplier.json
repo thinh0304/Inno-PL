@@ -1,0 +1,6 @@
+{
+  "label": "Nhà cung cấp",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:supplier",
+  "on_target_delete": "restrict"
+}

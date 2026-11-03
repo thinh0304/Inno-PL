@@ -7,6 +7,7 @@ export const PACKAGE = { id: 'inno/pl', version: '0.1.0' } as const;
 /** Every object of the package, with the version of the contract this code was written against. */
 export const OBJECTS = {
   'entity:business_plan': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:contract': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:contract_type_rate': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:customer': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:deal_stage_weight': { kind: 'entity', contractVersion: '0.1.0' },
@@ -32,6 +33,21 @@ export const OBJECTS = {
   'entity_field:business_plan/net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:business_plan/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:business_plan/year': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/advance_percent': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/ai_check': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/clause_review': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/extracted': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/file': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/party': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/skip_reason': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/source': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/step': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/supplier': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/uploaded_at': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/uploaded_by': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/value': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:contract/version': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/code': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/consult_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/deploy_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -286,6 +302,7 @@ export const OBJECTS = {
   'entity_field:vat_rate/rate': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:vat_rate/sort_order': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_view:business_plan/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:contract/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:contract_type_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:customer/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:deal_stage_weight/all': { kind: 'entity_view', contractVersion: '0.1.0' },
@@ -308,6 +325,7 @@ export const OBJECTS = {
   'entity_view:supplier/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:task_sla/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:vat_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'form:contract': { kind: 'form', contractVersion: '0.1.0' },
   'form:customer': { kind: 'form', contractVersion: '0.1.0' },
   'form:goods_line_price': { kind: 'form', contractVersion: '0.1.0' },
   'form:order': { kind: 'form', contractVersion: '0.1.0' },
@@ -336,7 +354,7 @@ export const OBJECTS = {
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = 'business_plan' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_event' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'order_task' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
+export type EntityKey = 'business_plan' | 'contract' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_event' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'order_task' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
 export type WorkflowKey = 'advance_order' | 'close_lost_order' | 'compute_pl' | 'init_order_tasks' | 'pl_selftest' | 'request_pl_on_proposal' | 'request_pl_on_proposal_update' | 'sla_sweep';
 
 /** The value of each field of each entity, as a record carries it. */
@@ -345,6 +363,23 @@ export interface EntityFields {
     net_profit?: number | null;
     revenue?: number | null;
     year?: number | null;
+  };
+  contract: {
+    advance_percent?: number | null;
+    ai_check?: string | null;
+    clause_review?: string | null;
+    extracted?: string | null;
+    file?: unknown;
+    order?: string | null;
+    party?: 'customer' | 'supplier' | null;
+    skip_reason?: string | null;
+    source?: 'upload' | 'template' | 'ai' | null;
+    step?: 'draft' | 'final' | null;
+    supplier?: string | null;
+    uploaded_at?: string | null;
+    uploaded_by?: string | null;
+    value?: number | null;
+    version?: number | null;
   };
   contract_type_rate: {
     code?: 'tm_once' | 'tmdk' | 'dv_once' | 'dv_recurring' | 'fulfillment' | null;

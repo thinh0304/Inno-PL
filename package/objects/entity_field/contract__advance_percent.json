@@ -1,0 +1,9 @@
+{
+  "label": "Tỷ lệ tạm ứng",
+  "type": "number",
+  "format": "percent",
+  "constraints": {
+    "minimum": 0,
+    "maximum": 1
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "name": "Hợp đồng",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "order": {
+        "x-entityField": "order",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:order"
+      },
+      "party": {
+        "x-entityField": "party",
+        "type": "string",
+        "enum": [
+          "customer",
+          "supplier"
+        ]
+      },
+      "supplier": {
+        "x-entityField": "supplier",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:supplier"
+      },
+      "step": {
+        "x-entityField": "step",
+        "type": "string",
+        "enum": [
+          "draft",
+          "final"
+        ]
+      },
+      "file": {
+        "x-entityField": "file",
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "uploaded_by": {
+        "x-entityField": "uploaded_by",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user"
+      },
+      "uploaded_at": {
+        "x-entityField": "uploaded_at",
+        "type": "string",
+        "format": "date-time"
+      },
+      "source": {
+        "x-entityField": "source",
+        "type": "string",
+        "enum": [
+          "upload",
+          "template",
+          "ai"
+        ]
+      },
+      "value": {
+        "x-entityField": "value",
+        "type": "number"
+      },
+      "advance_percent": {
+        "x-entityField": "advance_percent",
+        "type": "number"
+      },
+      "version": {
+        "x-entityField": "version",
+        "type": "number"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:contract"
+}
