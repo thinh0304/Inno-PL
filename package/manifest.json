@@ -2149,7 +2149,8 @@
       "entity": "@obj:entity:order_pl",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "update": "organization"
       }
     },
     {

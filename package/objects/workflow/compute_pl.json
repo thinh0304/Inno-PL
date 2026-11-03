@@ -736,13 +736,7 @@
       "parameters": {
         "id": "locked",
         "label": "Đã chốt số liệu",
-        "outcomeLabel": "Đã chốt số liệu",
-        "outputMapping": {
-          "skipped": {
-            "kind": "literal",
-            "valueJson": true
-          }
-        }
+        "outcomeLabel": "Đã chốt số liệu"
       },
       "settings": {}
     }

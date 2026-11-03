@@ -79,3 +79,10 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 - **Bằng chứng:** clone `thinh0304/inno-pl` ngày 03/11/2026: `PACKAGE_STALE: package/ does not match the config (stale: manifest.json, …)` khi chưa sửa gì; hết lỗi sau khi checkout lại với `core.autocrlf=false`.
 - **Làm tạm:** `git config --local core.autocrlf false && git config --local core.eol lf`, rồi checkout lại.
 - **Đề xuất:** starter kèm `.gitattributes` (`* text=auto eol=lf`), hoặc `--check` so sánh không phân biệt CRLF / LF.
+
+## F-10 · Output `lit(...)` của bước End qua được build nhưng bị từ chối lúc cài
+
+- **Vướng:** `end("locked", …, { skipped: lit(true) })` build và test xanh, nhưng khi cài: `APP_CONTRACT_UNDERIVABLE on workflow:compute_pl at INVALID_DEFINITION:/nodes/21/parameters`.
+- **Bằng chứng:** `steps.md` ghi `end(id, name, outcome?, outputs?)` với `outputs` là `{ name: ref(...) | lit(...) }`; deploy sandbox 03/11/2026 từ chối như trên; bỏ output thì cài được.
+- **Làm tạm:** chỉ dùng `ref(...)` trong output của End.
+- **Đề xuất:** builder từ chối `lit` trong output của End (hoặc nền tảng nhận nó), và tài liệu nói rõ.

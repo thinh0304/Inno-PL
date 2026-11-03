@@ -42,7 +42,7 @@
     {"principal":{"kind":"group","id":"${param:sa_group}"},"design":false,"operations":[{"operation":"read","record_scopes":[{"kind":"parent_field","field":"order","parent_field":"sa"}]},{"operation":"list","record_scopes":[{"kind":"parent_field","field":"order","parent_field":"sa"}]}]},
     {"principal":{"kind":"group","id":"${param:sd_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
     {"principal":{"kind":"group","id":"${param:acc_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
-    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"update","scope":"organization"}]},
     {"principal":{"kind":"group","id":"${param:automation_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"}]}
   ] },
   "conversation": null

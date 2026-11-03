@@ -101,6 +101,8 @@ describe('order and order_line', () => {
       expect(opsOf(key, 'automation_group'), key).toEqual(['create', 'list', 'read', 'update']);
       expect(entity(key).create_form, key).toBeUndefined();
     }
+    // Admin locks an order's figures (FR-5.7, Thiết kế 9.1).
+    expect(opsOf('order_pl', 'admin_group')).toEqual(['list', 'read', 'update']);
     expect(grantOf('order_pl', 'tm_group')).toBeUndefined();
     expect(grantOf('order_pl', 'proc_group')).toBeUndefined();
     expect(opsOf('order_pl_service', 'tm_group')).toEqual(['list', 'read']);

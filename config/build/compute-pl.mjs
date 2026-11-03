@@ -1,5 +1,5 @@
 import {
-  NOBODY, NOW, bind, code, decision, edges, end, flt, graph, lit, otherwise, ref, search, servicePrincipal, start,
+  NOBODY, NOW, bind, code, decision, edges, end, flt, graph, otherwise, ref, search, servicePrincipal, start,
   update, upsert, when, workflow,
 } from "@reflexify/agentflow-app-builder/workflow";
 
@@ -79,7 +79,7 @@ export const workflows = {
           net_profit: { ...out("order_pl.net_profit"), label: "LN thuần" },
           passed: { ...out("order_pl.passed"), label: "Đạt ngưỡng" },
         }),
-        end("locked", "Đã chốt số liệu", "Đã chốt số liệu", { skipped: lit(true) }),
+        end("locked", "Đã chốt số liệu", "Đã chốt số liệu"),
       ],
       edges(
         ...chain.slice(1).map((to, i) => [`e_${chain[i]}_${to}`, chain[i], to]),
