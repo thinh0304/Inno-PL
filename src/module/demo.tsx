@@ -17,8 +17,10 @@ function mountDemo(element: HTMLElement): void {
     admin: { isAdmin: true, canCreateOrder: false },
   } as const;
   const role = query.get('role') as keyof typeof ROLES | null;
+  // Whose tasks My work offers: the salesperson's own by default, else the role's.
+  const TASK_ROLES = { tm: ['tm'], proc: ['proc'], sd: ['sd'], admin: [] } as const;
   const api = createMemoryOrdersApi({ empty: query.has('empty'), delayMs: 300, access: role ? ROLES[role] : undefined,
-    me: role ? { id: `u-${role}`, name: role.toUpperCase() } : undefined });
+    roles: role ? [...TASK_ROLES[role]] : ['am'], me: role ? { id: `u-${role}`, name: role.toUpperCase() } : undefined });
   const scheme = matchMedia('(prefers-color-scheme: dark)');
   const theme = (): AppTheme => ({ mode: scheme.matches ? 'dark' : 'light', brand: 'agentflow' });
   const themes = new Set<(theme: AppTheme) => void>();

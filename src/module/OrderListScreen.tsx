@@ -15,6 +15,8 @@ interface Props {
   theme: ThemeMode;
   onOpen(id: string): void;
   onNew(): void;
+  /** Opens My work. */
+  onMyWork?(): void;
   /** yyyy-mm-dd; the period filter counts from it. */
   today?: string;
 }
@@ -35,13 +37,15 @@ function periodName(t: Text, today: string, period: Period): string {
 }
 
 /** The orders the person may see, with the period / status / AM filters (FR-1.1, 1.2), the new-order button (FR-1.5). */
-export function OrderListScreen({ api, lang, locale, theme, onOpen, onNew, today = new Date().toISOString().slice(0, 10) }: Props) {
+export function OrderListScreen({ api, lang, locale, theme, onOpen, onNew, onMyWork, today = new Date().toISOString().slice(0, 10) }: Props) {
   const t = TEXT[lang];
   const [load, setLoad] = useState<Load>({ state: 'loading' });
   const [period, setPeriod] = useState<Period>({ kind: 'all', offset: 0 });
   const [status, setStatus] = useState('');
   const [am, setAm] = useState('');
   const [deleting, setDeleting] = useState<OrderSummary | null>(null);
+  // How many tasks wait for this person (the badge on My work); not being able to count them hides the number, not the list.
+  const [waiting, setWaiting] = useState(0);
   const busy = useRef(false);
   const toasts = useToasts({ locale, theme });
   // Only the newest read may land: a retry pressed during a slow read must not be overwritten by it.
@@ -56,6 +60,11 @@ export function OrderListScreen({ api, lang, locale, theme, onOpen, onNew, today
     );
   }, [api]);
   useEffect(read, [read]);
+  useEffect(() => {
+    let alive = true;
+    api.myWork().then((items) => alive && setWaiting(items.length), () => alive && setWaiting(0));
+    return () => { alive = false; };
+  }, [api]);
 
   const ready = load.state === 'ready' ? load : null;
   const nameOf = useMemo(() => {
@@ -91,6 +100,7 @@ export function OrderListScreen({ api, lang, locale, theme, onOpen, onNew, today
         <h1>{t.listHeading}</h1>
         {ready && <span className="count">{t.count(shown.length)}</span>}
         <span className="grow" />
+        {onMyWork && <button type="button" className="af-button secondary" onClick={onMyWork}>{t.work.button(waiting)}</button>}
         {access?.canCreateOrder && (
           <button type="button" className="af-button primary" onClick={onNew}><PlusIcon />{t.newOrder}</button>
         )}

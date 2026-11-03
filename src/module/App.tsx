@@ -1,6 +1,7 @@
 import type { ThemeMode } from './kit.js';
 import type { ScreenHost } from './mount.js';
 import { OrderListScreen } from './OrderListScreen.js';
+import { MyWorkScreen, TaskRoute } from './MyWorkScreen.js';
 import { OrderPage } from './OrderPage.js';
 import type { OrdersApi } from './orders-api.js';
 import { parseRoute, routePath, usePath } from './routes.js';
@@ -22,8 +23,14 @@ export function App({ host, api, lang, locale, theme }: AppProps) {
   const route = parseRoute(usePath(host));
   if (route.name === 'list') {
     return <OrderListScreen api={api} lang={lang} locale={locale} theme={theme}
-      onOpen={(id) => host.navigate(routePath({ name: 'order', id, tab: null }))} onNew={() => host.navigate(routePath({ name: 'new' }))} />;
+      onOpen={(id) => host.navigate(routePath({ name: 'order', id, tab: null }))} onNew={() => host.navigate(routePath({ name: 'new' }))}
+      onMyWork={() => host.navigate(routePath({ name: 'work' }))} />;
   }
+  if (route.name === 'work') {
+    return <MyWorkScreen api={api} lang={lang} locale={locale} theme={theme} onBack={() => host.navigate(routePath({ name: 'list' }))}
+      onOpen={(id) => host.navigate(routePath({ name: 'order', id, tab: 'flow' }))} />;
+  }
+  if (route.name === 'task') return <TaskRoute api={api} id={route.id} lang={lang} navigate={(path) => host.navigate(path)} />;
   return <OrderPage key={route.name === 'order' ? route.id : 'new'} api={api} id={route.name === 'order' ? route.id : null}
     tab={route.name === 'order' ? route.tab : null} lang={lang} locale={locale} theme={theme} navigate={(path) => host.navigate(path)} tabs={TABS} />;
 }

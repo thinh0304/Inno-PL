@@ -341,3 +341,9 @@
 .event-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; }
 .event-warns { display: grid; gap: 4px; margin: 0; padding-inline-start: 16px; }
 .event-why, .event-note { margin: 0; overflow-wrap: anywhere; }
+
+/* My work */
+.worklist { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.workitem { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); }
+.workitem:last-child { border-bottom: 0; }
+.workitem-main { min-width: 0; flex: 1 1 260px; }
