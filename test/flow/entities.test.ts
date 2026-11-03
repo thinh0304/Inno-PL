@@ -163,3 +163,16 @@ describe('routing rules', () => {
     for (const r of rules) expect(Object.keys(r.when)).toHaveLength(1);
   });
 });
+
+describe('order_event create form', () => {
+  // The create through the API keeps only what the form binds: a log line the module writes must not lose any field
+  // (the sandbox returned an ignored-warnings line with an empty list, FR-6.10).
+  it('binds_every_field_the_module_writes', () => {
+    const form = raw('order_event').create_form.schema.properties as Record<string, Any>;
+    for (const key of ['order', 'task', 'task_code', 'at', 'actor', 'role', 'action', 'note', 'reason', 'warnings']) {
+      expect(form[key], key).toBeDefined();
+      expect(form[key]['x-entityField'], key).toBe(key);
+    }
+    expect(form.warnings.type).toBe('array');
+  });
+});

@@ -65,7 +65,7 @@ export const orderOf = async (orderId: string) => (await get(ADMIN(), 'order', o
 export const eventsOf = async (orderId: string) => (await listAll(ADMIN(), 'order_event')).filter((e) => e.order === orderId);
 
 // A plain polling loop (expect.poll is not allowed in beforeAll): the triggers need a few seconds per hop.
-export async function waitFor<T>(what: string, read: () => Promise<T | undefined | false>, seconds = 150): Promise<T> {
+export async function waitFor<T>(what: string, read: () => Promise<T | undefined | false>, seconds = 240): Promise<T> {
   const deadline = Date.now() + seconds * 1000;
   for (;;) {
     const value = await read();

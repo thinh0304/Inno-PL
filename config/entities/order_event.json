@@ -290,6 +290,13 @@
         "reason": {
           "x-entityField": "reason",
           "type": "string"
+        },
+        "warnings": {
+          "x-entityField": "warnings",
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
         }
       }
     }
