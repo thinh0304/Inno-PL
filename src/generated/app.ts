@@ -137,11 +137,12 @@ export const OBJECTS = {
   'entity_view:vat_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'form:case': { kind: 'form', contractVersion: '0.1.0' },
   'workflow:open_case': { kind: 'workflow', contractVersion: '0.1.0' },
+  'workflow:pl_selftest': { kind: 'workflow', contractVersion: '0.1.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
 export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'item_type' | 'kpi_target' | 'pl_setting' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
-export type WorkflowKey = 'open_case';
+export type WorkflowKey = 'open_case' | 'pl_selftest';
 
 /** The value of each field of each entity, as a record carries it. */
 export interface EntityFields {
@@ -282,4 +283,5 @@ export interface WorkflowInputs {
     amount?: number;
     summary: string;
   };
+  pl_selftest: Record<string, never>;
 }

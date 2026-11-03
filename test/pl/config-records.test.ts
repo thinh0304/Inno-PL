@@ -40,6 +40,17 @@ describe('configFromRecords', () => {
     expect(configFromRecords(records).settings).toEqual(DEFAULT_CONFIG.settings);
   });
 
+  it('a missing contract type rate falls back to its default', () => {
+    const records = seeds();
+    records.contract_type_rate = records.contract_type_rate
+      .filter((row) => row.code !== 'tm_once')
+      .map((row) => row.code === 'dv_once' ? { ...row, threshold: 0.35 } : row);
+    const rates = configFromRecords(records).contractTypeRates;
+    expect(rates.map((rate) => rate.code)).toEqual(['tm_once', 'tmdk', 'dv_once', 'dv_recurring', 'fulfillment']);
+    expect(rates[0]).toEqual(DEFAULT_CONFIG.contractTypeRates[0]);
+    expect(rates[2].threshold).toBe(0.35);
+  });
+
   it('a changed setting is read', () => {
     const records = seeds();
     records.pl_setting = [{ ...records.pl_setting[0], warranty_rate: 0.003 }];

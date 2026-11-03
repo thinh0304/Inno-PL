@@ -51,8 +51,10 @@ function settings(r: Rec | undefined): PlSettings {
 export function configFromRecords(r: ConfigRecords): PlConfig {
   const itemTypes = r.item_type.filter((row) => row.active !== false).map(itemType)
     .sort((a, b) => a.sortOrder - b.sortOrder);
-  const contractTypeRates = r.contract_type_rate.map(contractTypeRate)
-    .sort((a, b) => rank(CONTRACT_TYPE_ORDER, a.code) - rank(CONTRACT_TYPE_ORDER, b.code));
+  // The engine needs a rate for every contract type: one with no record keeps its default.
+  const recordedRates = new Map(r.contract_type_rate.map(contractTypeRate).map((rate) => [rate.code, rate]));
+  const contractTypeRates = [...DEFAULT_CONFIG.contractTypeRates.map((rate) => recordedRates.get(rate.code) ?? rate),
+    ...[...recordedRates.values()].filter((rate) => !CONTRACT_TYPE_ORDER.includes(rate.code))];
   const finCostTiers: FinCostTier[] = r.fin_cost_tier
     .map((row) => ({ tier: str(row.tier) as CustomerTier, fromRatio: num(row.from_ratio), rate: num(row.rate) }))
     .sort((a, b) => rank(TIER_ORDER, a.tier) - rank(TIER_ORDER, b.tier) || a.fromRatio - b.fromRatio);

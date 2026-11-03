@@ -72,3 +72,10 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 - **Bằng chứng:** `agentflow-ui-module/reference/records-api.md`, "Counting, and figures over many records": module đếm được bản ghi; phép cộng chỉ có ở `/dashboards/{id}/compute`, trong phạm vi quyền người xem.
 - **Làm tạm:** khai báo dashboard trong package cho từng phép tổng; tách các con số theo vai trò ra entity riêng (`order_pl_service`, `order_pl_goods`) để mỗi vai trò cộng trên phần mình được đọc.
 - **Đề xuất:** API aggregate (`sum` / `avg` / `group_by`) cho module, cùng quy tắc quyền như list.
+
+## F-09 · `build --check` hỏng trên Windows khi git đổi xuống dòng
+
+- **Vướng:** clone dự án trên Windows với `core.autocrlf=true` (mặc định của Git for Windows) thì `pnpm test` báo `PACKAGE_STALE` ngay trên bản sạch: git ghi `package/` ra CRLF, builder sinh LF, `--check` so từng byte.
+- **Bằng chứng:** clone `thinh0304/inno-pl` ngày 03/11/2026: `PACKAGE_STALE: package/ does not match the config (stale: manifest.json, …)` khi chưa sửa gì; hết lỗi sau khi checkout lại với `core.autocrlf=false`.
+- **Làm tạm:** `git config --local core.autocrlf false && git config --local core.eol lf`, rồi checkout lại.
+- **Đề xuất:** starter kèm `.gitattributes` (`* text=auto eol=lf`), hoặc `--check` so sánh không phân biệt CRLF / LF.

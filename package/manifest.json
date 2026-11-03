@@ -690,6 +690,10 @@
     {
       "key": "workflow:open_case",
       "kind": "workflow"
+    },
+    {
+      "key": "workflow:pl_selftest",
+      "kind": "workflow"
     }
   ],
   "grants": [
@@ -1123,6 +1127,11 @@
       "key": "start_open_case",
       "to": "@param:app_users",
       "workflow": "@obj:workflow:open_case"
+    },
+    {
+      "key": "start_pl_selftest",
+      "to": "@param:admin_group",
+      "workflow": "@obj:workflow:pl_selftest"
     }
   ],
   "ceiling": {
