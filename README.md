@@ -63,6 +63,7 @@ The module's files, in `src/module/`:
 - `access.ts` decides the tabs from what AgentFlow lets the person read;
 - `format.ts` shows money, percentages and days the Vietnamese way; `kit.tsx` wraps the kit's elements, `icons.tsx` holds the icons;
 - `text.ts` holds the Vietnamese and English text, and `styles.css` the module's one stylesheet;
+- The flow screens (plan 03b): `StageBar.tsx` (the seven stages above every saved order), `tabs/FlowTab.tsx` (the board of `TaskCard.tsx`s and, for the person's own tasks, `ActionPanel.tsx`: outcome buttons, one note for the reason, the warnings that will be logged, Close-lost for the order's Sales Admin), `tabs/HistoryTab.tsx` (the log, with a filter for ignored warnings), `MyWorkScreen.tsx` (`/tasks`, and `/tasks/<id>` which AgentFlow's My Work opens) and the "Việc của tôi (N)" button of the order list. `useFlow.ts` holds one order's tasks, log and the tasks this person may act on, and after an action reads again until the workflow has dealt with it. `flow-view.ts` derives "returned" and the Close-lost reason from the log. The pure parts are in `src/flow/board.ts` (stage states, who a task waits for) and `src/flow/warnings.ts` (system warnings: late, advance paid before the customer's, P&L below its threshold).
 - `demo.tsx` mounts the module on the fake, for `module.html`: `?lang=vi|en`, `?role=tm|proc|sd|admin`, `?empty`.
 
 ## Install the package
