@@ -27,6 +27,17 @@ interface Props {
   tabs?: Partial<Record<TabKey, TabComponent>>;
 }
 
+/** A tab of the row. On a narrow screen the row scrolls sideways, so the tab that becomes the selected one is brought into view. */
+function TabButton({ id, selected, label, onSelect }: { id: string; selected: boolean; label: string; onSelect(): void }) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (selected) ref.current?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+  }, [selected]);
+  return (
+    <button ref={ref} type="button" role="tab" id={`tab-${id}`} aria-selected={selected} aria-controls={`panel-${id}`} className="tab" onClick={onSelect}>{label}</button>
+  );
+}
+
 /** One order: its head and Save, the customer and delivery blocks, and the tabs this person may see (mockup renderDetail). */
 export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = {} }: Props) {
   const t = TEXT[lang];
@@ -112,8 +123,8 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
 
       <div className="tabs" role="tablist" aria-label={t.tabsLabel}>
         {visible.map((key) => (
-          <button key={key} type="button" role="tab" id={`tab-${key}`} aria-selected={key === current} aria-controls={`panel-${key}`}
-            className="tab" onClick={() => (id ? navigate(routePath({ name: 'order', id, tab: key })) : setLocalTab(key))}>{t.tabs[key]}</button>
+          <TabButton key={key} id={key} selected={key === current} label={t.tabs[key]}
+            onSelect={() => (id ? navigate(routePath({ name: 'order', id, tab: key })) : setLocalTab(key))} />
         ))}
       </div>
       <section role="tabpanel" id={`panel-${current}`} aria-labelledby={`tab-${current}`} className="tab-panel">

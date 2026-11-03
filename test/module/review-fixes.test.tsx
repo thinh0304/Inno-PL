@@ -51,7 +51,7 @@ describe('final review fixes', () => {
   });
 
   it('I2: fields are read-only while a save runs, so nothing typed is lost', async () => {
-    render(<OrderPage api={createMemoryOrdersApi({ delayMs: 80 })} id="o1" tab={null} lang="vi" locale="vi" theme="light" navigate={vi.fn()} />);
+    render(<OrderPage api={createMemoryOrdersApi({ delayMs: 400 })} id="o1" tab={null} lang="vi" locale="vi" theme="light" navigate={vi.fn()} />);
     const name = await screen.findByDisplayValue('Trung tâm CNTT Bà Rịa') as HTMLInputElement;
     fireEvent.change(name, { target: { value: 'Tên mới' } });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu' }));
