@@ -138,3 +138,12 @@ describe('enum colours', () => {
     expect(bad).toEqual([]);
   });
 });
+
+describe('routing rules', () => {
+  // The install refuses a `when` that is not one operator (WORK_ASSIGNMENT_RULE_INVALID), as a trigger filter is written.
+  it('each_routing_rule_picks_its_role_with_one_operator', () => {
+    const rules = raw('order_task').work.assignable.rules as Any[];
+    expect(rules.map((r) => r.when)).toEqual(['am', 'sa', 'tm', 'sd', 'proc', 'acc'].map((role) => ({ '==': [{ var: 'role' }, role] })));
+    for (const r of rules) expect(Object.keys(r.when)).toHaveLength(1);
+  });
+});

@@ -901,16 +901,11 @@
             ]
           },
           "when": {
-            "join": "and",
-            "leaves": [
+            "==": [
               {
-                "kind": "field",
-                "rule": {
-                  "field": "role",
-                  "op": "eq",
-                  "value": "am"
-                }
-              }
+                "var": "role"
+              },
+              "am"
             ]
           },
           "assign": [
@@ -939,16 +934,11 @@
             ]
           },
           "when": {
-            "join": "and",
-            "leaves": [
+            "==": [
               {
-                "kind": "field",
-                "rule": {
-                  "field": "role",
-                  "op": "eq",
-                  "value": "sa"
-                }
-              }
+                "var": "role"
+              },
+              "sa"
             ]
           },
           "assign": [
@@ -965,16 +955,11 @@
             ]
           },
           "when": {
-            "join": "and",
-            "leaves": [
+            "==": [
               {
-                "kind": "field",
-                "rule": {
-                  "field": "role",
-                  "op": "eq",
-                  "value": "tm"
-                }
-              }
+                "var": "role"
+              },
+              "tm"
             ]
           },
           "assign": [
@@ -991,16 +976,11 @@
             ]
           },
           "when": {
-            "join": "and",
-            "leaves": [
+            "==": [
               {
-                "kind": "field",
-                "rule": {
-                  "field": "role",
-                  "op": "eq",
-                  "value": "sd"
-                }
-              }
+                "var": "role"
+              },
+              "sd"
             ]
           },
           "assign": [
@@ -1017,16 +997,11 @@
             ]
           },
           "when": {
-            "join": "and",
-            "leaves": [
+            "==": [
               {
-                "kind": "field",
-                "rule": {
-                  "field": "role",
-                  "op": "eq",
-                  "value": "proc"
-                }
-              }
+                "var": "role"
+              },
+              "proc"
             ]
           },
           "assign": [
@@ -1043,16 +1018,11 @@
             ]
           },
           "when": {
-            "join": "and",
-            "leaves": [
+            "==": [
               {
-                "kind": "field",
-                "rule": {
-                  "field": "role",
-                  "op": "eq",
-                  "value": "acc"
-                }
-              }
+                "var": "role"
+              },
+              "acc"
             ]
           },
           "assign": [
