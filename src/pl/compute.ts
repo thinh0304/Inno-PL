@@ -55,8 +55,13 @@ export function computePl(input: PlOrderInput, config: PlConfig): PlResult {
     }
   }
   const contractTypes = CONTRACT_TYPE_ORDER.filter((code) => revenueByContractType.has(code));
-  const appliedContractType = contractTypes.reduce<ContractType | null>((best, code) =>
-    best === null || revenueByContractType.get(code)! > revenueByContractType.get(best)! ? code : best, null);
+  // BR-02: the type with the largest revenue, unless Sale chose another type the order holds;
+  // Fulfillment may always be chosen (Thiết kế 13.5). An override the order does not hold is ignored.
+  const override = input.contractTypeOverride;
+  const appliedContractType = override && (override === 'fulfillment' || contractTypes.includes(override))
+    ? override
+    : contractTypes.reduce<ContractType | null>((best, code) =>
+      best === null || revenueByContractType.get(code)! > revenueByContractType.get(best)! ? code : best, null);
   const rate = rateFor(config, appliedContractType);
 
   const revenue = sum(lines, (line) => line.revenue);
@@ -93,11 +98,17 @@ export function computePl(input: PlOrderInput, config: PlConfig): PlResult {
   const consultBonus = input.consultStaff ? Math.max(0, beforeConsult) * consultBonusRate : 0;
   const netProfitBeforeFund = beforeConsult - consultBonus;
 
-  const threshold = rate.threshold;
-  const provisionFundDraw = 0;
+  // Step 14: +debtStepRate for each whole debtStepDays of debt beyond debtBaseDays, never less than the base.
+  const threshold = rate.threshold
+    + Math.floor(Math.max(0, num(input.debtDays) - settings.debtBaseDays) / settings.debtStepDays) * settings.debtStepRate;
+
+  // Thiết kế 6.5: when Sale chooses the fund, draw just enough to reach the threshold, up to the fund's balance.
+  const need = Math.max(0, threshold * cost - netProfitBeforeFund);
+  const provisionFundDraw = input.useProvisionFund ? Math.min(need, Math.max(0, num(input.provisionFundBalance))) : 0;
   const netProfit = netProfitBeforeFund + provisionFundDraw;
   const netMargin = cost > 0 ? netProfit / cost : null;
-  const passed = netMargin !== null ? netMargin >= threshold : netProfit > 0;
+  // A draw sized to the threshold lands on it only up to rounding, so compare with a tolerance far below 1 VND.
+  const passed = cost > 0 ? netProfit >= threshold * cost - 1e-6 : netProfit > 0;
 
   return {
     lines, unknownItemTypes, byType, byStructure, byPurchaseGroup, contractTypes, appliedContractType,
