@@ -476,7 +476,7 @@ export interface EntityFields {
     use_provision_fund?: boolean | null;
   };
   order_event: {
-    action?: 'submitted' | 'approved' | 'returned' | 'agreed' | 'revise' | 'completed' | 'not_applicable' | 'auto_approved' | 'reopened_missing_fields' | 'returned_processed' | 'revise_processed' | 'completed_order' | 'close_lost' | 'ignored_warnings' | 'ignored_suggestion' | null;
+    action?: 'submitted' | 'approved' | 'returned' | 'agreed' | 'revise' | 'completed' | 'not_applicable' | 'auto_approved' | 'reopened_missing_fields' | 'returned_processed' | 'revise_processed' | 'completed_order' | 'close_lost' | 'close_lost_processed' | 'ignored_warnings' | 'ignored_suggestion' | null;
     actor?: string | null;
     at?: string | null;
     note?: string | null;
