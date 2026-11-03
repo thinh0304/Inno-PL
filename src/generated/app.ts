@@ -130,6 +130,7 @@ export const OBJECTS = {
   'entity_field:order/lead_source': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/number': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/payment_count': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/pl_requested_at': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/poc': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/prev_contract_no': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/proposal': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -292,6 +293,7 @@ export const OBJECTS = {
   'form:service_line_price': { kind: 'form', contractVersion: '0.1.0' },
   'form:staff': { kind: 'form', contractVersion: '0.1.0' },
   'form:supplier': { kind: 'form', contractVersion: '0.1.0' },
+  'trigger:compute_pl_on_request': { kind: 'trigger', contractVersion: null },
   'workflow:compute_pl': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:open_case': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:pl_selftest': { kind: 'workflow', contractVersion: '0.1.0' },
@@ -424,6 +426,7 @@ export interface EntityFields {
     lead_source?: string | null;
     number?: string | null;
     payment_count?: number | null;
+    pl_requested_at?: string | null;
     poc?: boolean | null;
     prev_contract_no?: string | null;
     proposal?: boolean | null;

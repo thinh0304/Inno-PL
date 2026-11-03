@@ -189,6 +189,11 @@
           "dv_recurring",
           "fulfillment"
         ]
+      },
+      "pl_requested_at": {
+        "x-entityField": "pl_requested_at",
+        "type": "string",
+        "format": "date-time"
       }
     }
   },

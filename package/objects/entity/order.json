@@ -51,7 +51,8 @@
     "@obj:entity_field:order/contract_type_override",
     "@obj:entity_field:order/deal_stages",
     "@obj:entity_field:order/has_goods",
-    "@obj:entity_field:order/has_service"
+    "@obj:entity_field:order/has_service",
+    "@obj:entity_field:order/pl_requested_at"
   ],
   "natural_key": [],
   "display_field": "code",

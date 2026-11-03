@@ -20,6 +20,15 @@ describe('workflow compute_pl', () => {
     expect(JSON.stringify(workflow.runAs)).toContain('automation_principal');
   });
 
+  it('only a trigger starts it: when the order\'s pl_requested_at changes', () => {
+    const manifest = JSON.parse(read('package/manifest.json'));
+    expect(JSON.stringify(manifest.grants ?? {})).not.toContain('workflow:compute_pl');
+    const trigger = JSON.parse(read('package/objects/trigger/compute_pl_on_request.json'));
+    expect(JSON.stringify(trigger)).toContain('pl_requested_at');
+    const order = JSON.parse(read('config/entities/order.json'));
+    expect(order.fields.find((f: { key: string }) => f.key === 'pl_requested_at')?.type).toBe('datetime');
+  });
+
   it('code_step_uses_committed_bundle', () => {
     expect(node('compute').parameters.source).toBe(read('config/code/compute_order_pl.js'));
   });

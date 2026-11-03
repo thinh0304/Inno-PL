@@ -1,10 +1,11 @@
 import {
-  NOW, bind, code, decision, edges, end, flt, graph, lit, otherwise, ref, restricted, search, servicePrincipal, start,
+  NOBODY, NOW, bind, code, decision, edges, end, flt, graph, lit, otherwise, ref, search, servicePrincipal, start,
   update, upsert, when, workflow,
 } from "@reflexify/agentflow-app-builder/workflow";
 
-// compute_pl: the order's official P&L (Thiết kế 5, 13.6). The screens start it after each save (plan 02b) and
-// advance_order calls it (plan 03). It runs as the automation principal: AM / SA may only read the P&L entities.
+// compute_pl: the order's official P&L (Thiết kế 5, 13.6). It runs as the automation principal, so AM / SA may only
+// read the P&L entities; a workflow people start must run as them, so nobody starts it by hand: the screens (plan 02b)
+// set order.pl_requested_at after each save, and the trigger below starts it on that change.
 
 const ORDER = "${entity:order}";
 const OF_ORDER = [flt("order", "eq", ref("subject.record_id"))];
@@ -62,7 +63,7 @@ export const workflows = {
     "Tính P&L đơn hàng",
     "Đọc dòng, giá, tài chính, đề xuất mua của đơn và cấu hình hiện hành, tính P&L, rồi ghi P&L đơn, phần dịch vụ, phần hàng hóa và mã đơn. Đơn đã chốt số liệu thì không tính lại.",
     servicePrincipal("automation_principal"),
-    restricted("am_group", "sa_group", "admin_group"),
+    NOBODY,
     graph(
       "Tính P&L đơn hàng",
       [
@@ -91,5 +92,14 @@ export const workflows = {
   ),
 };
 
-export const triggers = {};
+export const triggers = {
+  compute_pl_on_request: {
+    workflow: "compute_pl",
+    kind: "entity_record",
+    config: {
+      entity_id: ORDER, change_kind: "updated", input_mappings: [],
+      filter: { in: ["pl_requested_at", { var: "event.changed" }] },
+    },
+  },
+};
 export const actions = {};

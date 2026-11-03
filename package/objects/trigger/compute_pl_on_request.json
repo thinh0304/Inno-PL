@@ -1,0 +1,18 @@
+{
+  "workflow": "@obj:workflow:compute_pl",
+  "kind": "entity_record",
+  "enabled": false,
+  "config": {
+    "entity_id": "@obj:entity:order",
+    "change_kind": "updated",
+    "input_mappings": [],
+    "filter": {
+      "in": [
+        "pl_requested_at",
+        {
+          "var": "event.changed"
+        }
+      ]
+    }
+  }
+}

@@ -732,6 +732,10 @@
       "kind": "entity_field"
     },
     {
+      "key": "entity_field:order/pl_requested_at",
+      "kind": "entity_field"
+    },
+    {
       "key": "entity_view:order/all",
       "kind": "entity_view"
     },
@@ -1330,6 +1334,10 @@
     {
       "key": "workflow:compute_pl",
       "kind": "workflow"
+    },
+    {
+      "key": "trigger:compute_pl_on_request",
+      "kind": "trigger"
     }
   ],
   "grants": [
@@ -2682,21 +2690,6 @@
       "key": "start_pl_selftest",
       "to": "@param:admin_group",
       "workflow": "@obj:workflow:pl_selftest"
-    },
-    {
-      "key": "start_compute_pl",
-      "to": "@param:am_group",
-      "workflow": "@obj:workflow:compute_pl"
-    },
-    {
-      "key": "start_compute_pl_2",
-      "to": "@param:sa_group",
-      "workflow": "@obj:workflow:compute_pl"
-    },
-    {
-      "key": "start_compute_pl_3",
-      "to": "@param:admin_group",
-      "workflow": "@obj:workflow:compute_pl"
     }
   ],
   "ceiling": {
