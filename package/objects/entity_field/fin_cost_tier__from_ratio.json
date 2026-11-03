@@ -8,5 +8,6 @@
   "constraints": {
     "minimum": 0,
     "maximum": 1
-  }
+  },
+  "required": true
 }

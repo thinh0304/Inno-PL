@@ -5,17 +5,16 @@
   "icon": "settings",
   "accent": "slate",
   "fields": [
-    {"key":"key","label":"Khóa (năm:mã NV)","type":"text","required":true},
     {"key":"year","label":"Năm","type":"number","required":true},
-    {"key":"staff","label":"Nhân viên","type":"reference","target_entity_id":"${entity:staff}"},
+    {"key":"staff","label":"Nhân viên","type":"reference","target_entity_id":"${entity:staff}","required":true},
     {"key":"revenue","label":"Doanh thu","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
     {"key":"net_profit","label":"LN thuần","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
     {"key":"order_count","label":"Số đơn","type":"number"},
     {"key":"kpi_amount","label":"Chỉ tiêu KD được chia","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
     {"key":"new_logo_min","label":"Số new logo tối thiểu","type":"number"}
   ],
-  "natural_key": [{"id":"by_key","name":"Khóa","fields":["key"]}],
-  "display_field": "key",
+  "natural_key": [{"id":"by_year_staff","name":"Năm và nhân viên","fields":["year","staff"]}],
+  "display_field": "year",
   "views": [
     {"key":"all","name":"Chỉ tiêu KPI","columns":["year","staff","revenue","net_profit","order_count","kpi_amount"]}
   ],

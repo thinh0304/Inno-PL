@@ -53,12 +53,10 @@ export const OBJECTS = {
   'entity_field:customer/tax_lookup': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:customer/tax_status': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:customer/tier': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:deal_stage_weight/key': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:deal_stage_weight/stage': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:deal_stage_weight/weight': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:deal_stage_weight/weight_set': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:fin_cost_tier/from_ratio': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:fin_cost_tier/key': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:fin_cost_tier/rate': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:fin_cost_tier/tier': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:item_type/active': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -77,7 +75,6 @@ export const OBJECTS = {
   'entity_field:item_type/vat_exempt_purchase': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:item_type/vat_exempt_sale': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:item_type/warranty_base': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:kpi_target/key': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:kpi_target/kpi_amount': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:kpi_target/net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:kpi_target/new_logo_min': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -161,7 +158,7 @@ export interface EntityFields {
     urgent?: boolean | null;
   };
   contract_type_rate: {
-    code?: string | null;
+    code?: 'tm_once' | 'tmdk' | 'dv_once' | 'dv_recurring' | 'fulfillment' | null;
     consult_bonus?: number | null;
     deploy_bonus?: number | null;
     name?: string | null;
@@ -189,14 +186,12 @@ export interface EntityFields {
     tier?: 'vip' | 'potential' | 'standard' | null;
   };
   deal_stage_weight: {
-    key?: string | null;
     stage?: 'lead' | 'opportunity' | 'clarification' | 'quotation' | 'negotiation' | 'close' | 'contract' | null;
     weight?: number | null;
     weight_set?: 'new_tm' | 'new_dvdk' | 'tmdk' | 'dvdk' | null;
   };
   fin_cost_tier: {
     from_ratio?: number | null;
-    key?: string | null;
     rate?: number | null;
     tier?: 'vip' | 'potential' | 'standard' | null;
   };
@@ -219,7 +214,6 @@ export interface EntityFields {
     warranty_base?: boolean | null;
   };
   kpi_target: {
-    key?: string | null;
     kpi_amount?: number | null;
     net_profit?: number | null;
     new_logo_min?: number | null;

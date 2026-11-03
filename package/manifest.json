@@ -344,10 +344,6 @@
       "kind": "entity"
     },
     {
-      "key": "entity_field:deal_stage_weight/key",
-      "kind": "entity_field"
-    },
-    {
       "key": "entity_field:deal_stage_weight/weight_set",
       "kind": "entity_field"
     },
@@ -366,10 +362,6 @@
     {
       "key": "entity:fin_cost_tier",
       "kind": "entity"
-    },
-    {
-      "key": "entity_field:fin_cost_tier/key",
-      "kind": "entity_field"
     },
     {
       "key": "entity_field:fin_cost_tier/tier",
@@ -462,10 +454,6 @@
     {
       "key": "entity:kpi_target",
       "kind": "entity"
-    },
-    {
-      "key": "entity_field:kpi_target/key",
-      "kind": "entity_field"
     },
     {
       "key": "entity_field:kpi_target/year",

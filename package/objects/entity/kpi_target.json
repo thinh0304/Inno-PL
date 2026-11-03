@@ -5,7 +5,6 @@
   "accent": "slate",
   "access": "restricted",
   "fields": [
-    "@obj:entity_field:kpi_target/key",
     "@obj:entity_field:kpi_target/year",
     "@obj:entity_field:kpi_target/staff",
     "@obj:entity_field:kpi_target/revenue",
@@ -16,12 +15,13 @@
   ],
   "natural_key": [
     {
-      "id": "by_key",
-      "name": "Khóa",
+      "id": "by_year_staff",
+      "name": "Năm và nhân viên",
       "fields": [
-        "key"
+        "year",
+        "staff"
       ]
     }
   ],
-  "display_field": "key"
+  "display_field": "year"
 }

@@ -5,7 +5,7 @@
   "icon": "settings",
   "accent": "slate",
   "fields": [
-    {"key":"code","label":"Mã loại hợp đồng","type":"text","required":true},
+    {"key":"code","label":"Mã loại hợp đồng","type":"enum","required":true,"facetable":true,"enum_values":[{"value":"tm_once","label":"Thương mại 1 lần"},{"value":"tmdk","label":"Thương mại định kỳ"},{"value":"dv_once","label":"Dịch vụ 1 lần"},{"value":"dv_recurring","label":"Dịch vụ định kỳ"},{"value":"fulfillment","label":"Fulfillment"}]},
     {"key":"name","label":"Tên","type":"text"},
     {"key":"threshold","label":"Ngưỡng LN thuần / giá vốn","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
     {"key":"tech_support_bonus","label":"Thưởng hỗ trợ KT định kỳ","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
