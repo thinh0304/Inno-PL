@@ -3,6 +3,7 @@
 import { fieldsOf, refId } from '../order/records';
 import type { Rec } from '../order/types';
 import { parseNumber } from '../pl/config-records';
+import type { ProposalTerms } from './rules';
 import type { ContractRec, ContractSource, Party, Step } from './types';
 
 const str = (value: unknown) => (value == null ? '' : String(value));
@@ -15,6 +16,12 @@ export function contractFromRecord(record: unknown): ContractRec {
     file: first == null ? null : String(first), uploaded_by: refId(r.uploaded_by), uploaded_at: str(r.uploaded_at ?? r.created_at),
     source: (str(r.source) || 'upload') as ContractSource, value: parseNumber(r.value) ?? null, advance_percent: parseNumber(r.advance_percent) ?? null,
     version: parseNumber(r.version) ?? 1, ai_check: r.ai_check ?? null, skip_reason: str(r.skip_reason) };
+}
+
+/** Purchasing's proposals as the platform returns them -> the terms contractSlots reads. */
+export function proposalTerms(records: unknown[]): ProposalTerms[] {
+  return (records ?? []).map(fieldsOf).map((p) => ({ order_line: refId(p.order_line), proposed_supplier: refId(p.proposed_supplier),
+    proposed_cost: parseNumber(p.proposed_cost) ?? null }));
 }
 
 /** The next version of a party's (and supplier's) contract at a step: one more than the highest recorded. */

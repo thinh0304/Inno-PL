@@ -43,7 +43,7 @@ describe('flow workflows', () => {
     expect(node('sla_sweep', 'sweep').parameters.source).toBe(read('config/code/sla_sweep.js'));
     const inputs = (key: string, id: string) => (node(key, id).parameters.inputs as { name: string }[]).map((i) => i.name).sort();
     expect(inputs('advance_order', 'advance')).toEqual(['cfg_contract_type_rate', 'cfg_deal_stage_weight', 'cfg_fin_cost_tier', 'cfg_item_type',
-      'cfg_pl_setting', 'cfg_task_sla', 'cfg_vat_rate', 'contracts', 'finance', 'goods_prices', 'lines', 'now', 'order', 'pl', 'service_prices', 'tasks']);
+      'cfg_pl_setting', 'cfg_task_sla', 'cfg_vat_rate', 'contracts', 'finance', 'goods_prices', 'lines', 'now', 'order', 'pl', 'proposals', 'service_prices', 'tasks']);
     expect(node('advance_order', 'contracts').parameters).toMatchObject({ limit: 200 });
     expect(inputs('sla_sweep', 'sweep')).toEqual(['now', 'tasks']);
   });

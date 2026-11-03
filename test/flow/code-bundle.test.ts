@@ -37,7 +37,7 @@ describe('config/code/advance_order.js and sla_sweep.js', () => {
   it('bundles_read_only_declared_inputs', () => {
     const names = (text: string) => [...new Set([...text.matchAll(/\binputs\s*(?:\.\s*(\w+)|\[)/g)].map((m) => m[1] ?? '['))].sort();
     expect(names(read('advance_order'))).toEqual(['cfg_contract_type_rate', 'cfg_deal_stage_weight', 'cfg_fin_cost_tier', 'cfg_item_type',
-      'cfg_pl_setting', 'cfg_task_sla', 'cfg_vat_rate', 'contracts', 'finance', 'goods_prices', 'lines', 'now', 'order', 'pl', 'service_prices', 'tasks']);
+      'cfg_pl_setting', 'cfg_task_sla', 'cfg_vat_rate', 'contracts', 'finance', 'goods_prices', 'lines', 'now', 'order', 'pl', 'proposals', 'service_prices', 'tasks']);
     expect(names(read('sla_sweep'))).toEqual(['now', 'tasks']);
   });
 
@@ -46,7 +46,7 @@ describe('config/code/advance_order.js and sla_sweep.js', () => {
     const approved: Record<string, unknown> = { ...(order as Record<string, unknown>), status: 'in_progress', stage: 4, approved: true };
     const done = (code: string, outcome = 'completed') => ({ id: `id-${code}`, task_code: code, status: 'done', outcome, opened_at: NOW, finished_at: NOW });
     const tasks = ['t11', 't23', 't31'].map((c) => done(c, c === 't11' ? 'submitted' : c === 't31' ? 'approved' : 'completed'))
-      .concat([done('t40'), { id: 'id-t44', task_code: 't44', status: 'open', outcome: null, opened_at: NOW, finished_at: null } as never]);
+      .concat([{ ...done('t40'), finished_at: null } as never, { id: 'id-t44', task_code: 't44', status: 'open', outcome: null, opened_at: NOW, finished_at: null } as never]);
     const args = { order: approved, lines, goods_prices, service_prices, finance, tasks, pl: [{ revenue: 50_000_000, passed: true }], now: NOW };
     const gated = runAdvance({ ...args, contracts: [], config: null });
     expect(gated.update_list.find((u) => u.task_code === 't40')).toMatchObject({ status: 'open' });
@@ -54,7 +54,9 @@ describe('config/code/advance_order.js and sla_sweep.js', () => {
     // The same order with the customer's draft uploaded: t40 stays done.
     const draft = { id: 'c1', order: approved.id, party: 'customer', step: 'draft', file: ['a1'], version: 1 };
     const ok = runAdvance({ ...args, contracts: [draft], config: null });
-    expect(ok.update_list.find((u) => u.task_code === 't40')).toBeUndefined();
+    // Just finished and gated through: it stays done (the run only stamps its finish time).
+    expect(ok.update_list.find((u) => u.task_code === 't40')).toMatchObject({ status: 'done' });
+    expect(ok.event_list.map((e) => e.action)).not.toContain('reopened_missing_contract');
     expect(load(read('advance_order'))({ ...args, contracts: [draft], ...cfgNull })).toEqual(ok);
   });
 });

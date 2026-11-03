@@ -37,13 +37,24 @@ function newest(list: ContractRec[], party: Party, supplier: string | null, step
 /** BR-44: a contract above the limit must have a file; at the limit it need not. */
 export const needsFile = (value: number, limit: number): boolean => value > limit;
 
-/** The customer's contract, then one per supplier in the order of the lines, then suppliers no longer on any line. */
-export function contractSlots(draft: OrderDraft, revenue: number, contracts: ContractRec[]): Slot[] {
+/** Purchasing's proposal for a goods line (purchase_proposal): who it buys from and at what cost, when it has said. */
+export interface ProposalTerms { order_line: string | null; proposed_supplier: string | null; proposed_cost: number | null }
+
+/**
+ * The customer's contract, then one per supplier of the goods lines in line order, then suppliers no longer on any line.
+ * The supplier and the cost are Purchasing's proposal when it has one, else AM's (FR-7.8, BR-48); service lines have no
+ * supplier contract here (t44 / t45 are about goods, and Purchasing cannot read service prices).
+ */
+export function contractSlots(draft: OrderDraft, revenue: number, contracts: ContractRec[], proposals: ProposalTerms[] = []): Slot[] {
+  const proposalOf = new Map(proposals.filter((p) => p.order_line).map((p) => [p.order_line!, p]));
   const costs = new Map<string, number>();
   for (const line of draft.lines) {
-    const supplier = line.price.supplier;
+    if (line.price.source !== 'goods') continue;
+    const proposal = proposalOf.get(line.id);
+    const supplier = proposal?.proposed_supplier ?? line.price.supplier;
     if (!supplier) continue;
-    costs.set(supplier, (costs.get(supplier) ?? 0) + (line.price.unit_cost ?? 0) * (line.quantity ?? 0));
+    const unit = proposal?.proposed_cost ?? line.price.unit_cost ?? 0;
+    costs.set(supplier, (costs.get(supplier) ?? 0) + unit * (line.quantity ?? 0));
   }
   const slot = (party: Party, supplier: string | null, expectedValue: number, present: boolean): Slot => {
     const history = [...ofSlot(contracts, party, supplier)].sort((a, b) => b.version - a.version || (a.step < b.step ? -1 : 1));

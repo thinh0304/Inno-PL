@@ -447,6 +447,13 @@ var PL = (() => {
       skip_reason: str3(r.skip_reason)
     };
   }
+  function proposalTerms(records) {
+    return (records ?? []).map(fieldsOf).map((p) => ({
+      order_line: refId(p.order_line),
+      proposed_supplier: refId(p.proposed_supplier),
+      proposed_cost: parseNumber(p.proposed_cost) ?? null
+    }));
+  }
 
   // src/pl/kpi.ts
   function chooseWeightSet(applied, isNewOrder) {
@@ -861,12 +868,16 @@ var PL = (() => {
     return best;
   }
   var needsFile = (value, limit) => value > limit;
-  function contractSlots(draft, revenue, contracts) {
+  function contractSlots(draft, revenue, contracts, proposals = []) {
+    const proposalOf = new Map(proposals.filter((p) => p.order_line).map((p) => [p.order_line, p]));
     const costs = /* @__PURE__ */ new Map();
     for (const line of draft.lines) {
-      const supplier = line.price.supplier;
+      if (line.price.source !== "goods") continue;
+      const proposal = proposalOf.get(line.id);
+      const supplier = proposal?.proposed_supplier ?? line.price.supplier;
       if (!supplier) continue;
-      costs.set(supplier, (costs.get(supplier) ?? 0) + (line.price.unit_cost ?? 0) * (line.quantity ?? 0));
+      const unit = proposal?.proposed_cost ?? line.price.unit_cost ?? 0;
+      costs.set(supplier, (costs.get(supplier) ?? 0) + unit * (line.quantity ?? 0));
     }
     const slot = (party, supplier, expectedValue, present) => {
       const history = [...ofSlot(contracts, party, supplier)].sort((a, b) => b.version - a.version || (a.step < b.step ? -1 : 1));
@@ -1103,7 +1114,7 @@ var PL = (() => {
       for (const code of ["t40", "t44", "t41", "t45"]) {
         const t = get(code);
         const issues = input.contractIssues?.[code] ?? [];
-        if (t.status !== "done" || !issues.length) continue;
+        if (t.status !== "done" || t.done_at !== null || !issues.length) continue;
         open(t);
         events.push({ task_code: code, action: "reopened_missing_contract", note: issues.map((i) => i.message).join("; ") });
       }
@@ -1232,7 +1243,7 @@ var PL = (() => {
     const slaDays = Object.fromEntries(config.taskSlas.map((s) => [s.taskCode, s.slaDays]));
     const tasks = (args.tasks ?? []).map(taskFromRecord);
     const submitIssues = validateOrder(draft, config, "submit").issues.filter((i) => i.severity === "error");
-    const slots = contractSlots(draft, order.revenue, (args.contracts ?? []).map(contractFromRecord));
+    const slots = contractSlots(draft, order.revenue, (args.contracts ?? []).map(contractFromRecord), proposalTerms(args.proposals ?? []));
     const t42 = tasks.find((t) => t.task_code === "t42");
     const contractIssues = Object.fromEntries(["t40", "t44", "t41", "t45"].map((code) => [
       code,
@@ -1286,7 +1297,7 @@ function main(inputs) {
   keys.forEach(function (k) { if (config[k] == null) config[k] = []; });
   return PL.runAdvance({
     order: inputs.order, tasks: inputs.tasks, pl: inputs.pl, contracts: inputs.contracts, lines: inputs.lines,
-    goods_prices: inputs.goods_prices,
+    goods_prices: inputs.goods_prices, proposals: inputs.proposals,
     service_prices: inputs.service_prices, finance: inputs.finance, config: none ? null : config, now: inputs.now,
   });
 }

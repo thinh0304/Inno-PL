@@ -68,6 +68,27 @@ describe('contractSlots', () => {
   });
 });
 
+describe('review fixes', () => {
+  it('service_line_suppliers_are_not_contract_slots', () => {
+    // Purchasing cannot read service prices and t44 / t45 are about goods: a service subcontractor is no supplier slot.
+    const draft = order([['s1', 1, 30 * M]]);
+    draft.lines.push({ ...line(draft, 's5', 1, 40 * M), id: 'svc', price: { ...line(draft, 's5', 1, 40 * M).price, source: 'service' } });
+    expect(contractSlots(draft, 0, []).map((s) => s.key)).toEqual(['customer', 'supplier:s1']);
+    expect(gate('t44', draft, 0, [rec('supplier', 's1', 'draft')])).toEqual([]);
+  });
+
+  it('proposals_decide_the_supplier_and_the_cost', () => {
+    // Purchasing buys line 1 from s2 at 30 tr, not from AM's s1 at 10 tr (FR-7.8: from the purchase order; BR-48: purchase cost).
+    const draft = order([['s1', 1, 10 * M], ['s1', 2, 1 * M]]);
+    const proposals = [{ order_line: draft.lines[0].id, proposed_supplier: 's2', proposed_cost: 30 * M }];
+    const slots = contractSlots(draft, 0, [], proposals);
+    expect(slots.map((s) => [s.key, s.expectedValue])).toEqual([['customer', 0], ['supplier:s2', 30 * M], ['supplier:s1', 2 * M]]);
+    // A proposal without a supplier or a cost keeps AM's.
+    const partial = contractSlots(draft, 0, [], [{ order_line: draft.lines[0].id, proposed_supplier: null, proposed_cost: null }]);
+    expect(partial.map((s) => [s.key, s.expectedValue])).toEqual([['customer', 0], ['supplier:s1', 12 * M]]);
+  });
+});
+
 describe('latest and needsFile', () => {
   it('slot_key_names_the_party_and_supplier', () => {
     expect(slotKey('customer', null)).toBe('customer');

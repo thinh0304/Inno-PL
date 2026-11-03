@@ -118,7 +118,9 @@ export function advanceOrder(input: AdvanceInput): AdvanceResult {
     for (const code of ['t40', 't44', 't41', 't45'] as const) {
       const t = get(code);
       const issues = input.contractIssues?.[code] ?? [];
-      if (t.status !== 'done' || !issues.length) continue;
+      // Only a task a person has just finished (no finish time yet: this run stamps it): a settings change or a new rule must
+      // not roll back orders that went past the contract stage long ago.
+      if (t.status !== 'done' || t.done_at !== null || !issues.length) continue;
       open(t);
       events.push({ task_code: code, action: 'reopened_missing_contract', note: issues.map((i) => i.message).join('; ') });
     }

@@ -39,7 +39,7 @@ const ENTRIES = {
       + CONFIG_MAIN
       + '  return PL.runAdvance({\n'
       + '    order: inputs.order, tasks: inputs.tasks, pl: inputs.pl, contracts: inputs.contracts, lines: inputs.lines,\n'
-      + '    goods_prices: inputs.goods_prices,\n'
+      + '    goods_prices: inputs.goods_prices, proposals: inputs.proposals,\n'
       + '    service_prices: inputs.service_prices, finance: inputs.finance, config: none ? null : config, now: inputs.now,\n'
       + '  });\n}\n',
   },

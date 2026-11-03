@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type ReactElement } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type ReactElement } from 'react';
 import { tabsFor } from './access.js';
 import { CustomerCard } from './CustomerCard.js';
 import { DeliveryCard } from './DeliveryCard.js';
@@ -9,6 +9,7 @@ import type { OrdersApi } from './orders-api.js';
 import { routePath, type TabKey } from './routes.js';
 import { StageBar } from './StageBar.js';
 import { errorText, TEXT, type Lang } from './text.js';
+import { proposalTerms } from '../contract/records';
 import { useContracts, type ContractsHook } from './useContracts.js';
 import { useFlow, type FlowHook } from './useFlow.js';
 import { useOrderDraft, type OrderDraftHook } from './useOrderDraft.js';
@@ -46,7 +47,9 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
   // The flow is read again as the order is whenever a task changes it (a return unlocks the order, a submission locks it).
   const flow = useFlow(api, id, hook.refresh);
   const revenue = Number(hook.saved?.official.order_pl?.revenue ?? 0) || 0;
-  const contracts = useContracts(api, id, hook.draft, revenue, hook.config, flow.tasks, hook.refresh);
+  // Purchasing's proposals decide the suppliers' contracts, for whoever may read them (PROC, SD, ACC; the server always does).
+  const proposals = useMemo(() => proposalTerms(hook.saved?.proposals ?? []), [hook.saved]);
+  const contracts = useContracts(api, id, hook.draft, revenue, hook.config, flow.tasks, hook.refresh, proposals);
   const toasts = useToasts({ locale, theme });
   const reasonId = useId();
   const pressed = useRef(false);

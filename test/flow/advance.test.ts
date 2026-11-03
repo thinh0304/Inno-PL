@@ -207,9 +207,11 @@ describe('contract gate (BR-44, BR-45)', () => {
   const atDrafts = { t11: ['done', 'submitted'], t23: ['done', 'completed'], t31: ['done', 'approved'] } as const;
   const signed = { ...atDrafts, t40: ['done', 'completed'], t44: ['done', 'completed'], t42: ['done', 'agreed'] } as const;
   const issue = (code: string, message: string) => ({ code, slot: 'customer', message }) as never;
+  // A task a person has just finished has no finish time yet: advance_order stamps it.
+  const justDone = (tasks: ReturnType<typeof tasksWith>, ...codes: string[]) => tasks.map((t) => (codes.includes(t.task_code) ? { ...t, done_at: null, due_state: null, late_days: null } : t));
 
   it('done_t40_without_the_required_draft_is_reopened_with_an_event', () => {
-    const tasks = tasksWith({ ...atDrafts, t40: ['done', 'completed'], t44: 'open' }, ord);
+    const tasks = justDone(tasksWith({ ...atDrafts, t40: ['done', 'completed'], t44: 'open' }, ord), 't40');
     const { next, result } = step(input({ order: ord, tasks, contractIssues: { t40: [issue('draft_missing', 'Thiếu dự thảo hợp đồng khách hàng')] } }));
     expect(byCode(next.tasks, 't40')).toMatchObject({ status: 'open', outcome: null, done_at: null });
     expect(result.events).toEqual([{ task_code: 't40', action: 'reopened_missing_contract', note: 'Thiếu dự thảo hợp đồng khách hàng' }]);
@@ -217,7 +219,7 @@ describe('contract gate (BR-44, BR-45)', () => {
   });
 
   it('done_t41_with_a_missing_order_field_is_reopened', () => {
-    const tasks = tasksWith({ ...signed, t41: ['done', 'completed'], t45: 'open' }, ord);
+    const tasks = justDone(tasksWith({ ...signed, t41: ['done', 'completed'], t45: 'open' }, ord), 't41');
     const issues = { t41: [issue('order_fields', 'order.receiver_name: Bắt buộc'), issue('order_fields', 'order.signed_on: Bắt buộc')] };
     const { next, result } = step(input({ order: ord, tasks, contractIssues: issues }));
     expect(statuses(next.tasks)).toMatchObject({ t41: 'open', t51: 'blocked' });
@@ -226,7 +228,7 @@ describe('contract gate (BR-44, BR-45)', () => {
   });
 
   it('done_t45_with_one_supplier_missing_a_final_is_reopened_and_t53_goes_back_to_blocked', () => {
-    const tasks = tasksWith({ ...signed, t41: 'open', t45: ['done', 'completed'], t53: 'open' }, ord);
+    const tasks = justDone(tasksWith({ ...signed, t41: 'open', t45: ['done', 'completed'], t53: 'open' }, ord), 't45');
     const { next } = step(input({ order: ord, tasks, contractIssues: { t45: [issue('final_missing', 'Thiếu bản chính thức NCC A')] } }));
     expect(statuses(next.tasks)).toMatchObject({ t45: 'open', t53: 'blocked' });
   });
@@ -235,8 +237,17 @@ describe('contract gate (BR-44, BR-45)', () => {
     const tasks = tasksWith({ ...atDrafts, t40: ['done', 'completed'], t44: 'open' }, ord);
     const first = step(input({ order: ord, tasks, contractIssues: { t40: [] } }));
     expect(byCode(first.next.tasks, 't40').status).toBe('done');
-    const gated = step(input({ order: ord, tasks, contractIssues: { t40: [issue('draft_missing', 'x')] } }));
+    const gated = step(input({ order: ord, tasks: justDone(tasks, 't40'), contractIssues: { t40: [issue('draft_missing', 'x')] } }));
     expect(empty(advanceOrder({ ...gated.next, contractIssues: { t40: [issue('draft_missing', 'x')] }, now: '2026-11-04T03:00:00Z' }))).toBe(true);
+  });
+
+  it('a_contract_task_finished_earlier_is_not_judged_again', () => {
+    // A settings change (a lower file limit) or a new rule must not roll back orders past the contract stage.
+    const tasks = tasksWith({ ...signed, t41: ['done', 'completed'], t45: ['done', 'completed'], t51: 'open', t53: ['done', 'completed'] }, ord);
+    const issues = { t40: [issue('draft_missing', 'x')], t41: [issue('final_missing', 'x')], t45: [issue('final_missing', 'x')] };
+    const { result } = step(input({ order: { ...ord, contract_signed: true }, tasks, contractIssues: issues }));
+    expect(result.updates.filter((u) => ['t40', 't44', 't41', 't45', 't42', 't51', 't53'].includes(u.task_code))).toEqual([]);
+    expect(result.events.filter((e) => e.action === 'reopened_missing_contract')).toEqual([]);
   });
 
   it('a_cancelled_or_not_applicable_task_is_never_reopened', () => {

@@ -56,11 +56,12 @@ function flowGraph(title, subjectEntity, orderIdPath) {
     search("service_prices", "Đọc giá dịch vụ", "${entity:service_line_price}", OF_ORDER, { limit: 500 }),
     search("finance", "Đọc tài chính đơn", "${entity:order_finance}", OF_ORDER, { limit: 1 }),
     search("contracts", "Đọc hợp đồng của đơn", "${entity:contract}", OF_ORDER, { limit: 200 }),
+    search("proposals", "Đọc đề xuất mua của đơn", "${entity:purchase_proposal}", OF_ORDER, { limit: 500 }),
     ...CONFIG.map((key) => search(`cfg_${key}`, `Đọc cấu hình ${key}`, `\${entity:${key}}`, [], { limit: 500 })),
   ];
   const advance = code("advance", "Điều phối quy trình", "code/advance_order.js", [
     ["order", ref("nodes.order.output.record")],
-    ...["tasks", "pl", "lines", "goods_prices", "service_prices", "finance", "contracts"].map((id) => [id, ref(`nodes.${id}.output.records`)]),
+    ...["tasks", "pl", "lines", "goods_prices", "service_prices", "finance", "contracts", "proposals"].map((id) => [id, ref(`nodes.${id}.output.records`)]),
     ...CONFIG.map((key) => [`cfg_${key}`, ref(`nodes.cfg_${key}.output.records`)]),
     ["now", NOW],
   ], ADVANCE_SCHEMA);

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { contractGate, contractSlots, prepayTotal, type SigningField } from '../contract/rules';
+import { contractGate, contractSlots, prepayTotal, type ProposalTerms, type SigningField } from '../contract/rules';
 import type { ContractRec, ContractTask, GateIssue, Slot } from '../contract/types';
 import type { OrderDraft, OrderFields, Rec } from '../order/types';
 import type { PlConfig } from '../pl/types';
 import type { ContractUpload, OrderTask, OrdersApi } from './orders-api.js';
+
+const NO_PROPOSALS: ProposalTerms[] = [];
 
 export interface ContractsHook {
   state: 'loading' | 'ready' | 'failed';
@@ -28,7 +30,7 @@ export interface ContractsHook {
  * person may have uploaded meanwhile); a signing-field save lets the page read the order again (`onChanged`).
  */
 export function useContracts(api: OrdersApi, orderId: string | null, draft: OrderDraft, revenue: number, config: PlConfig,
-  tasks: OrderTask[], onChanged: () => void): ContractsHook {
+  tasks: OrderTask[], onChanged: () => void, proposals: ProposalTerms[] = NO_PROPOSALS): ContractsHook {
   const [state, setState] = useState<ContractsHook['state']>(orderId ? 'loading' : 'ready');
   const [list, setList] = useState<ContractRec[]>([]);
   const [suppliers, setSuppliers] = useState<Rec[]>([]);
@@ -64,7 +66,7 @@ export function useContracts(api: OrdersApi, orderId: string | null, draft: Orde
     return () => { live = false; };
   }, [api]);
 
-  const slots = useMemo(() => contractSlots(draft, revenue, list), [draft, revenue, list]);
+  const slots = useMemo(() => contractSlots(draft, revenue, list, proposals), [draft, revenue, list, proposals]);
   const t42 = tasks.find((t) => t.task_code === 't42');
   const gate = useCallback((task: ContractTask) => contractGate(task, { slots, draft, config,
     t42: { status: t42?.status ?? 'blocked', outcome: t42?.outcome ?? null } }), [slots, draft, config, t42?.status, t42?.outcome]);
