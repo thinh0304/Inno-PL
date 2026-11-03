@@ -147,8 +147,11 @@ Theo người dùng (03/11/2026): chi phí dự phòng được trích từ các
 | `provision_entry` | người (AM / SA chủ quỹ), ref `order`, loại (góp / sử dụng / điều chỉnh của Admin), số tiền, trạng thái (dự kiến / ghi nhận / hủy), thời điểm. **Chỉ tạo**, không sửa / xóa | chủ quỹ, SD, ACC, Admin |
 
 - Số dư quỹ = Σ góp đã ghi nhận − Σ sử dụng đã ghi nhận (tính trong module / dashboard theo người).
-- Góp: mỗi đơn trích `giá vốn × tỷ lệ dự phòng theo loại HĐ` (Define dòng 33; như Excel PL!K53). Ghi nhận khi nào và dấu của khoản sử dụng trong công thức: **xem mục 14**.
-- Không cho sử dụng vượt số dư (kiểm ở module và ở `advance_order` khi gửi duyệt); SD thấy khoản sử dụng quỹ khi duyệt t31.
+- **Góp:** mỗi đơn trích `giá vốn × tỷ lệ dự phòng theo loại HĐ` (Define dòng 33; như Excel PL!K53). Khoản này là chi phí của đơn. Bút toán góp ở trạng thái *dự kiến* từ khi đơn được phê duyệt, chuyển *ghi nhận* khi đơn **hoàn tất**; đơn Close-lost thì bút toán góp bị *hủy*.
+- **Sử dụng:** khi Sale chọn "Có", hệ thống **tự tính** số tiền vừa đủ để đơn đạt ngưỡng: `sử dụng = max(0, ngưỡng × giá vốn − LN thuần trước khi dùng quỹ)`. Số này **cộng vào** LN thuần (dòng "Bù từ quỹ dự phòng" trên bảng P&L). Nếu số dư quỹ không đủ, chỉ dùng tới số dư, đơn vẫn Không đạt và có cảnh báo cho SD.
+- Bút toán sử dụng được *giữ chỗ* khi gửi duyệt (t11), *ghi nhận* khi SD phê duyệt (t31). Trả lại hoặc Close-lost thì bút toán bị *hủy*, tiền **hoàn lại** quỹ.
+- Số dư khả dụng = Σ góp đã ghi nhận − Σ sử dụng đã giữ chỗ hoặc ghi nhận.
+- Kiểm số dư ở module và lại ở `advance_order` khi gửi duyệt (hai đơn cùng lúc không được dùng trùng một khoản); SD thấy khoản bù từ quỹ khi duyệt t31.
 
 ## 7. Phân quyền
 
@@ -269,7 +272,7 @@ Ca vàng TM-1040: các assert dùng số **tính theo Đặc tả** (với dự 
 
 ### 13.2 Chi phí dự phòng
 
-Xem 6.5. Mỗi đơn luôn trích `giá vốn × tỷ lệ dự phòng theo loại HĐ` (như Excel PL!K53) — khoản này là chi phí của đơn và là phần góp vào quỹ của AM / SA. Khi đơn không đạt ngưỡng, Sale chọn "Có" và nhập số tiền lấy từ quỹ để bù. **Còn chờ xác nhận:** mục 14.
+Xem 6.5. Mỗi đơn luôn trích `giá vốn × tỷ lệ dự phòng theo loại HĐ` (như Excel PL!K53) — khoản này là chi phí của đơn và là phần góp vào quỹ của AM / SA. Khi đơn không đạt ngưỡng, Sale chọn "Có"; hệ thống tự tính khoản vừa đủ ngưỡng, lấy từ quỹ và cộng vào LN thuần. Góp ghi nhận khi đơn hoàn tất; Close-lost hoàn lại (người dùng xác nhận 03/11/2026). Khác Excel: Excel để Sale nhập tay số tiền (PL!K54).
 
 ### 13.3 Chia chỉ tiêu KD (KPI) — theo Excel
 
@@ -295,7 +298,7 @@ Xem 6.5. Mỗi đơn luôn trích `giá vốn × tỷ lệ dự phòng theo lo�
 ### 13.4 Vai trò TM và PROC xem tiền
 
 - **TM:** chỉ chỉ số phần dịch vụ — doanh thu, giá vốn, LN gộp theo từng loại dịch vụ (một lần / định kỳ, nội bộ / thuê ngoài). Không thấy hàng hóa, CPBH, CPTC, LN thuần đơn, KPI.
-- **PROC:** tổng giá vốn hàng hóa (thiết bị / license) và **KPI Mua hàng** = chênh lệch giữa giá đề xuất và giá mua (định nghĩa chính xác: mục 14).
+- **PROC:** tổng giá vốn hàng hóa (thiết bị / license) và **KPI Mua hàng** = Σ theo dòng hàng hóa (đơn giá mua dự kiến của Sale − đơn giá Mua hàng đề xuất ở t23) × SL = phần Mua hàng tiết kiệm được (âm nếu đắt hơn). Lưu trên `order_pl_goods`, cộng theo người Mua hàng phụ trách t23.
 - Cài đặt bằng các entity ở 6.2 và dashboard riêng cho TM, PROC.
 
 ### 13.5 Fulfillment
@@ -309,11 +312,9 @@ Loại HĐ "Fulfillment" chỉ do AM / SA **tự chọn** ở "Loại áp dụng
 - **Thưởng kinh doanh, thưởng hỗ trợ KT định kỳ theo loại HĐ:** lưu trong cấu hình, không vào công thức.
 - **Đọc Excel khi import:** trong trình duyệt bằng SheetJS, tìm ô theo nhãn.
 
-## 14. Còn chờ người dùng xác nhận
+## 14. Còn chờ người dùng bổ sung
 
-1. **Quỹ dự phòng:** khi chọn "Có", số tiền lấy từ quỹ **cộng vào** LN của đơn (làm LN thuần tăng để đạt ngưỡng) hay **thay** khoản trích theo tỷ lệ (Excel PL!K53/K54: trừ số nhập tay thay vì tỷ lệ)? Phần góp vào quỹ được ghi nhận khi đơn được phê duyệt hay khi đơn hoàn tất? Đơn Close-lost có hoàn lại không?
-2. **KPI Mua hàng:** "giá đề xuất" là giá mua dự kiến của Sale hay giá Mua hàng đề xuất ở t23; "giá mua" là giá trên HĐ NCC đã ký (t45)?
-3. **Service tra MST:** địa chỉ, cách xác thực, request / response. Trong lúc chờ, bước gọi được viết với host và khóa là tham số cài đặt, kèm một service giả để test.
+- **Mẫu API tra MST** (người dùng sẽ gửi sau). Trong lúc chờ: workflow `lookup_tax_code` gọi bước webhook với host, đường dẫn và khóa là tham số cài đặt (`egress` + `secret_ref`); kết quả được chuẩn hóa về một schema nội bộ (tên đăng ký thuế, địa chỉ, người đại diện, tình trạng, ngày cấp, cơ quan thuế) qua một Code step, để khi có mẫu thật chỉ sửa phần chuyển đổi. Test bằng service giả trong sandbox.
 
 ## 15. Để lại cho người dựng
 
