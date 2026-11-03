@@ -244,3 +244,20 @@
 .lines tfoot td.num { text-align: end; }
 .inline-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 8px 12px; align-items: end; }
 @container pl (width < 720px) { .inline-form, .detail-grid { grid-template-columns: minmax(0, 1fr); } .detail-grid .wide { grid-column: auto; } }
+
+/* The P&L tab */
+.status-line { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+.status-line[data-tone='warn'] { padding: 8px 12px; background: var(--warn-soft); color: var(--warn-ink); border-radius: max(0px, calc(var(--r) - 2px)); }
+.stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+@container pl (width < 1000px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { display: grid; gap: 4px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.stat-value { display: inline-flex; align-items: center; gap: 6px; font-size: 18px; line-height: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat[data-tone='ok'] { box-shadow: inset 3px 0 0 var(--ok); }
+.stat[data-tone='ok'] .stat-value { color: var(--ok-ink); }
+.stat[data-tone='danger'] { box-shadow: inset 3px 0 0 var(--danger); }
+.stat[data-tone='danger'] .stat-value { color: var(--danger-ink); }
+.pl th[scope='row'] { font-weight: 400; text-align: start; }
+.pl tr[data-strong] th, .pl tr[data-strong] td { font-weight: 600; }
+.pl tr[data-sub] th { padding-inline-start: 32px; color: var(--muted); }
+.pl .formula { color: var(--muted); font-size: 12px; }
+.toggle { display: inline-flex; align-items: center; gap: 4px; font-weight: 400; }
