@@ -1,0 +1,34 @@
+{
+  "name": "Tài chính đơn",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "order": {
+        "x-entityField": "order",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:order"
+      },
+      "sales_cost": {
+        "x-entityField": "sales_cost",
+        "type": "number"
+      },
+      "prev_sales_cost": {
+        "x-entityField": "prev_sales_cost",
+        "type": "number"
+      },
+      "prev_revenue": {
+        "x-entityField": "prev_revenue",
+        "type": "number"
+      },
+      "prev_net_profit": {
+        "x-entityField": "prev_net_profit",
+        "type": "number"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:order_finance"
+}

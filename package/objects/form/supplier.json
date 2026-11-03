@@ -1,0 +1,36 @@
+{
+  "name": "Nhà cung cấp",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "x-entityField": "name",
+        "type": "string"
+      },
+      "contact_name": {
+        "x-entityField": "contact_name",
+        "type": "string"
+      },
+      "phone": {
+        "x-entityField": "phone",
+        "type": "string"
+      },
+      "email": {
+        "x-entityField": "email",
+        "type": "string"
+      },
+      "debt_days": {
+        "x-entityField": "debt_days",
+        "type": "number"
+      },
+      "active": {
+        "x-entityField": "active",
+        "type": "boolean"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:supplier"
+}

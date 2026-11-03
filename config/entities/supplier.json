@@ -18,6 +18,7 @@
   "views": [
     {"key":"all","name":"Nhà cung cấp","columns":["name","contact_name","phone","email","debt_days","active"]}
   ],
+  "create_form": {"name":"Nhà cung cấp","schema":{"type":"object","properties":{"name":{"x-entityField":"name","type":"string"},"contact_name":{"x-entityField":"contact_name","type":"string"},"phone":{"x-entityField":"phone","type":"string"},"email":{"x-entityField":"email","type":"string"},"debt_days":{"x-entityField":"debt_days","type":"number"},"active":{"x-entityField":"active","type":"boolean"}}}},
   "access": { "mode": "restricted", "grants": [
     {"principal":{"kind":"group","id":"${param:app_users}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
     {"principal":{"kind":"group","id":"${param:am_group}"},"design":false,"operations":[{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"}]},

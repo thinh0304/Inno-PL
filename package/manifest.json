@@ -341,6 +341,10 @@
       "kind": "entity_view"
     },
     {
+      "key": "form:customer",
+      "kind": "form"
+    },
+    {
       "key": "entity:deal_stage_weight",
       "kind": "entity"
     },
@@ -379,6 +383,46 @@
     {
       "key": "entity_view:fin_cost_tier/all",
       "kind": "entity_view"
+    },
+    {
+      "key": "entity:goods_line_price",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:goods_line_price/order_line",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:goods_line_price/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:goods_line_price/unit_price",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:goods_line_price/discount_pct",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:goods_line_price/vat_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:goods_line_price/unit_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:goods_line_price/supplier",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:goods_line_price/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:goods_line_price",
+      "kind": "form"
     },
     {
       "key": "entity:item_type",
@@ -689,6 +733,38 @@
       "kind": "form"
     },
     {
+      "key": "entity:order_finance",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order_finance/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_finance/sales_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_finance/prev_sales_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_finance/prev_revenue",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_finance/prev_net_profit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order_finance/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:order_finance",
+      "kind": "form"
+    },
+    {
       "key": "entity:order_line",
       "kind": "entity"
     },
@@ -833,6 +909,82 @@
       "kind": "entity_view"
     },
     {
+      "key": "entity:purchase_proposal",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:purchase_proposal/order_line",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:purchase_proposal/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:purchase_proposal/proposed_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:purchase_proposal/actual_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:purchase_proposal/proposed_supplier",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:purchase_proposal/note",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:purchase_proposal/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:purchase_proposal",
+      "kind": "form"
+    },
+    {
+      "key": "entity:service_line_price",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:service_line_price/order_line",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:service_line_price/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:service_line_price/unit_price",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:service_line_price/discount_pct",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:service_line_price/vat_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:service_line_price/unit_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:service_line_price/supplier",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:service_line_price/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:service_line_price",
+      "kind": "form"
+    },
+    {
       "key": "entity:staff",
       "kind": "entity"
     },
@@ -859,6 +1011,10 @@
     {
       "key": "entity_view:staff/all",
       "kind": "entity_view"
+    },
+    {
+      "key": "form:staff",
+      "kind": "form"
     },
     {
       "key": "entity:supplier",
@@ -895,6 +1051,10 @@
     {
       "key": "entity_view:supplier/all",
       "kind": "entity_view"
+    },
+    {
+      "key": "form:supplier",
+      "kind": "form"
     },
     {
       "key": "entity:task_sla",
@@ -1154,6 +1314,135 @@
       }
     },
     {
+      "key": "goods_line_price_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:goods_line_price",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "goods_line_price_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:goods_line_price",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "goods_line_price_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:goods_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "goods_line_price_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:goods_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "goods_line_price_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:goods_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "goods_line_price_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:goods_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "goods_line_price_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:goods_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
       "key": "item_type_app_users",
       "to": "@param:app_users",
       "entity": "@obj:entity:item_type",
@@ -1329,6 +1618,112 @@
       }
     },
     {
+      "key": "order_finance_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order_finance",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_finance_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order_finance",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_finance_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order_finance",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_finance_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order_finance",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_finance_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order_finance",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_finance_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order_finance",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
       "key": "order_line_am_group",
       "to": "@param:am_group",
       "entity": "@obj:entity:order_line",
@@ -1498,6 +1893,173 @@
         "read": "organization",
         "list": "organization",
         "update": "organization"
+      }
+    },
+    {
+      "key": "purchase_proposal_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:purchase_proposal",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "purchase_proposal_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:purchase_proposal",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "purchase_proposal_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:purchase_proposal",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "purchase_proposal_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:purchase_proposal",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "service_line_price_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:service_line_price",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "service_line_price_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:service_line_price",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "service_line_price_tm_group",
+      "to": "@param:tm_group",
+      "entity": "@obj:entity:service_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "service_line_price_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:service_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "service_line_price_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:service_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "service_line_price_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:service_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "service_line_price_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:service_line_price",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
       }
     },
     {

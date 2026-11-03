@@ -1,0 +1,27 @@
+{
+  "name": "Giá dòng dịch vụ",
+  "description": "Giá bán, chiết khấu, VAT, giá mua dự kiến của Sale và NCC cho dòng dịch vụ. Kỹ thuật đọc được, Mua hàng không.",
+  "icon": "tags",
+  "accent": "amber",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:service_line_price/order_line",
+    "@obj:entity_field:service_line_price/order",
+    "@obj:entity_field:service_line_price/unit_price",
+    "@obj:entity_field:service_line_price/discount_pct",
+    "@obj:entity_field:service_line_price/vat_rate",
+    "@obj:entity_field:service_line_price/unit_cost",
+    "@obj:entity_field:service_line_price/supplier"
+  ],
+  "natural_key": [
+    {
+      "id": "by_line",
+      "name": "Dòng danh mục",
+      "fields": [
+        "order_line"
+      ]
+    }
+  ],
+  "display_field": "unit_price",
+  "create_form": "@obj:form:service_line_price"
+}

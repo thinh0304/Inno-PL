@@ -49,6 +49,38 @@ describe('order and order_line', () => {
     expect(opsOf('order_line', 'am_group')).toEqual(['create', 'delete', 'list', 'read', 'update']);
   });
 
+  it('prices_live_outside_order', () => {
+    for (const key of ['goods_line_price', 'service_line_price']) {
+      expect(fieldKeys(key), key).toEqual(expect.arrayContaining(['order_line', 'order', 'unit_price', 'unit_cost',
+        'discount_pct', 'vat_rate', 'supplier']));
+    }
+    expect(fieldKeys('order_finance')).toEqual(expect.arrayContaining(['order', 'sales_cost', 'prev_sales_cost',
+      'prev_revenue', 'prev_net_profit']));
+  });
+
+  it('purchase_proposal_hidden_from_am_and_tm', () => {
+    for (const group of ['am_group', 'sa_group', 'tm_group', 'admin_group']) expect(grantOf('purchase_proposal', group)).toBeUndefined();
+    expect(opsOf('purchase_proposal', 'proc_group')).toEqual(['create', 'list', 'read', 'update']);
+    expect(opsOf('purchase_proposal', 'sd_group')).toEqual(['list', 'read']);
+  });
+
+  it('tm_reads_service_but_not_goods_prices', () => {
+    expect(opsOf('service_line_price', 'tm_group')).toEqual(['list', 'read']);
+    expect(grantOf('goods_line_price', 'tm_group')).toBeUndefined();
+  });
+
+  it('proc_reads_goods_but_not_service_prices', () => {
+    expect(opsOf('goods_line_price', 'proc_group')).toEqual(['list', 'read']);
+    expect(grantOf('service_line_price', 'proc_group')).toBeUndefined();
+    expect(grantOf('order_finance', 'proc_group')).toBeUndefined();
+    expect(grantOf('order_finance', 'tm_group')).toBeUndefined();
+  });
+
+  it('shared_records_have_create_forms', () => {
+    for (const key of ['customer', 'supplier', 'staff', 'goods_line_price', 'service_line_price', 'order_finance',
+      'purchase_proposal']) expect(entity(key).create_form, key).toBeTruthy();
+  });
+
   it('both have a create form', () => {
     expect(entity('order').create_form).toBeTruthy();
     expect(entity('order_line').create_form).toBeTruthy();

@@ -1,0 +1,17 @@
+{
+  "name": "Giá dòng hàng hóa",
+  "type": "grid",
+  "columns": [
+    "order",
+    "order_line",
+    "unit_price",
+    "discount_pct",
+    "vat_rate",
+    "unit_cost",
+    "supplier"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

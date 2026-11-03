@@ -27,6 +27,7 @@
   "views": [
     {"key":"all","name":"Khách hàng","columns":["code","name","tax_code","tier","representative"]}
   ],
+  "create_form": {"name":"Khách hàng","schema":{"type":"object","properties":{"code":{"x-entityField":"code","type":"string"},"name":{"x-entityField":"name","type":"string"},"tax_code":{"x-entityField":"tax_code","type":"string"},"address":{"x-entityField":"address","type":"string"},"tier":{"x-entityField":"tier","type":"string","enum":["vip","potential","standard"]},"representative":{"x-entityField":"representative","type":"string"},"representative_title":{"x-entityField":"representative_title","type":"string"},"bank_account":{"x-entityField":"bank_account","type":"string"},"bank_name":{"x-entityField":"bank_name","type":"string"},"receiver_name":{"x-entityField":"receiver_name","type":"string"},"receiver_phone":{"x-entityField":"receiver_phone","type":"string"},"delivery_address":{"x-entityField":"delivery_address","type":"string"},"delivery_note":{"x-entityField":"delivery_note","type":"string"},"tax_lookup":{"x-entityField":"tax_lookup","type":"string"},"tax_status":{"x-entityField":"tax_status","type":"string"}}}},
   "access": { "mode": "restricted", "grants": [
     {"principal":{"kind":"group","id":"${param:app_users}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
     {"principal":{"kind":"group","id":"${param:am_group}"},"design":false,"operations":[{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"}]},

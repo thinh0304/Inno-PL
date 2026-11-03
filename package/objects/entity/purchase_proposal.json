@@ -1,0 +1,26 @@
+{
+  "name": "Đề xuất mua",
+  "description": "Giá mua và NCC Mua hàng đề xuất cho dòng hàng hóa (t23), giá mua thực tế. Chỉ Mua hàng, SD, Kế toán xem (FR-4.6).",
+  "icon": "cart",
+  "accent": "amber",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:purchase_proposal/order_line",
+    "@obj:entity_field:purchase_proposal/order",
+    "@obj:entity_field:purchase_proposal/proposed_cost",
+    "@obj:entity_field:purchase_proposal/actual_cost",
+    "@obj:entity_field:purchase_proposal/proposed_supplier",
+    "@obj:entity_field:purchase_proposal/note"
+  ],
+  "natural_key": [
+    {
+      "id": "by_line",
+      "name": "Dòng danh mục",
+      "fields": [
+        "order_line"
+      ]
+    }
+  ],
+  "display_field": "proposed_cost",
+  "create_form": "@obj:form:purchase_proposal"
+}

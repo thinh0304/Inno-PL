@@ -1,0 +1,5 @@
+{
+  "label": "NCC đề xuất",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:supplier"
+}

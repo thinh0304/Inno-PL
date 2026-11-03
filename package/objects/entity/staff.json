@@ -20,5 +20,6 @@
       ]
     }
   ],
-  "display_field": "name"
+  "display_field": "name",
+  "create_form": "@obj:form:staff"
 }

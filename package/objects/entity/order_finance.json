@@ -1,0 +1,25 @@
+{
+  "name": "Tài chính đơn",
+  "description": "Các trường tiền của phiếu khảo sát: chi phí bán hàng và số liệu năm trước của đơn tái ký (FR-2.2, FR-2.4).",
+  "icon": "wallet",
+  "accent": "amber",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:order_finance/order",
+    "@obj:entity_field:order_finance/sales_cost",
+    "@obj:entity_field:order_finance/prev_sales_cost",
+    "@obj:entity_field:order_finance/prev_revenue",
+    "@obj:entity_field:order_finance/prev_net_profit"
+  ],
+  "natural_key": [
+    {
+      "id": "by_order",
+      "name": "Đơn hàng",
+      "fields": [
+        "order"
+      ]
+    }
+  ],
+  "display_field": "sales_cost",
+  "create_form": "@obj:form:order_finance"
+}

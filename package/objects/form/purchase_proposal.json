@@ -1,0 +1,42 @@
+{
+  "name": "Đề xuất mua",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "order_line": {
+        "x-entityField": "order_line",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:order_line"
+      },
+      "order": {
+        "x-entityField": "order",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:order"
+      },
+      "proposed_cost": {
+        "x-entityField": "proposed_cost",
+        "type": "number"
+      },
+      "actual_cost": {
+        "x-entityField": "actual_cost",
+        "type": "number"
+      },
+      "proposed_supplier": {
+        "x-entityField": "proposed_supplier",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:supplier"
+      },
+      "note": {
+        "x-entityField": "note",
+        "type": "string"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:purchase_proposal"
+}
