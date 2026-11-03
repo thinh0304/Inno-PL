@@ -103,3 +103,23 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 - **Đề xuất:**
   - Cho rule so một trường người với người đang ghi khi tạo (`$bind: viewer.id` trên write, hoặc `in_field` đọc giá trị mới).
   - Cho rule đi nhiều bước tham chiếu, hoặc tra cứu theo khóa tự nhiên.
+
+## F-12 · Enum colours are not checked by the builder
+
+`agentflow-app build` accepts any `color` on an `enum_values` option; the install refuses an unknown one (`unknown option color: slate`; `slate` is an accent, not an option colour). Allowed: gray, sky, teal, amber, emerald, violet, indigo, rose, fuchsia, `#RRGGBB`. Found on the sandbox, plan 03; `test/flow/entities.test.ts` now checks every entity file.
+
+## F-13 · A routing rule's `when` is one json-logic operator
+
+The builder only checks that `when` is an object; the install refuses `{ join, leaves }` (`WORK_ASSIGNMENT_RULE_INVALID`: "a condition applies exactly one operator"). It is written as a trigger filter is: `{ "==": [{ "var": "role" }, "tm"] }`.
+
+## F-14 · A write of an unchanged status can be refused
+
+An update that binds `status` to the value the record already has was refused with `STAGE_TRANSITION_NOT_ALLOWED` for an order whose stored status was no valid starting point. Write a status only when it changes.
+
+## F-15 · Rules cannot guard a delete
+
+Rules fire on `is_new` and `is_update`, so "no line or price may be deleted after submit" cannot be written; the AM / SA `delete` grant on `order_line` and the price entities stays and only the screens lock it.
+
+## F-16 · A Code step failure leaves no message
+
+One `advance_order` Code step ended `CODE_EXECUTION_FAILED` (3.4 s, 1 of 66 runs) with `error_message: null`, empty `invocations`, and an empty `input` on the node run. The same records run fine in Node. A failed run leaves the order waiting for the next task change or an admin Retry.
