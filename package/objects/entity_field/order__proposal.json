@@ -1,0 +1,8 @@
+{
+  "label": "Có Proposal",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

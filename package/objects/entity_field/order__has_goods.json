@@ -1,0 +1,8 @@
+{
+  "label": "Có hàng hóa",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

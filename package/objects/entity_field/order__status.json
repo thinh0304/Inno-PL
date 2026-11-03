@@ -1,0 +1,31 @@
+{
+  "label": "Trạng thái",
+  "type": "enum",
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "draft",
+      "label": "Nháp",
+      "color": "gray"
+    },
+    {
+      "value": "in_progress",
+      "label": "Đang xử lý",
+      "color": "sky"
+    },
+    {
+      "value": "done",
+      "label": "Hoàn tất",
+      "color": "emerald"
+    },
+    {
+      "value": "close_lost",
+      "label": "Close-lost",
+      "color": "rose"
+    }
+  ],
+  "default": {
+    "kind": "literal",
+    "value": "draft"
+  }
+}

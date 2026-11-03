@@ -1,0 +1,28 @@
+{
+  "name": "Dòng danh mục",
+  "description": "Một dòng thiết bị / dịch vụ của đơn: mã loại, tên, ĐVT, số lượng, thời hạn, thông số (FR-3.1, FR-3.2). Không chứa giá.",
+  "icon": "list-checks",
+  "accent": "sky",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:order_line/order",
+    "@obj:entity_field:order_line/line_no",
+    "@obj:entity_field:order_line/item_type_code",
+    "@obj:entity_field:order_line/co_cq",
+    "@obj:entity_field:order_line/name",
+    "@obj:entity_field:order_line/unit",
+    "@obj:entity_field:order_line/quantity",
+    "@obj:entity_field:order_line/months",
+    "@obj:entity_field:order_line/sku",
+    "@obj:entity_field:order_line/specs",
+    "@obj:entity_field:order_line/start_date",
+    "@obj:entity_field:order_line/end_date",
+    "@obj:entity_field:order_line/delivery_time",
+    "@obj:entity_field:order_line/supplier_priority",
+    "@obj:entity_field:order_line/end_user",
+    "@obj:entity_field:order_line/note"
+  ],
+  "natural_key": [],
+  "display_field": "name",
+  "create_form": "@obj:form:order_line"
+}

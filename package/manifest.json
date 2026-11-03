@@ -27,7 +27,8 @@
         "key": "user",
         "access": "read",
         "fields": {
-          "name": "text"
+          "name": "text",
+          "email": "text"
         }
       }
     ],
@@ -488,6 +489,282 @@
       "kind": "entity_view"
     },
     {
+      "key": "entity:order",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order/number",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/status",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/stage",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/customer",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/customer_name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/customer_code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/tax_code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/address",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/contact_name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/contact_phone",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/contact_email",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/representative",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/representative_title",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/bank_account",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/bank_name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/receiver_name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/receiver_phone",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/delivery_address",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/delivery_note",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/quote_date",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/quote_valid_until",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/exchange_rate",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/internal_contract_no",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/customer_po_no",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/content",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/signed_on",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/am",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/sa",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/inside_sales",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/is_new_order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/is_new_logo",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/prev_contract_no",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/lead_source",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/customer_tier",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/debt_days",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/use_provision_fund",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/payment_count",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/customer_prepays",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/deploy_staff",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/consult_staff",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/proposal",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/poc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/contract_type_override",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/deal_stages",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/has_goods",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/has_service",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:order",
+      "kind": "form"
+    },
+    {
+      "key": "entity:order_line",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order_line/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/line_no",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/item_type_code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/co_cq",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/name",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/unit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/quantity",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/months",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/sku",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/specs",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/start_date",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/end_date",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/delivery_time",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/supplier_priority",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/end_user",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_line/note",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order_line/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:order_line",
+      "kind": "form"
+    },
+    {
       "key": "entity:pl_setting",
       "kind": "entity"
     },
@@ -932,6 +1209,260 @@
       "key": "kpi_target_automation_group",
       "to": "@param:automation_group",
       "entity": "@obj:entity:kpi_target",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "order_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "create": "organization"
+      },
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "am"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "create": "organization"
+      },
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "sa"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_tm_group",
+      "to": "@param:tm_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "order_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "order_line_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order_line",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_line_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order_line",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_line_tm_group",
+      "to": "@param:tm_group",
+      "entity": "@obj:entity:order_line",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_line_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order_line",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_line_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:order_line",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_line_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order_line",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_line_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order_line",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization",
+        "delete": "organization"
+      }
+    },
+    {
+      "key": "order_line_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order_line",
       "operations": {
         "read": "organization",
         "list": "organization",

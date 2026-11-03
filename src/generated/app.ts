@@ -14,6 +14,8 @@ export const OBJECTS = {
   'entity:fin_cost_tier': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:item_type': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:kpi_target': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:order': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:order_line': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:pl_setting': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:staff': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:supplier': { kind: 'entity', contractVersion: '0.1.0' },
@@ -82,6 +84,69 @@ export const OBJECTS = {
   'entity_field:kpi_target/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:kpi_target/staff': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:kpi_target/year': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/address': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/am': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/bank_account': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/bank_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/consult_staff': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/contact_email': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/contact_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/contact_phone': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/content': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/contract_type_override': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/customer': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/customer_code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/customer_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/customer_po_no': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/customer_prepays': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/customer_tier': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/deal_stages': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/debt_days': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/delivery_address': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/delivery_note': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/deploy_staff': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/exchange_rate': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/has_goods': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/has_service': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/inside_sales': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/internal_contract_no': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/is_new_logo': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/is_new_order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/lead_source': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/number': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/payment_count': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/poc': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/prev_contract_no': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/proposal': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/quote_date': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/quote_valid_until': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/receiver_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/receiver_phone': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/representative': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/representative_title': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/sa': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/signed_on': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/stage': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/status': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/tax_code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/use_provision_fund': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/co_cq': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/delivery_time': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/end_date': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/end_user': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/item_type_code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/line_no': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/months': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/note': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/quantity': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/sku': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/specs': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/start_date': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/supplier_priority': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_line/unit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/annual_interest': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/auto_approve_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/contract_file_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -127,18 +192,22 @@ export const OBJECTS = {
   'entity_view:fin_cost_tier/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:item_type/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:kpi_target/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:order/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:order_line/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:pl_setting/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:staff/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:supplier/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:task_sla/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:vat_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'form:case': { kind: 'form', contractVersion: '0.1.0' },
+  'form:order': { kind: 'form', contractVersion: '0.1.0' },
+  'form:order_line': { kind: 'form', contractVersion: '0.1.0' },
   'workflow:open_case': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:pl_selftest': { kind: 'workflow', contractVersion: '0.1.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'item_type' | 'kpi_target' | 'pl_setting' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
+export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'item_type' | 'kpi_target' | 'order' | 'order_line' | 'pl_setting' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
 export type WorkflowKey = 'open_case' | 'pl_selftest';
 
 /** The value of each field of each entity, as a record carries it. */
@@ -221,6 +290,73 @@ export interface EntityFields {
     revenue?: number | null;
     staff?: string | null;
     year?: number | null;
+  };
+  order: {
+    address?: string | null;
+    am?: string | null;
+    bank_account?: string | null;
+    bank_name?: string | null;
+    code?: string | null;
+    consult_staff?: string | null;
+    contact_email?: string | null;
+    contact_name?: string | null;
+    contact_phone?: string | null;
+    content?: string | null;
+    contract_type_override?: 'tm_once' | 'tmdk' | 'dv_once' | 'dv_recurring' | 'fulfillment' | null;
+    customer?: string | null;
+    customer_code?: string | null;
+    customer_name?: string | null;
+    customer_po_no?: string | null;
+    customer_prepays?: boolean | null;
+    customer_tier?: 'vip' | 'potential' | 'standard' | null;
+    deal_stages?: unknown;
+    debt_days?: number | null;
+    delivery_address?: string | null;
+    delivery_note?: string | null;
+    deploy_staff?: string | null;
+    exchange_rate?: number | null;
+    has_goods?: boolean | null;
+    has_service?: boolean | null;
+    inside_sales?: string | null;
+    internal_contract_no?: string | null;
+    is_new_logo?: boolean | null;
+    is_new_order?: boolean | null;
+    lead_source?: string | null;
+    number?: string | null;
+    payment_count?: number | null;
+    poc?: boolean | null;
+    prev_contract_no?: string | null;
+    proposal?: boolean | null;
+    quote_date?: string | null;
+    quote_valid_until?: string | null;
+    receiver_name?: string | null;
+    receiver_phone?: string | null;
+    representative?: string | null;
+    representative_title?: string | null;
+    sa?: string | null;
+    signed_on?: string | null;
+    stage?: number | null;
+    status?: 'draft' | 'in_progress' | 'done' | 'close_lost' | null;
+    tax_code?: string | null;
+    use_provision_fund?: boolean | null;
+  };
+  order_line: {
+    co_cq?: boolean | null;
+    delivery_time?: string | null;
+    end_date?: string | null;
+    end_user?: string | null;
+    item_type_code?: string | null;
+    line_no?: number | null;
+    months?: number | null;
+    name?: string | null;
+    note?: string | null;
+    order?: string | null;
+    quantity?: number | null;
+    sku?: string | null;
+    specs?: string | null;
+    start_date?: string | null;
+    supplier_priority?: string | null;
+    unit?: string | null;
   };
   pl_setting: {
     annual_interest?: number | null;

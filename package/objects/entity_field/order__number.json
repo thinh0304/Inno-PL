@@ -1,0 +1,6 @@
+{
+  "label": "Số thứ tự",
+  "type": "auto_number",
+  "auto_number_scope": "order:{{ year() }}",
+  "auto_number_format": "{{ year() }}-{{ value | pad(4) }}"
+}

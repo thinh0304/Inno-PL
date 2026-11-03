@@ -1,0 +1,8 @@
+{
+  "label": "CO/CQ",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

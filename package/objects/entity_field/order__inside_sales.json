@@ -1,0 +1,5 @@
+{
+  "label": "Inside Sales",
+  "type": "reference",
+  "target_entity_id": "@req:entity:user"
+}

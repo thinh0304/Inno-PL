@@ -1,0 +1,5 @@
+{
+  "label": "Nhân sự tư vấn",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:staff"
+}

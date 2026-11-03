@@ -1,0 +1,80 @@
+{
+  "name": "Dòng danh mục",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "order": {
+        "x-entityField": "order",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:order"
+      },
+      "line_no": {
+        "x-entityField": "line_no",
+        "type": "number"
+      },
+      "item_type_code": {
+        "x-entityField": "item_type_code",
+        "type": "string"
+      },
+      "co_cq": {
+        "x-entityField": "co_cq",
+        "type": "boolean"
+      },
+      "name": {
+        "x-entityField": "name",
+        "type": "string"
+      },
+      "unit": {
+        "x-entityField": "unit",
+        "type": "string"
+      },
+      "quantity": {
+        "x-entityField": "quantity",
+        "type": "number"
+      },
+      "months": {
+        "x-entityField": "months",
+        "type": "number"
+      },
+      "sku": {
+        "x-entityField": "sku",
+        "type": "string"
+      },
+      "specs": {
+        "x-entityField": "specs",
+        "type": "string"
+      },
+      "start_date": {
+        "x-entityField": "start_date",
+        "type": "string",
+        "format": "date"
+      },
+      "end_date": {
+        "x-entityField": "end_date",
+        "type": "string",
+        "format": "date"
+      },
+      "delivery_time": {
+        "x-entityField": "delivery_time",
+        "type": "string"
+      },
+      "supplier_priority": {
+        "x-entityField": "supplier_priority",
+        "type": "string"
+      },
+      "end_user": {
+        "x-entityField": "end_user",
+        "type": "string"
+      },
+      "note": {
+        "x-entityField": "note",
+        "type": "string"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:order_line"
+}

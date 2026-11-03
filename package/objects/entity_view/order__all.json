@@ -1,0 +1,15 @@
+{
+  "name": "Đơn hàng",
+  "type": "grid",
+  "columns": [
+    "code",
+    "customer_name",
+    "am",
+    "status",
+    "stage"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}
