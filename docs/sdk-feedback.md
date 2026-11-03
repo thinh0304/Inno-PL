@@ -32,6 +32,8 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 | F-22 | Nhỏ | Test | `GET /app/objects` chỉ trả lời người gọi của chính ứng dụng: không dựng được `OrdersApi` từ người của sandbox |
 | F-23 | Nhỏ | Workflow | `expect` của bước Update: cách so giá trị số / boolean khi giá trị là template chưa rõ |
 | F-24 | Nhỏ | Tài liệu | Trả lời của `GET /work?view=` không được mô tả |
+| F-25 | Chặn | UI module | Ứng dụng đã cài không tải file lên được (`POST /attachments` → `APP_CEILING_DENIED`); host không có cách nào khác để người dùng tải file |
+| F-26 | Nhỏ | Dữ liệu | Trường `file` chỉ trả mảng id: tên file cần thêm một lần đọc `GET /attachments/{id}` mỗi file |
 
 ---
 
@@ -231,3 +233,19 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 - **Bằng chứng:** `e2e/flow.sandbox.test.ts` (test `submit_walks_to_t23_and_locks_the_order`, phần đọc `/work`).
 - **Làm tạm:** đọc chịu lỗi: nhận cả mảng lẫn `{ items }`, `record_id ?? id`.
 - **Đề xuất:** mô tả trả lời trong `records-api.md` và có kiểu trong `operations.d.ts`.
+
+## F-25 · Ứng dụng đã cài không tải file lên được
+
+- **Vướng:** ở giai đoạn Hợp đồng (Đặc tả FR-7.1, FR-7.6), SA và Mua hàng tải file hợp đồng (PDF, Word, ảnh) ngay trên trang đơn của module; file nằm ở trường `file` của entity `contract`.
+- **Cách tái hiện** (thiếu tính năng — theo tài liệu, chưa chạy qua module thật): `operations.upload_attachment` trong `@reflexify/agentflow-sdk/dist/generated/public.d.ts`: *"403: An installed app does not upload files (`APP_CEILING_DENIED`)"*. Cùng lời gọi bằng người của sandbox (`as('sa').POST('/attachments', multipart)`) trả `201`. `AppHost` (`dist/modules/contract.d.ts`) chỉ có `api`, `apiUrl` và `navigate` trong module: không mở được form tạo bản ghi hay trang bản ghi gốc của AgentFlow để người dùng tải file ở đó. Ứng dụng thì vẫn khởi chạy được workflow (`start_instance`).
+- **Bằng chứng:** `e2e/contract-files.sandbox.test.ts` (03/11/2026): người dùng tải lên được, tạo `contract` với `file: [id]` được, AM tải về được qua `GET /attachments/{id}/download`; tài liệu nói ứng dụng tải về được file của bản ghi mà nó đọc được.
+- **Làm tạm:** chờ quyết định của người dùng (lộ trình, mục "Kiểm trên sandbox: hợp đồng").
+- **Đề xuất:** cho ứng dụng tải file khi ceiling có quyền tạo trên một entity có trường `file` (file chưa gắn chỉ gắn được vào entity đó); hoặc `host.uploadFile(file): Promise<AttachmentMetadata>` do host gọi bằng chính người dùng; hoặc `host.openRecordForm(entityKey, prefill)` mở form gốc của nền tảng.
+
+## F-26 · Trường `file` chỉ trả mảng id
+
+- **Vướng:** khung Hợp đồng (FR-7.9) hiện tên file, người tải, thời gian.
+- **Cách tái hiện** (tái hiện được): đọc một bản ghi `contract` có file: `file` là `["43add103-…"]`, không có tên; tên chỉ có ở `GET /attachments/{id}` (`original_filename`).
+- **Bằng chứng:** `e2e/contract-files.sandbox.test.ts`, test `sa_uploads_a_pdf_and_attaches_it_to_a_contract`.
+- **Làm tạm:** đọc siêu dữ liệu từng file khi mở tab Hợp đồng.
+- **Đề xuất:** bản ghi trả kèm `{ id, original_filename, content_type, byte_size }` cho trường `file`, hoặc một lần đọc nhiều id.

@@ -4,7 +4,7 @@ import { entity, fieldKeys, grantOf, opsOf } from '../order/entities.test';
 
 type Any = Record<string, any>;
 const raw = () => entity('contract') as unknown as Any;
-const rule = (key: string) => (raw().rules as Any[]).find((r) => r.key === key);
+const rule = (key: string): Any => (raw().rules as Any[]).find((r) => r.key === key)!;
 const ALLOWED_COLOURS = ['gray', 'sky', 'teal', 'amber', 'emerald', 'violet', 'indigo', 'rose', 'fuchsia'];
 
 // Every key of ContractRec except what the module derives (file_name comes with the attachment, not a field).
@@ -15,7 +15,7 @@ describe('contract entity', () => {
   it('contract_has_the_spec_fields', () => {
     expect(fieldKeys('contract')).toEqual(['order', 'party', 'supplier', 'step', 'file', 'uploaded_by', 'uploaded_at', 'source', 'value',
       'advance_percent', 'version', 'ai_check', 'clause_review', 'extracted', 'skip_reason']);
-    const f = (key: string) => (raw().fields as Any[]).find((x) => x.key === key);
+    const f = (key: string): Any => (raw().fields as Any[]).find((x) => x.key === key)!;
     expect(f('file').type).toBe('file');
     expect(f('order')).toMatchObject({ type: 'reference', target_entity_id: '${entity:order}', required: true });
     expect(f('supplier')).toMatchObject({ type: 'reference', target_entity_id: '${entity:supplier}' });
