@@ -1068,14 +1068,14 @@ var PL = (() => {
       reason: String(r.reason ?? ""),
       opened_at: optStr2(r.opened_at),
       due_at: optStr2(r.due_at),
-      done_at: optStr2(r.done_at),
+      done_at: optStr2(r.finished_at),
       sla_days: parseNumber(r.sla_days) ?? null,
       due_state: optStr2(r.due_state),
       late_days: parseNumber(r.late_days) ?? null
     };
   }
-  var TASK_VALUES = ["status", "outcome", "reason", "opened_at", "due_at", "done_at", "sla_days", "due_state", "late_days"];
-  var values = (t) => Object.fromEntries(TASK_VALUES.map((f) => [f, t[f] ?? null]));
+  var TASK_VALUES = ["status", "outcome", "reason", "opened_at", "due_at", "finished_at", "sla_days", "due_state", "late_days"];
+  var values = (t) => Object.fromEntries(TASK_VALUES.map((f) => [f, f === "finished_at" ? t.done_at ?? null : t[f] ?? null]));
   function runAdvance(args) {
     const config = args.config ? configFromRecords(args.config) : DEFAULT_CONFIG;
     const records = {
@@ -1123,7 +1123,7 @@ var PL = (() => {
         pl_requested_at: now.pl_requested_at
       },
       order_changed: Object.keys(result.order).length > 0,
-      create_list: result.creates.map((c) => ({ task_code: c.task_code, stage: c.set.stage, role: c.set.role, ...values(c.set) })),
+      create_list: result.creates.map((c) => ({ task_code: c.task_code, stage: c.set.stage, role: c.set.role, am_user: draft.order.am, ...values(c.set) })),
       update_list: result.updates.map((u) => {
         const full = { ...tasks.find((t) => t.task_code === u.task_code), ...u.set };
         return { id: u.id, task_code: u.task_code, expect_status: u.expect_status, ...values(full) };

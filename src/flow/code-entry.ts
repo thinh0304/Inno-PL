@@ -16,12 +16,12 @@ function taskFromRecord(record: Rec): TaskRec {
   const r = fieldsOf(record);
   return { id: String(r.id ?? ''), task_code: String(r.task_code) as TaskCode, stage: parseNumber(r.stage) ?? 0, role: String(r.role) as TaskRole,
     status: String(r.status ?? 'blocked') as TaskStatus, outcome: optStr(r.outcome) as TaskOutcome | null, reason: String(r.reason ?? ''),
-    opened_at: optStr(r.opened_at), due_at: optStr(r.due_at), done_at: optStr(r.done_at), sla_days: parseNumber(r.sla_days) ?? null,
+    opened_at: optStr(r.opened_at), due_at: optStr(r.due_at), done_at: optStr(r.finished_at), sla_days: parseNumber(r.sla_days) ?? null,
     due_state: optStr(r.due_state), late_days: parseNumber(r.late_days) ?? null };
 }
 
-const TASK_VALUES = ['status', 'outcome', 'reason', 'opened_at', 'due_at', 'done_at', 'sla_days', 'due_state', 'late_days'] as const;
-const values = (t: TaskRec) => Object.fromEntries(TASK_VALUES.map((f) => [f, t[f] ?? null]));
+const TASK_VALUES = ['status', 'outcome', 'reason', 'opened_at', 'due_at', 'finished_at', 'sla_days', 'due_state', 'late_days'] as const;
+const values = (t: TaskRec) => Object.fromEntries(TASK_VALUES.map((f) => [f, f === 'finished_at' ? t.done_at ?? null : (t as unknown as Rec)[f] ?? null]));
 
 export interface AdvanceOutput extends AdvanceResult {
   /** The order's seven flow fields as they stand after this run (what the update step writes), and whether any changed. */
@@ -58,7 +58,7 @@ export function runAdvance(args: { order: Rec; tasks: Rec[]; pl: Rec[]; lines: R
     order_fields: { status: now.status, stage: now.stage, approved: now.approved, approved_at: now.approved_at,
       contract_signed: now.contract_signed, pending_roles: now.pending_roles, pl_requested_at: now.pl_requested_at },
     order_changed: Object.keys(result.order).length > 0,
-    create_list: result.creates.map((c) => ({ task_code: c.task_code, stage: c.set.stage, role: c.set.role, ...values(c.set as TaskRec) })),
+    create_list: result.creates.map((c) => ({ task_code: c.task_code, stage: c.set.stage, role: c.set.role, am_user: draft.order.am, ...values(c.set as TaskRec) })),
     update_list: result.updates.map((u) => {
       const full = { ...tasks.find((t) => t.task_code === u.task_code)!, ...u.set } as TaskRec;
       return { id: u.id, task_code: u.task_code, expect_status: u.expect_status, ...values(full) };

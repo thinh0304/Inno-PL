@@ -696,11 +696,83 @@
       "kind": "entity_field"
     },
     {
+      "key": "entity_field:order/approved",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/approved_at",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/contract_signed",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/pending_roles",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order/close_reason",
+      "kind": "entity_field"
+    },
+    {
       "key": "entity_view:order/all",
       "kind": "entity_view"
     },
     {
       "key": "form:order",
+      "kind": "form"
+    },
+    {
+      "key": "entity:order_event",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order_event/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/task",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/task_code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/at",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/actor",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/role",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/action",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/note",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/reason",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_event/warnings",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order_event/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:order_event",
       "kind": "form"
     },
     {
@@ -1009,6 +1081,74 @@
     },
     {
       "key": "entity_view:order_pl_service/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:order_task",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order_task/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/task_code",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/stage",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/role",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/am_user",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/status",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/outcome",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/reason",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/opened_at",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/due_at",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/finished_at",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/sla_days",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/due_state",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/late_days",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_task/priority",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order_task/all",
       "kind": "entity_view"
     },
     {
@@ -1791,6 +1931,121 @@
       }
     },
     {
+      "key": "order_event_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order_event",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_event_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order_event",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_event_tm_group",
+      "to": "@param:tm_group",
+      "entity": "@obj:entity:order_event",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization"
+      }
+    },
+    {
+      "key": "order_event_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order_event",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization"
+      }
+    },
+    {
+      "key": "order_event_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:order_event",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization"
+      }
+    },
+    {
+      "key": "order_event_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order_event",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization"
+      }
+    },
+    {
+      "key": "order_event_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order_event",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_event_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order_event",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization"
+      }
+    },
+    {
       "key": "order_finance_am_group",
       "to": "@param:am_group",
       "entity": "@obj:entity:order_finance",
@@ -2289,6 +2544,122 @@
       "key": "order_pl_service_automation_group",
       "to": "@param:automation_group",
       "entity": "@obj:entity:order_pl_service",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "order_task_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order_task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      },
+      "record_scopes": {
+        "update": [
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_task_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order_task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      },
+      "record_scopes": {
+        "update": [
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_task_tm_group",
+      "to": "@param:tm_group",
+      "entity": "@obj:entity:order_task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      },
+      "record_scopes": {
+        "update": [
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_task_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order_task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      },
+      "record_scopes": {
+        "update": [
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_task_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:order_task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      },
+      "record_scopes": {
+        "update": [
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_task_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order_task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      },
+      "record_scopes": {
+        "update": [
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_task_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order_task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_task_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order_task",
       "operations": {
         "read": "organization",
         "list": "organization",

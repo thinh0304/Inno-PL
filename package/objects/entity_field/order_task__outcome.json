@@ -1,0 +1,39 @@
+{
+  "label": "Kết quả",
+  "type": "enum",
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "submitted",
+      "label": "Đã gửi duyệt"
+    },
+    {
+      "value": "approved",
+      "label": "Duyệt"
+    },
+    {
+      "value": "returned",
+      "label": "Trả lại"
+    },
+    {
+      "value": "agreed",
+      "label": "Đồng ý"
+    },
+    {
+      "value": "revise",
+      "label": "Yêu cầu sửa dự thảo"
+    },
+    {
+      "value": "completed",
+      "label": "Hoàn thành"
+    },
+    {
+      "value": "not_applicable",
+      "label": "Không áp dụng"
+    },
+    {
+      "value": "auto_approved",
+      "label": "Tự duyệt"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Nhật ký xử lý đơn",
+  "type": "grid",
+  "columns": [
+    "order",
+    "task_code",
+    "action",
+    "role",
+    "actor",
+    "at"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

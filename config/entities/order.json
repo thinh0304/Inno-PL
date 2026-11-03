@@ -52,7 +52,12 @@
     {"key":"deal_stages","label":"Phân bổ giai đoạn deal","type":"list","sortable":false,"item_fields":[{"key":"stage","label":"Giai đoạn","type":"enum","required":true,"enum_values":[{"value":"opportunity","label":"Opportunities"},{"value":"clarification","label":"Requirement Clarification"},{"value":"quotation","label":"Quotation"},{"value":"negotiation","label":"Negotiation"},{"value":"close","label":"Close Deal"},{"value":"contract","label":"Contract · Payment · Support"}]},{"key":"weight","label":"Hệ số","type":"number","required":false},{"key":"person","label":"Nhân sự (mã NV)","type":"text","required":false}]},
     {"key":"has_goods","label":"Có hàng hóa","type":"boolean","default":{"kind":"literal","value":false}},
     {"key":"has_service","label":"Có dịch vụ","type":"boolean","default":{"kind":"literal","value":false}},
-    {"key":"pl_requested_at","label":"Yêu cầu tính P&L lúc","type":"datetime"}
+    {"key":"pl_requested_at","label":"Yêu cầu tính P&L lúc","type":"datetime"},
+    {"key":"approved","label":"Đã phê duyệt","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"approved_at","label":"Phê duyệt lúc","type":"datetime"},
+    {"key":"contract_signed","label":"Đã ký HĐ khách hàng","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"pending_roles","label":"Đang chờ","type":"multi_select","enum_values":[{"value":"am","label":"AM"},{"value":"sa","label":"Sales Admin"},{"value":"tm","label":"Technical Manager"},{"value":"sd","label":"Sales Director"},{"value":"proc","label":"Mua hàng"},{"value":"acc","label":"Kế toán"}]},
+    {"key":"close_reason","label":"Lý do Close-lost","type":"text"}
   ],
   "natural_key": [],
   "display_field": "code",

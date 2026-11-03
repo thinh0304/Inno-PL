@@ -1,0 +1,49 @@
+{
+  "label": "Cảnh báo",
+  "type": "list",
+  "sortable": false,
+  "item_fields": [
+    {
+      "key": "source",
+      "label": "Nguồn",
+      "type": "enum",
+      "required": true,
+      "enum_values": [
+        {
+          "value": "ai",
+          "label": "Trợ lý AI"
+        },
+        {
+          "value": "system",
+          "label": "Hệ thống"
+        }
+      ]
+    },
+    {
+      "key": "level",
+      "label": "Mức",
+      "type": "enum",
+      "required": true,
+      "enum_values": [
+        {
+          "value": "info",
+          "label": "Thông tin"
+        },
+        {
+          "value": "warning",
+          "label": "Cảnh báo"
+        },
+        {
+          "value": "critical",
+          "label": "Nghiêm trọng"
+        }
+      ]
+    },
+    {
+      "key": "text",
+      "label": "Nội dung",
+      "type": "text",
+      "required": true
+    }
+  ]
+}

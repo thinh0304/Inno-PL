@@ -1,0 +1,16 @@
+{
+  "name": "Task của đơn",
+  "type": "grid",
+  "columns": [
+    "order",
+    "task_code",
+    "role",
+    "status",
+    "due_at",
+    "due_state"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

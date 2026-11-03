@@ -1,0 +1,14 @@
+{
+  "label": "Mức ưu tiên",
+  "type": "enum",
+  "enum_values": [
+    {
+      "value": "normal",
+      "label": "Bình thường"
+    }
+  ],
+  "default": {
+    "kind": "literal",
+    "value": "normal"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "label": "Task",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:order_task",
+  "on_target_delete": "cascade"
+}

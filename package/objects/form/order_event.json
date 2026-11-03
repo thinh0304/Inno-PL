@@ -1,0 +1,80 @@
+{
+  "name": "Nhật ký xử lý đơn",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "order": {
+        "x-entityField": "order",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:order"
+      },
+      "task": {
+        "x-entityField": "task",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:order_task"
+      },
+      "task_code": {
+        "x-entityField": "task_code",
+        "type": "string"
+      },
+      "at": {
+        "x-entityField": "at",
+        "type": "string",
+        "format": "date-time"
+      },
+      "actor": {
+        "x-entityField": "actor",
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user"
+      },
+      "role": {
+        "x-entityField": "role",
+        "type": "string",
+        "enum": [
+          "am",
+          "sa",
+          "tm",
+          "sd",
+          "proc",
+          "acc"
+        ]
+      },
+      "action": {
+        "x-entityField": "action",
+        "type": "string",
+        "enum": [
+          "submitted",
+          "approved",
+          "returned",
+          "agreed",
+          "revise",
+          "completed",
+          "not_applicable",
+          "auto_approved",
+          "reopened_missing_fields",
+          "returned_processed",
+          "revise_processed",
+          "completed_order",
+          "close_lost",
+          "ignored_warnings",
+          "ignored_suggestion"
+        ]
+      },
+      "note": {
+        "x-entityField": "note",
+        "type": "string"
+      },
+      "reason": {
+        "x-entityField": "reason",
+        "type": "string"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:order_event"
+}

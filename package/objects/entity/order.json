@@ -52,7 +52,12 @@
     "@obj:entity_field:order/deal_stages",
     "@obj:entity_field:order/has_goods",
     "@obj:entity_field:order/has_service",
-    "@obj:entity_field:order/pl_requested_at"
+    "@obj:entity_field:order/pl_requested_at",
+    "@obj:entity_field:order/approved",
+    "@obj:entity_field:order/approved_at",
+    "@obj:entity_field:order/contract_signed",
+    "@obj:entity_field:order/pending_roles",
+    "@obj:entity_field:order/close_reason"
   ],
   "natural_key": [],
   "display_field": "code",

@@ -1,0 +1,68 @@
+{
+  "label": "Mã task",
+  "type": "enum",
+  "facetable": true,
+  "required": true,
+  "enum_values": [
+    {
+      "value": "t11",
+      "label": "T11 · Lập đơn hàng & gửi duyệt"
+    },
+    {
+      "value": "t22",
+      "label": "T22 · Duyệt giải pháp & chi phí kỹ thuật"
+    },
+    {
+      "value": "t23",
+      "label": "T23 · Đề xuất giá mua & NCC"
+    },
+    {
+      "value": "t31",
+      "label": "T31 · Phê duyệt đơn & phương án mua hàng"
+    },
+    {
+      "value": "t40",
+      "label": "T40 · Dự thảo HĐ khách hàng"
+    },
+    {
+      "value": "t44",
+      "label": "T44 · Dự thảo HĐ nhà cung cấp"
+    },
+    {
+      "value": "t42",
+      "label": "T42 · Duyệt dự thảo hợp đồng"
+    },
+    {
+      "value": "t41",
+      "label": "T41 · Ký HĐ khách hàng · bản chính thức"
+    },
+    {
+      "value": "t45",
+      "label": "T45 · Ký HĐ nhà cung cấp · bản chính thức (SD ký = duyệt tạm ứng)"
+    },
+    {
+      "value": "t51",
+      "label": "T51 · Xác nhận KH tạm ứng"
+    },
+    {
+      "value": "t53",
+      "label": "T53 · Thanh toán tạm ứng NCC"
+    },
+    {
+      "value": "t61",
+      "label": "T61 · Nhận hàng & giao cho KH"
+    },
+    {
+      "value": "t62",
+      "label": "T62 · Triển khai & nghiệm thu"
+    },
+    {
+      "value": "t71",
+      "label": "T71 · Kiểm tra biên bản, xuất hóa đơn & gửi hồ sơ thanh toán"
+    },
+    {
+      "value": "t72",
+      "label": "T72 · Lưu trữ hồ sơ & cập nhật chi phí phát sinh"
+    }
+  ]
+}

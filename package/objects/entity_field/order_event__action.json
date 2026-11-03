@@ -1,0 +1,68 @@
+{
+  "label": "Thao tác",
+  "type": "enum",
+  "facetable": true,
+  "required": true,
+  "enum_values": [
+    {
+      "value": "submitted",
+      "label": "Gửi duyệt"
+    },
+    {
+      "value": "approved",
+      "label": "Duyệt"
+    },
+    {
+      "value": "returned",
+      "label": "Trả lại"
+    },
+    {
+      "value": "agreed",
+      "label": "Đồng ý"
+    },
+    {
+      "value": "revise",
+      "label": "Yêu cầu sửa dự thảo"
+    },
+    {
+      "value": "completed",
+      "label": "Hoàn thành"
+    },
+    {
+      "value": "not_applicable",
+      "label": "Không áp dụng"
+    },
+    {
+      "value": "auto_approved",
+      "label": "Tự duyệt"
+    },
+    {
+      "value": "reopened_missing_fields",
+      "label": "Mở lại vì thiếu trường bắt buộc"
+    },
+    {
+      "value": "returned_processed",
+      "label": "Đã xử lý trả lại"
+    },
+    {
+      "value": "revise_processed",
+      "label": "Đã xử lý yêu cầu sửa"
+    },
+    {
+      "value": "completed_order",
+      "label": "Hoàn tất đơn"
+    },
+    {
+      "value": "close_lost",
+      "label": "Close-lost"
+    },
+    {
+      "value": "ignored_warnings",
+      "label": "Bỏ qua cảnh báo"
+    },
+    {
+      "value": "ignored_suggestion",
+      "label": "Bỏ qua đề xuất"
+    }
+  ]
+}

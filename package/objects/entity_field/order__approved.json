@@ -1,0 +1,8 @@
+{
+  "label": "Đã phê duyệt",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

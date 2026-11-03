@@ -15,11 +15,13 @@ export const OBJECTS = {
   'entity:item_type': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:kpi_target': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:order_event': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order_finance': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order_line': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order_pl': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order_pl_goods': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order_pl_service': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:order_task': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:pl_setting': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:purchase_proposal': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:service_line_price': { kind: 'entity', contractVersion: '0.1.0' },
@@ -92,14 +94,18 @@ export const OBJECTS = {
   'entity_field:kpi_target/year': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/address': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/am': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/approved': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/approved_at': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/bank_account': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/bank_name': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/close_reason': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/code': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/consult_staff': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/contact_email': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/contact_name': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/contact_phone': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/content': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/contract_signed': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/contract_type_override': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/customer': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/customer_code': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -122,6 +128,7 @@ export const OBJECTS = {
   'entity_field:order/lead_source': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/number': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/payment_count': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order/pending_roles': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/pl_requested_at': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/poc': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/prev_contract_no': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -138,6 +145,16 @@ export const OBJECTS = {
   'entity_field:order/status': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/tax_code': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order/use_provision_fund': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/action': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/actor': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/at': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/note': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/reason': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/role': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/task': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/task_code': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_event/warnings': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order_finance/order': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order_finance/prev_net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order_finance/prev_revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -203,6 +220,21 @@ export const OBJECTS = {
   'entity_field:order_pl_service/recurring_cost': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order_pl_service/recurring_revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order_pl_service/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/am_user': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/due_at': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/due_state': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/finished_at': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/late_days': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/opened_at': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/outcome': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/priority': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/reason': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/role': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/sla_days': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/stage': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/status': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_task/task_code': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/annual_interest': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/auto_approve_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/contract_file_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -262,11 +294,13 @@ export const OBJECTS = {
   'entity_view:item_type/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:kpi_target/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:order_event/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order_finance/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order_line/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order_pl/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order_pl_goods/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order_pl_service/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:order_task/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:pl_setting/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:purchase_proposal/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:service_line_price/all': { kind: 'entity_view', contractVersion: '0.1.0' },
@@ -277,6 +311,7 @@ export const OBJECTS = {
   'form:customer': { kind: 'form', contractVersion: '0.1.0' },
   'form:goods_line_price': { kind: 'form', contractVersion: '0.1.0' },
   'form:order': { kind: 'form', contractVersion: '0.1.0' },
+  'form:order_event': { kind: 'form', contractVersion: '0.1.0' },
   'form:order_finance': { kind: 'form', contractVersion: '0.1.0' },
   'form:order_line': { kind: 'form', contractVersion: '0.1.0' },
   'form:purchase_proposal': { kind: 'form', contractVersion: '0.1.0' },
@@ -293,7 +328,7 @@ export const OBJECTS = {
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = 'business_plan' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
+export type EntityKey = 'business_plan' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_event' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'order_task' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
 export type WorkflowKey = 'compute_pl' | 'pl_selftest' | 'request_pl_on_proposal' | 'request_pl_on_proposal_update';
 
 /** The value of each field of each entity, as a record carries it. */
@@ -380,14 +415,18 @@ export interface EntityFields {
   order: {
     address?: string | null;
     am?: string | null;
+    approved?: boolean | null;
+    approved_at?: string | null;
     bank_account?: string | null;
     bank_name?: string | null;
+    close_reason?: string | null;
     code?: string | null;
     consult_staff?: string | null;
     contact_email?: string | null;
     contact_name?: string | null;
     contact_phone?: string | null;
     content?: string | null;
+    contract_signed?: boolean | null;
     contract_type_override?: 'tm_once' | 'tmdk' | 'dv_once' | 'dv_recurring' | 'fulfillment' | null;
     customer?: string | null;
     customer_code?: string | null;
@@ -410,6 +449,7 @@ export interface EntityFields {
     lead_source?: string | null;
     number?: string | null;
     payment_count?: number | null;
+    pending_roles?: ('am' | 'sa' | 'tm' | 'sd' | 'proc' | 'acc')[] | null;
     pl_requested_at?: string | null;
     poc?: boolean | null;
     prev_contract_no?: string | null;
@@ -426,6 +466,18 @@ export interface EntityFields {
     status?: 'draft' | 'in_progress' | 'done' | 'close_lost' | null;
     tax_code?: string | null;
     use_provision_fund?: boolean | null;
+  };
+  order_event: {
+    action?: 'submitted' | 'approved' | 'returned' | 'agreed' | 'revise' | 'completed' | 'not_applicable' | 'auto_approved' | 'reopened_missing_fields' | 'returned_processed' | 'revise_processed' | 'completed_order' | 'close_lost' | 'ignored_warnings' | 'ignored_suggestion' | null;
+    actor?: string | null;
+    at?: string | null;
+    note?: string | null;
+    order?: string | null;
+    reason?: string | null;
+    role?: 'am' | 'sa' | 'tm' | 'sd' | 'proc' | 'acc' | null;
+    task?: string | null;
+    task_code?: string | null;
+    warnings?: unknown;
   };
   order_finance: {
     order?: string | null;
@@ -501,6 +553,23 @@ export interface EntityFields {
     recurring_cost?: number | null;
     recurring_revenue?: number | null;
     revenue?: number | null;
+  };
+  order_task: {
+    am_user?: string | null;
+    due_at?: string | null;
+    due_state?: 'on_time' | 'due_soon' | 'overdue' | 'done_on_time' | 'done_late' | null;
+    finished_at?: string | null;
+    late_days?: number | null;
+    opened_at?: string | null;
+    order?: string | null;
+    outcome?: 'submitted' | 'approved' | 'returned' | 'agreed' | 'revise' | 'completed' | 'not_applicable' | 'auto_approved' | null;
+    priority?: 'normal' | null;
+    reason?: string | null;
+    role?: 'am' | 'sa' | 'tm' | 'sd' | 'proc' | 'acc' | null;
+    sla_days?: number | null;
+    stage?: number | null;
+    status?: 'blocked' | 'open' | 'done' | 'skipped' | 'not_applicable' | 'cancelled' | null;
+    task_code?: 't11' | 't22' | 't23' | 't31' | 't40' | 't44' | 't42' | 't41' | 't45' | 't51' | 't53' | 't61' | 't62' | 't71' | 't72' | null;
   };
   pl_setting: {
     annual_interest?: number | null;
