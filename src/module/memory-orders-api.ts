@@ -1,5 +1,8 @@
 // The orders in memory, for the demo and the screen tests. Records have AgentFlow's shape ({ id, body, updated_at }),
 // saving runs the real save plan, and setting pl_requested_at runs the same computation compute_pl runs.
+import { statusFor, needsReason } from '../flow/actions';
+import { runAdvance } from '../flow/code-entry';
+import { TASKS, type TaskRole } from '../flow/tasks';
 import { runComputeOrderPl } from '../order/code-entry';
 import { draftFromRecords, lineGroup, refId } from '../order/records';
 import type { OrderDraft, OrderRecords, Rec } from '../order/types';
@@ -7,12 +10,15 @@ import { configFromRecords } from '../pl/config-records';
 import { DEFAULT_CONFIG } from '../pl/defaults';
 import type { PlConfig } from '../pl/types';
 import { DEMO_CUSTOMERS, DEMO_ORDERS, DEMO_STAFF, DEMO_SUPPLIERS, recordsFromConfig } from './demo-data.js';
-import { OrdersError, type Access, type LoadedOrder, type OrderSummary, type OrdersApi, type Person } from './orders-api.js';
+import { OrdersError, type Access, type LoadedOrder, type OrderEvent, type OrderSummary, type OrderTask, type OrdersApi, type Person,
+  type WorkItem } from './orders-api.js';
 import { executeSavePlan, savePlan, type WriteEntity } from './save-plan.js';
 
 type Stored = { id: string; body: Rec; updated_at: string };
 const ENTITIES = ['order', 'order_line', 'goods_line_price', 'service_line_price', 'order_finance', 'purchase_proposal',
-  'order_pl', 'order_pl_service', 'order_pl_goods', 'customer', 'supplier'] as const;
+  'order_pl', 'order_pl_service', 'order_pl_goods', 'order_task', 'order_event', 'customer', 'supplier'] as const;
+const TASK_VALUES = ['status', 'outcome', 'reason', 'opened_at', 'due_at', 'finished_at', 'due_state', 'late_days'];
+const ALL_ROLES: TaskRole[] = ['am', 'sa', 'tm', 'sd', 'proc', 'acc'];
 
 export interface MemoryOptions {
   empty?: boolean;
@@ -23,6 +29,8 @@ export interface MemoryOptions {
   delayMs?: number;
   /** compute_pl runs this long after pl_requested_at changes, as a trigger does (0: at once). */
   computeDelayMs?: number;
+  /** The task roles this person is in (My work offers them the open tasks of these roles). */
+  roles?: TaskRole[];
 }
 
 const ALL: Access = { seesPl: true, seesGoodsPrices: true, seesServicePrices: true, seesProposals: false, seesPlService: true,
@@ -82,6 +90,33 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
   };
   for (const id of table('order').keys()) compute(id);
 
+  // What the flow triggers do after a write: init_order_tasks, advance_order (until a run changes nothing, as the
+  // trigger on its own writes would end), compute_pl when advance asks for one more P&L.
+  const reconcile = (orderId: string) => {
+    for (let pass = 0; pass < 8; pass++) {
+      const order = table('order').get(orderId);
+      if (!order) return;
+      const out = runAdvance({ order: order as unknown as Rec, tasks: rows('order_task', orderId) as unknown as Rec[],
+        pl: rows('order_pl', orderId) as unknown as Rec[], lines: rows('order_line', orderId) as unknown as Rec[],
+        goods_prices: rows('goods_line_price', orderId) as unknown as Rec[], service_prices: rows('service_line_price', orderId) as unknown as Rec[],
+        finance: rows('order_finance', orderId) as unknown as Rec[], config, now: now() });
+      for (const item of out.create_list) put('order_task', item as Rec);
+      for (const item of out.update_list) {
+        const row = table('order_task').get(String(item.id));
+        // Like the update step's expect: a task that has moved on since it was read is left as it is.
+        if (!row || row.body.status !== item.expect_status) continue;
+        for (const key of TASK_VALUES) row.body[key] = item[key];
+        row.updated_at = now();
+      }
+      const asked = out.order.pl_requested_at;
+      if (out.order_changed) Object.assign(order.body, out.order_fields);
+      for (const e of out.event_list) put('order_event', { order: orderId, task: e.task_id, task_code: e.task_code, role: e.role, action: e.action, note: e.note, at: e.at, warnings: [] });
+      if (asked) compute(orderId);
+      if (!out.create_list.length && !out.update_list.length && !out.order_changed && !out.event_list.length) return;
+    }
+  };
+  for (const [id, row] of table('order')) if (row.body.status === 'draft') reconcile(id);
+
   let failAfter = options.failAfter;
   const failIfDue = () => {
     writes += 1;
@@ -116,8 +151,17 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
   };
   const access: Access = { ...ALL, ...options.access };
 
+  const who = (): Person => options.me ?? { id: 'u-am', name: 'Nguyễn Thuận' };
+  const taskViews = (orderId: string): OrderTask[] => rows('order_task', orderId).map(({ id, body }): OrderTask => ({ id, order: orderId,
+    task_code: body.task_code as OrderTask['task_code'], stage: Number(body.stage ?? 0), role: body.role as OrderTask['role'],
+    status: body.status as OrderTask['status'], outcome: (body.outcome ?? null) as OrderTask['outcome'], reason: String(body.reason ?? ''),
+    opened_at: (body.opened_at ?? null) as string | null, due_at: (body.due_at ?? null) as string | null,
+    done_at: (body.finished_at ?? null) as string | null, sla_days: (body.sla_days ?? null) as number | null,
+    due_state: (body.due_state ?? null) as string | null, late_days: (body.late_days ?? null) as number | null,
+    claimedBy: refId(body.claimed_by) })).sort((a, b) => TASKS.findIndex((t) => t.code === a.task_code) - TASKS.findIndex((t) => t.code === b.task_code));
+
   const api: OrdersApi = {
-    me: () => options.me ?? { id: 'u-am', name: 'Nguyễn Thuận' },
+    me: who,
     async access() { await wait(); return access; },
     async config() { await wait(); return config; },
     async staff() { await wait(); return DEMO_STAFF; },
@@ -158,10 +202,12 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       await wait();
       const created = await executeSavePlan(savePlan(draft, saved, plConfig), writer);
       const id = draft.order.id && !draft.order.id.startsWith('new:') ? draft.order.id : created['new:order'];
+      const fresh = !table('order').get(id)!.body.created_at;
       table('order').get(id)!.body.created_at ??= now();
       await writer.patch('order', id, { pl_requested_at: now() });
       if (options.computeDelayMs) setTimeout(() => compute(id), options.computeDelayMs);
       else compute(id);
+      if (fresh) reconcile(id);
       return load(id);
     },
     async saveProposal(lineId, orderId, fields) {
@@ -176,6 +222,61 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       await wait();
       for (const entity of ENTITIES) for (const row of rows(entity, id)) table(entity).delete(row.id);
       table('order').delete(id);
+    },
+    async tasks(orderId) {
+      await wait();
+      return taskViews(orderId);
+    },
+    async events(orderId) {
+      await wait();
+      return rows('order_event', orderId).map(({ id, body }): OrderEvent => ({ id, order: orderId, task_code: (body.task_code as string | null) ?? null,
+        at: String(body.at ?? ''), actor: refId(body.actor), role: (body.role as string | null) ?? null, action: String(body.action),
+        note: String(body.note ?? ''), reason: String(body.reason ?? ''), warnings: (body.warnings ?? []) as OrderEvent['warnings'] }))
+        .sort((a, b) => a.at.localeCompare(b.at));
+    },
+    async act(task, outcome, reason, warnings) {
+      await wait();
+      const row = table('order_task').get(task.id);
+      const me = who().id;
+      // The refusals the server gives: the stage model, the outcome rules and the work claim (plan 03, order_task).
+      if (!row || row.body.status !== 'open') throw new OrdersError('STAGE_TRANSITION_NOT_ALLOWED', 'Task không còn chờ làm', {}, 422);
+      if (!TASKS.find((t) => t.code === task.task_code)!.outcomes.includes(outcome)) throw new OrdersError('ENTITY_VALIDATION_RULE_FAILED', 'Kết quả không hợp lệ cho task này', {}, 422);
+      if (needsReason(outcome) && !reason.trim()) throw new OrdersError('ENTITY_VALIDATION_RULE_FAILED', 'Trả lại hoặc yêu cầu sửa phải có lý do', {}, 422);
+      if (row.body.claimed_by && row.body.claimed_by !== me) throw new OrdersError('WORK_NOT_CLAIMANT', null, {}, 403);
+      Object.assign(row.body, { claimed_by: me, status: statusFor(outcome), outcome, reason });
+      row.updated_at = now();
+      const orderId = refId(row.body.order)!;
+      const log = { order: orderId, task: row.id, task_code: row.body.task_code, role: row.body.role, actor: me, at: now() };
+      put('order_event', { ...log, action: outcome, reason, note: '', warnings: [] });
+      if (warnings.length) put('order_event', { ...log, action: 'ignored_warnings', reason: '', note: '', warnings });
+      reconcile(orderId);
+    },
+    async myWork() {
+      await wait();
+      const me = who().id;
+      const roles = options.roles ?? ALL_ROLES;
+      const items: WorkItem[] = [];
+      for (const orderId of table('order').keys()) {
+        const order = table('order').get(orderId)!.body;
+        for (const task of taskViews(orderId)) {
+          if (task.status !== 'open') continue;
+          const mine = task.claimedBy === me;
+          if (!mine && !(task.claimedBy === null && roles.includes(task.role))) continue;
+          items.push({ task, orderCode: String(order.code ?? ''), customerName: String(order.customer_name ?? ''), mine });
+        }
+      }
+      return items.sort((a, b) => Number(b.mine) - Number(a.mine));
+    },
+    async closeLost(orderId, reason) {
+      await wait();
+      const order = table('order').get(orderId);
+      if (!order) throw new OrdersError('ENTITY_RECORD_NOT_FOUND', null, {}, 404);
+      if (!reason.trim()) throw new OrdersError('STAGE_TRANSITION_NOT_ALLOWED', 'Cần ghi lý do Close-lost', {}, 422);
+      if (order.body.contract_signed === true) throw new OrdersError('ENTITY_VALIDATION_RULE_FAILED', 'Đã ký HĐ khách hàng — không Close-lost được', {}, 422);
+      Object.assign(order.body, { status: 'close_lost', close_reason: reason });
+      order.updated_at = now();
+      put('order_event', { order: orderId, task: null, task_code: null, role: null, actor: who().id, at: now(), action: 'close_lost', reason, note: '', warnings: [] });
+      reconcile(orderId);
     },
   };
   return api;

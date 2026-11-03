@@ -7,7 +7,7 @@ type Row = { id: string; body: Record<string, unknown>; updated_at: string };
 export type Refuse = (method: string, entity: string, id?: string) => { status: number; type: string; detail?: string } | null;
 
 export const ENTITY_KEYS = ['order', 'order_line', 'goods_line_price', 'service_line_price', 'order_finance', 'purchase_proposal',
-  'order_pl', 'order_pl_service', 'order_pl_goods', 'customer', 'supplier', 'staff', 'item_type', 'contract_type_rate',
+  'order_pl', 'order_pl_service', 'order_pl_goods', 'order_task', 'order_event', 'customer', 'supplier', 'staff', 'item_type', 'contract_type_rate',
   'fin_cost_tier', 'vat_rate', 'pl_setting', 'task_sla', 'deal_stage_weight'];
 
 export function fakeBackend(refuse: Refuse = () => null) {
@@ -25,6 +25,13 @@ export function fakeBackend(refuse: Refuse = () => null) {
       return answer({ revision: 1, objects: ENTITY_KEYS.map((key) => ({ id: `e-${key}`, key, kind: 'entity', logical_key: `entity:${key}`,
         state: 'live', source: 'own', parent: null, feature: null, contract: null, contract_version: null, customized: false })) });
     }
+    if (path === '/work') {
+      // The work list: open tasks, held by this person ("mine") or by nobody ("claimable").
+      const view = (init as unknown as { params: { query: { view: string } } }).params.query.view;
+      const open = [...rows.get('e-order_task')!.values()].filter((row) => row.body.status === 'open'
+        && (view === 'mine' ? row.body.claimed_by === 'u-am' : !row.body.claimed_by));
+      return answer({ items: open.map((row) => ({ entity_id: 'e-order_task', id: row.id })) });
+    }
     const { entity_id, record_id } = init!.params!.path!;
     const refused = refuse('GET', entityOf(entity_id), record_id);
     if (refused) return fail(refused.status, refused.type, refused.detail);
@@ -37,6 +44,14 @@ export function fakeBackend(refuse: Refuse = () => null) {
     const refused = refuse(path.endsWith('/query') ? 'QUERY' : 'POST', entityOf(entity_id));
     if (refused) return fail(refused.status, refused.type, refused.detail);
     const table = rows.get(entity_id)!;
+    if (path.endsWith('/work/claim')) {
+      const row = table.get(init.params.path.record_id);
+      if (!row) return fail(404, 'ENTITY_RECORD_NOT_FOUND');
+      if (row.body.claimed_by && row.body.claimed_by !== 'u-am') return fail(409, 'WORK_ALREADY_CLAIMED');
+      row.body.claimed_by = 'u-am';
+      row.updated_at = stamp();
+      return answer(row);
+    }
     if (path.endsWith('/query')) {
       const filters: { field: string; value: unknown }[] = init.body.filter?.field_filters ?? [];
       const items = [...table.values()].filter((row) => filters.every((f) => row.body[f.field] === f.value));

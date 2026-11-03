@@ -1,8 +1,20 @@
 // What the order screens need from AgentFlow. The module talks to AgentFlow through it (http-orders-api.ts), and the
 // demo and the tests through a fake (memory-orders-api.ts).
+import type { TaskRec } from '../flow/advance';
+import type { TaskOutcome } from '../flow/tasks';
 import type { FinanceFields, OrderDraft, OrderFields, OrderRecords, Rec } from '../order/types';
 import type { ConfigRecords } from '../pl/config-records';
 import type { CustomerTier, PlConfig } from '../pl/types';
+
+/** One of an order's fifteen tasks, as the screens read it; claimedBy is whoever holds it (null: nobody yet). */
+export interface OrderTask extends TaskRec { order: string; claimedBy: string | null; }
+/** A line of the order's log (order_event): nobody edits or deletes one. */
+export interface OrderEvent { id: string; order: string; task_code: string | null; at: string; actor: string | null; role: string | null;
+  action: string; note: string; reason: string; warnings: { source: string; level: string; text: string }[]; }
+/** A warning the person saw and went ahead anyway (FR-6.10): logged with the action. */
+export interface IgnoredWarning { source: 'ai' | 'system'; level: 'info' | 'warning' | 'critical'; text: string; }
+/** A task waiting for this person: held by them, or offered to a group they are in. */
+export interface WorkItem { task: OrderTask; orderCode: string; customerName: string; mine: boolean; }
 
 export interface OrderSummary { id: string; code: string; customerName: string; customerCode: string; am: string | null;
   sa: string | null; status: OrderFields['status']; stage: number; createdAt: string;
@@ -37,6 +49,16 @@ export interface OrdersApi {
   save(draft: OrderDraft, saved: OrderRecords | null, config: PlConfig): Promise<LoadedOrder>;
   saveProposal(lineId: string, orderId: string, fields: ProposalFields): Promise<Rec>;
   deleteOrder(id: string): Promise<void>;
+  /** The order's fifteen tasks, in flow order. [] when the person may not read them. */
+  tasks(orderId: string): Promise<OrderTask[]>;
+  /** The order's log, oldest first. */
+  events(orderId: string): Promise<OrderEvent[]>;
+  /** Takes the task if nobody holds it, sets its outcome (with a reason where one is needed) and logs what the person did. */
+  act(task: OrderTask, outcome: TaskOutcome, reason: string, warnings: IgnoredWarning[]): Promise<void>;
+  /** Tasks held by this person, then tasks offered to them. */
+  myWork(): Promise<WorkItem[]>;
+  /** Close-lost: needs a reason, and is refused once the customer's contract is signed (BR-4A). */
+  closeLost(orderId: string, reason: string): Promise<void>;
 }
 
 /**

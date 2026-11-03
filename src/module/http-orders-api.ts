@@ -1,10 +1,13 @@
 // The orders over AgentFlow's published record operations, through the host's client, as the signed-in person.
 import { AgentFlowError, getAppObjects, ok, type AppHost } from '@reflexify/agentflow-sdk';
+import { statusFor } from '../flow/actions';
+import { TASKS } from '../flow/tasks';
 import { draftFromRecords, fieldsOf, lineGroup, refId } from '../order/records';
 import type { OrderRecords, Rec } from '../order/types';
-import { configFromRecords, type ConfigRecords } from '../pl/config-records';
+import { configFromRecords, parseNumber, type ConfigRecords } from '../pl/config-records';
 import { probeAccess } from './access.js';
-import { OrdersError, type Access, type LoadedOrder, type OrderSummary, type OrdersApi, type StaffMember } from './orders-api.js';
+import { OrdersError, type Access, type LoadedOrder, type OrderEvent, type OrderSummary, type OrderTask, type OrdersApi, type StaffMember,
+  type WorkItem } from './orders-api.js';
 import { executeSavePlan, isNew, NEW_ORDER, savePlan, type Writer } from './save-plan.js';
 
 type Filter = { field: string; op: string; value?: unknown };
@@ -30,6 +33,18 @@ async function call<T>(request: Promise<{ data?: T; error?: unknown; response: R
 // 403: no grant for it; 404: nothing the person may read. Either way the screen shows less, not a failure.
 const NOT_FOR_THEM = (error: unknown) => error instanceof OrdersError && (error.status === 403 || error.status === 404
   || /^(FORBIDDEN|HTTP_403|HTTP_404|ENTITY_NOT_FOUND|ENTITY_RECORD_NOT_FOUND|.*_FORBIDDEN|.*_DENIED)$/.test(error.code));
+
+const optStr = (value: unknown) => (value == null || value === '' ? null : String(value));
+const byFlow = (a: OrderTask, b: OrderTask) => TASKS.findIndex((t) => t.code === a.task_code) - TASKS.findIndex((t) => t.code === b.task_code);
+
+function taskOf(record: Rec): OrderTask {
+  const t = fieldsOf(record);
+  return { id: String(t.id), order: refId(t.order) ?? '', task_code: t.task_code as OrderTask['task_code'], stage: parseNumber(t.stage) ?? 0,
+    role: t.role as OrderTask['role'], status: (t.status ?? 'blocked') as OrderTask['status'], outcome: optStr(t.outcome) as OrderTask['outcome'],
+    reason: String(t.reason ?? ''), opened_at: optStr(t.opened_at), due_at: optStr(t.due_at), done_at: optStr(t.finished_at),
+    sla_days: parseNumber(t.sla_days) ?? null, due_state: optStr(t.due_state), late_days: parseNumber(t.late_days) ?? null,
+    claimedBy: refId(t.claimed_by) };
+}
 
 export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): OrdersApi & { canRead(entity: string): Promise<boolean> } {
   const api = host.api;
@@ -245,6 +260,60 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
     async deleteOrder(id: string) {
       await getRecord('order', id);
       await writer.remove('order', id);
+    },
+    async tasks(orderId: string) {
+      return (await ofOrder('order_task', orderId)).map(taskOf).sort(byFlow);
+    },
+    async events(orderId: string) {
+      return (await ofOrder('order_event', orderId)).map(fieldsOf).map((e): OrderEvent => ({ id: String(e.id), order: orderId,
+        task_code: optStr(e.task_code), at: String(e.at ?? ''), actor: refId(e.actor), role: optStr(e.role), action: String(e.action ?? ''),
+        note: String(e.note ?? ''), reason: String(e.reason ?? ''), warnings: (Array.isArray(e.warnings) ? e.warnings : []) as OrderEvent['warnings'] }))
+        .sort((a, b) => a.at.localeCompare(b.at));
+    },
+    async act(task, outcome, reason, warnings) {
+      const me = self.me().id;
+      // The task is offered to a group until somebody takes it; only its holder may finish it (WORK_NOT_CLAIMANT).
+      if (task.claimedBy !== me) {
+        const entity_id = await entityId('order_task');
+        await call(api.POST('/entities/{entity_id}/records/{record_id}/work/claim', { params: { path: { entity_id, record_id: task.id } } } as never) as never);
+      }
+      await getRecord('order_task', task.id);
+      await patch('order_task', task.id, { status: statusFor(outcome), outcome, reason });
+      const log = { order: task.order, task: task.id, task_code: task.task_code, role: task.role, actor: me, at: new Date().toISOString() };
+      await writer.create('order_event' as never, { ...log, action: outcome, reason });
+      if (warnings.length) await writer.create('order_event' as never, { ...log, action: 'ignored_warnings', warnings });
+    },
+    async myWork() {
+      const entity = await entityId('order_task');
+      const items: WorkItem[] = [];
+      const seen = new Set<string>();
+      const orders = new Map<string, Rec>();
+      for (const view of ['mine', 'claimable'] as const) {
+        let listed: unknown;
+        try {
+          listed = await call(api.GET('/work' as never, { params: { query: { view } } } as never) as never);
+        } catch (error) {
+          if (NOT_FOR_THEM(error)) continue;
+          throw error;
+        }
+        const list = (Array.isArray(listed) ? listed : (listed as { items?: unknown[] } | null)?.items ?? []) as
+          { entity_id?: string; id?: string; record_id?: string }[];
+        for (const row of list) {
+          const id = row.record_id ?? row.id;
+          if (row.entity_id !== entity || !id || seen.has(id)) continue;
+          const task = taskOf(await getRecord('order_task', id));
+          if (task.status !== 'open') continue;
+          seen.add(id);
+          if (!orders.has(task.order)) orders.set(task.order, fieldsOf(await getRecord('order', task.order)));
+          const order = orders.get(task.order)!;
+          items.push({ task, orderCode: String(order.code ?? ''), customerName: String(order.customer_name ?? ''), mine: view === 'mine' });
+        }
+      }
+      return items;
+    },
+    async closeLost(orderId: string, reason: string) {
+      await getRecord('order', orderId);
+      await patch('order', orderId, { status: 'close_lost', close_reason: reason });
     },
   };
   return self;
