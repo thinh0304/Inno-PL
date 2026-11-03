@@ -98,6 +98,13 @@ Every `agentflow-app` command takes `--json` for one JSON value on stdout. A ref
   `http-orders-api.ts` for AgentFlow, `memory-orders-api.ts` for the demo and the tests. Saving goes through
   `save-plan.ts`, then sets `order.pl_requested_at`; the screens never start a workflow and never write P&L.
 - `config/build/request-pl.mjs`: two trigger workflows that set `pl_requested_at` when Purchasing writes a proposal.
+- `src/contract/`: the contract rules (`contractSlots`, `contractGate`, `prepayTotal`, `SIGNING_FIELDS`, `contractFromRecord`), tested in
+  `test/contract/`; `advance_order` (via `src/flow/code-entry.ts`) and the screens both use `contractGate`, so a change there changes both.
+- `config/entities/contract.json`: an upload is a new record (`version` + 1), never an edit; `file` is an array of attachment ids, and the
+  file's name comes from `GET /attachments/{id}` (F-26). The signing fields leave `locked_after_submit` and lock on `contract_signed`.
+- `tabs/ContractsTab.tsx` and `useContracts.ts`: the contracts tab; `OrdersApi.contracts / uploadContract / saveSigning / contractFileUrl`.
+  AgentFlow refuses uploads from an installed app (`UPLOAD_NOT_ALLOWED`, F-25) and files a run produced (F-27): no contract templates yet.
+- `e2e/module-helpers.ts`: `moduleApi(handle)`, the module's `OrdersApi` as a sandbox person.
 
 ## Rules
 
