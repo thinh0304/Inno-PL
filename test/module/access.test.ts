@@ -23,11 +23,15 @@ describe('access', () => {
 
   it('tabs_by_role', () => {
     const am = { ...none, seesPl: true, seesGoodsPrices: true, seesServicePrices: true, seesPlService: true, seesPlGoods: true, canCreateOrder: true };
-    expect(tabsFor(am, true)).toEqual(['form', 'lines', 'suppliers', 'pl']);
-    expect(tabsFor({ ...am, seesProposals: true, canCreateOrder: false }, false)).toEqual(['pl', 'lines', 'purchase', 'suppliers', 'form']);
-    expect(tabsFor({ ...am, canCreateOrder: false, isAdmin: true }, false)).toEqual(['pl', 'lines', 'suppliers', 'form']);
-    expect(tabsFor({ ...none, seesGoodsPrices: true, seesProposals: true, seesPlGoods: true }, false)).toEqual(['purchase']);
-    expect(tabsFor({ ...none, seesServicePrices: true, seesPlService: true }, false)).toEqual(['purchase']);
+    // The flow and the history follow the role's own tabs on every saved order.
+    expect(tabsFor(am, true)).toEqual(['form', 'lines', 'suppliers', 'pl', 'flow', 'history']);
+    expect(tabsFor({ ...am, seesProposals: true, canCreateOrder: false }, false)).toEqual(['pl', 'lines', 'purchase', 'suppliers', 'form', 'flow', 'history']);
+    expect(tabsFor({ ...am, canCreateOrder: false, isAdmin: true }, false)).toEqual(['pl', 'lines', 'suppliers', 'form', 'flow', 'history']);
+    expect(tabsFor({ ...none, seesGoodsPrices: true, seesProposals: true, seesPlGoods: true }, false)).toEqual(['purchase', 'flow', 'history']);
+    expect(tabsFor({ ...none, seesServicePrices: true, seesPlService: true }, false)).toEqual(['purchase', 'flow', 'history']);
+    expect(tabsFor(none, false)).toEqual(['form', 'flow', 'history']);
+    // A new order has no flow yet.
+    expect(tabsFor(am, true, false)).toEqual(['form', 'lines', 'suppliers', 'pl']);
   });
 
   it('editor_only_in_draft', () => {

@@ -73,6 +73,6 @@ describe('the order page', () => {
   it('tabs follow the role', async () => {
     show('o1');
     await screen.findByDisplayValue('Trung tâm CNTT Bà Rịa');
-    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Phiếu khảo sát', 'Danh mục Thiết bị / Dịch vụ', 'Nhà cung cấp', 'Kết quả P&L']);
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Phiếu khảo sát', 'Danh mục Thiết bị / Dịch vụ', 'Nhà cung cấp', 'Kết quả P&L', 'Quy trình', 'Lịch sử']);
   });
 });

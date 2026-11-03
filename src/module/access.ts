@@ -20,13 +20,17 @@ export async function probeAccess(source: AccessSource): Promise<Access> {
   return { seesPl, seesGoodsPrices, seesServicePrices, seesProposals, seesPlService, seesPlGoods, canCreateOrder, isAdmin };
 }
 
-/** The order page's tabs, in the mockup's order for each role (ROLETABS), without the process tab (plan 03). */
-export function tabsFor(access: Access, editor: boolean): TabKey[] {
-  if (editor) return ['form', 'lines', 'suppliers', 'pl'];
-  if (access.seesPl && access.seesProposals) return ['pl', 'lines', 'purchase', 'suppliers', 'form'];
-  if (access.seesPl) return ['pl', 'lines', 'suppliers', 'form'];
-  if (access.seesProposals || access.seesGoodsPrices || access.seesServicePrices) return ['purchase'];
-  return ['form'];
+/**
+ * The order page's tabs, in the mockup's order for each role (ROLETABS), then the flow and the history for every saved
+ * order (a new order has neither yet).
+ */
+export function tabsFor(access: Access, editor: boolean, saved = true): TabKey[] {
+  const flow: TabKey[] = saved ? ['flow', 'history'] : [];
+  if (editor) return ['form', 'lines', 'suppliers', 'pl', ...flow];
+  if (access.seesPl && access.seesProposals) return ['pl', 'lines', 'purchase', 'suppliers', 'form', ...flow];
+  if (access.seesPl) return ['pl', 'lines', 'suppliers', 'form', ...flow];
+  if (access.seesProposals || access.seesGoodsPrices || access.seesServicePrices) return ['purchase', ...flow];
+  return ['form', ...flow];
 }
 
 /** The AM or SA of a draft order edits it; locking at later stages is plan 03's. */

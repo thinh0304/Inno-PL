@@ -2,10 +2,10 @@ import type { AppHost } from '@reflexify/agentflow-sdk';
 import { useEffect, useState } from 'react';
 
 // The module's paths: the list, a new order, and an order with its open tab (?tab=).
-export type TabKey = 'form' | 'lines' | 'suppliers' | 'pl' | 'purchase';
+export type TabKey = 'form' | 'lines' | 'suppliers' | 'pl' | 'purchase' | 'flow' | 'history';
 export type Route = { name: 'list' } | { name: 'new' } | { name: 'order'; id: string; tab: TabKey | null };
 
-const TABS: readonly TabKey[] = ['form', 'lines', 'suppliers', 'pl', 'purchase'];
+const TABS: readonly TabKey[] = ['form', 'lines', 'suppliers', 'pl', 'purchase', 'flow', 'history'];
 
 export function parseRoute(path: string): Route {
   const [pathname, query = ''] = path.split('?');

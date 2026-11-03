@@ -17,3 +17,11 @@ describe('routes', () => {
     }
   });
 });
+
+describe('the flow tabs', () => {
+  it('parse_and_build_the_flow_and_history_tabs', () => {
+    expect(parseRoute('/orders/o1?tab=flow')).toEqual({ name: 'order', id: 'o1', tab: 'flow' });
+    expect(parseRoute('/orders/o1?tab=history')).toEqual({ name: 'order', id: 'o1', tab: 'history' });
+    expect(routePath({ name: 'order', id: 'o1', tab: 'flow' })).toBe('/orders/o1?tab=flow');
+  });
+});

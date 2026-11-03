@@ -2,14 +2,17 @@ import { useEffect, useId, useRef, useState, type ReactElement } from 'react';
 import { tabsFor } from './access.js';
 import { CustomerCard } from './CustomerCard.js';
 import { DeliveryCard } from './DeliveryCard.js';
+import { returnedInfo } from './flow-view.js';
 import { AlertIcon, ChevronIcon } from './icons.js';
 import { useToasts, type ThemeMode } from './kit.js';
 import type { OrdersApi } from './orders-api.js';
 import { routePath, type TabKey } from './routes.js';
+import { StageBar } from './StageBar.js';
 import { errorText, TEXT, type Lang } from './text.js';
+import { useFlow, type FlowHook } from './useFlow.js';
 import { useOrderDraft, type OrderDraftHook } from './useOrderDraft.js';
 
-export interface TabProps { hook: OrderDraftHook; api: OrdersApi; lang: Lang; locale: string; theme: ThemeMode }
+export interface TabProps { hook: OrderDraftHook; flow: FlowHook; api: OrdersApi; lang: Lang; locale: string; theme: ThemeMode }
 export type TabComponent = (props: TabProps) => ReactElement;
 
 interface Props {
@@ -28,6 +31,8 @@ interface Props {
 export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = {} }: Props) {
   const t = TEXT[lang];
   const hook = useOrderDraft(api, id);
+  // The flow is read again as the order is whenever a task changes it (a return unlocks the order, a submission locks it).
+  const flow = useFlow(api, id, hook.refresh);
   const toasts = useToasts({ locale, theme });
   const reasonId = useId();
   const pressed = useRef(false);
@@ -56,7 +61,8 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
 
   const { order } = hook.draft;
   const nameOf = (user: string | null) => (user ? hook.staff.find((s) => s.user === user)?.name ?? null : null);
-  const visible = tabsFor(hook.access!, hook.editor);
+  const visible = tabsFor(hook.access!, hook.editor, Boolean(id));
+  const { returned } = returnedInfo(flow.events, order.status);
   const chosen = id ? tab : localTab;
   const current = chosen && visible.includes(chosen) ? chosen : visible[0];
   const Tab = tabs[current];
@@ -100,6 +106,7 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
         )}
       </header>
 
+      {id && flow.tasks.length > 0 && <StageBar tasks={flow.tasks} status={order.status} returned={returned} lang={lang} />}
       <CustomerCard hook={hook} api={api} lang={lang} />
       <DeliveryCard hook={hook} lang={lang} />
 
@@ -110,7 +117,7 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
         ))}
       </div>
       <section role="tabpanel" id={`panel-${current}`} aria-labelledby={`tab-${current}`} className="tab-panel">
-        {Tab && <Tab hook={hook} api={api} lang={lang} locale={locale} theme={theme} />}
+        {Tab && <Tab hook={hook} flow={flow} api={api} lang={lang} locale={locale} theme={theme} />}
       </section>
       {toasts.region}
     </main>

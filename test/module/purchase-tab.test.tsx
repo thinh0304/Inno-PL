@@ -26,7 +26,7 @@ async function open(options: MemoryOptions, id = 'o1') {
 describe('the purchase tab', () => {
   it('procurement_edits_proposals_and_sees_saving', async () => {
     await open(PROC);
-    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Đơn mua hàng']);
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Đơn mua hàng', 'Quy trình', 'Lịch sử']);
     const cost = await screen.findByLabelText('Đơn giá mua đề xuất — Mua hàng dòng 1');
     fireEvent.change(cost, { target: { value: '18.000.000' } });
     fireEvent.click(screen.getByRole('button', { name: 'Lưu đề xuất dòng 1' }));
@@ -38,7 +38,7 @@ describe('the purchase tab', () => {
 
   it('tm_sees_services_without_full_pl', async () => {
     await open(TM, 'o2');
-    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Đơn mua hàng']);
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual(['Đơn mua hàng', 'Quy trình', 'Lịch sử']);
     const services = (await screen.findByText('Đơn mua hàng — Dịch vụ & hạng mục khác')).closest('section')!;
     expect(services.textContent).toMatch(/4\.200\.000/);
     expect(screen.queryByText(/6\.500\.000/)).toBeNull();
