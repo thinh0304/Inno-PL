@@ -182,7 +182,9 @@
                 "approved",
                 "approved_at",
                 "contract_signed",
-                "pending_roles"
+                "pending_roles",
+                "has_goods",
+                "has_service"
               ]
             }
           },

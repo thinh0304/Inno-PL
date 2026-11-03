@@ -264,6 +264,99 @@
       "field": "outcome"
     },
     {
+      "key": "t11_finishes_as_submitted",
+      "message": "Task lập đơn (t11) chỉ kết thúc bằng gửi duyệt",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "field",
+            "rule": {
+              "field": "task_code",
+              "op": "eq",
+              "value": "t11"
+            }
+          },
+          {
+            "kind": "field",
+            "rule": {
+              "field": "status",
+              "op": "eq",
+              "value": "done"
+            }
+          },
+          {
+            "kind": "field",
+            "rule": {
+              "field": "outcome",
+              "op": "ne",
+              "value": "submitted"
+            }
+          }
+        ]
+      },
+      "field": "outcome"
+    },
+    {
+      "key": "outcome_is_final_once_done",
+      "message": "Task đã xong — không đổi được kết quả",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "was",
+              "rule": {
+                "field": "status",
+                "op": "ne",
+                "value": "open"
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed_any",
+              "fields": [
+                "outcome",
+                "reason"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:automation_group"
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:admin_group"
+              }
+            }
+          }
+        ]
+      },
+      "field": "outcome"
+    },
+    {
       "key": "reason_for_return",
       "message": "Trả lại hoặc yêu cầu sửa phải có lý do",
       "condition": {

@@ -994,6 +994,7 @@ var PL = (() => {
         for (const code of ["t40", "t44"]) if (get(code).status !== "not_applicable") open(get(code));
       }
       const t11 = get("t11");
+      if (t11.status === "done" && t11.outcome !== "submitted" && ord.status === "draft") open(t11);
       if (t11.status === "done" && t11.outcome === "submitted" && ord.status === "draft") {
         if (input.submitIssues.length) {
           open(t11);
@@ -1011,7 +1012,12 @@ var PL = (() => {
       }
       for (const d of TASKS) {
         const t = get(d.code);
-        if (t.status !== "blocked" || !predecessors(d.code, flow()).every(passed)) continue;
+        if (d.code === "t11" || !["open", "done", "skipped"].includes(t.status)) continue;
+        if (!predecessors(d.code, flow()).every(passed)) reset(t, "blocked");
+      }
+      for (const d of TASKS) {
+        const t = get(d.code);
+        if (t.status !== "blocked" || ord.status === "draft" || !predecessors(d.code, flow()).every(passed)) continue;
         open(t);
         if (d.code === "t31" && !needsApproval(flow(), autoApproveLimit)) {
           t.status = "skipped";

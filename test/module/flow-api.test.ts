@@ -117,6 +117,16 @@ describe('the flow through the HTTP API', () => {
       ['task-1', true, 'TM-1', 'Công ty A'], ['task-2', false, 'TM-1', 'Công ty A']]);
   });
 
+  it('my_work_skips_tasks_on_orders_the_person_may_not_read', async () => {
+    // A Sales Admin is offered every SA task but reads only the orders they are named on.
+    const b = fakeBackend((method, entity, id) => (method === 'GET' && entity === 'order' && id === 'o2' ? { status: 403, type: 'FORBIDDEN' } : null));
+    b.seed('order', { code: 'TM-1', customer_name: 'Công ty A', status: 'in_progress' }, 'o1');
+    b.seed('order', { code: 'TM-2', customer_name: 'Công ty B', status: 'in_progress' }, 'o2');
+    b.seed('order_task', { order: 'o2', task_code: 't40', role: 'sa', status: 'open', stage: 4 }, 'task-x');
+    b.seed('order_task', { order: 'o1', task_code: 't40', role: 'sa', status: 'open', stage: 4 }, 'task-y');
+    expect((await createHttpOrdersApi(b.host).myWork()).map((w) => w.task.id)).toEqual(['task-y']);
+  });
+
   it('close_lost_writes_the_status_and_reason', async () => {
     const b = fakeBackend();
     b.seed('order', { code: 'TM-1', status: 'in_progress' }, 'o1');

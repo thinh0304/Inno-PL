@@ -42,7 +42,7 @@ describe('order_task and order_event', () => {
 
   it('holder_rules_exist', () => {
     expect(ruleKeys('order_task')).toEqual(['holder_changes_only_outcome', 'returned_only_t22_t31', 'revise_only_t42', 'submitted_only_t11',
-      'not_applicable_only_t53', 'auto_approved_is_automatic', 'reason_for_return', 'only_am_finishes', 'only_sa_finishes', 'only_tm_finishes',
+      'not_applicable_only_t53', 'auto_approved_is_automatic', 't11_finishes_as_submitted', 'outcome_is_final_once_done', 'reason_for_return', 'only_am_finishes', 'only_sa_finishes', 'only_tm_finishes',
       'only_sd_finishes', 'only_proc_finishes', 'only_acc_finishes']);
   });
 
@@ -82,7 +82,7 @@ describe('locks after submit', () => {
 
   it('flow_fields_are_automatic', () => {
     const r = rule('order', 'flow_fields_are_automatic');
-    expect(writeOps(r, 'changed_any')[0].fields.sort()).toEqual(['approved', 'approved_at', 'contract_signed', 'pending_roles', 'stage']);
+    expect(writeOps(r, 'changed_any')[0].fields.sort()).toEqual(['approved', 'approved_at', 'contract_signed', 'has_goods', 'has_service', 'pending_roles', 'stage']);
     expect(notIn(r)).toHaveLength(2);
     for (const key of ['new_order_is_unapproved', 'new_order_is_draft']) {
       expect(writeOps(rule('order', key), 'is_new'), key).toHaveLength(1);
@@ -136,6 +136,22 @@ describe('enum colours', () => {
       }
     }
     expect(bad).toEqual([]);
+  });
+});
+
+describe('final review rules', () => {
+  it('t11_can_only_be_finished_as_submitted', () => {
+    const r = rule('order_task', 't11_finishes_as_submitted');
+    expect(leaves(r).filter((l) => l.kind === 'field').map((l) => l.rule)).toEqual([
+      { field: 'task_code', op: 'eq', value: 't11' }, { field: 'status', op: 'eq', value: 'done' }, { field: 'outcome', op: 'ne', value: 'submitted' }]);
+  });
+
+  it('a_finished_tasks_outcome_cannot_be_changed_by_people', () => {
+    const r = rule('order_task', 'outcome_is_final_once_done');
+    expect(writeOps(r, 'is_update')).toHaveLength(1);
+    expect(writeOps(r, 'was')[0].rule).toEqual({ field: 'status', op: 'ne', value: 'open' });
+    expect(writeOps(r, 'changed_any')[0].fields.sort()).toEqual(['outcome', 'reason']);
+    expect(notIn(r).sort()).toEqual(['${param:admin_group}', '${param:automation_group}']);
   });
 });
 

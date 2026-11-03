@@ -63,6 +63,16 @@ describe('flow workflows', () => {
     }
   });
 
+  it('the_order_and_the_log_are_written_before_the_tasks_that_start_new_runs', () => {
+    for (const key of ['advance_order', 'init_order_tasks']) {
+      const edges = load(key).edges as { from: string; to: string }[];
+      const after = (from: string) => edges.filter((e) => e.from === from).map((e) => e.to);
+      expect(after('each_create'), key).toEqual(['is_changed']);
+      expect(after('each_event'), key).toEqual(['each_update']);
+      expect(after('each_update'), key).toEqual(['done']);
+    }
+  });
+
   it('writes_every_field_the_code_returns', () => {
     const { create_list, event_list } = runAdvance({ ...TM1040_RECORDS, tasks: [], pl: [], config: null, now: '2026-11-03T10:00:00Z' } as any);
     const created = (node('init_order_tasks', 'each_create').parameters.body.nodes as Node[]).find((n) => n.parameters.operation === 'create')!;

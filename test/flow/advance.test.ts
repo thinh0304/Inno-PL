@@ -153,6 +153,30 @@ describe('advanceOrder', () => {
     expect(result.events).toEqual([{ task_code: null, action: 'completed_order', note: '' }]);
   });
 
+  it('t11_finished_without_submitting_is_reopened_and_opens_nothing', () => {
+    // The server refuses it (rule), but a run must not trust that: C1 of the final review.
+    const { next } = step(input({ tasks: tasksWith({ t11: ['done', 'completed'] }) }));
+    expect(statuses(next.tasks)).toMatchObject({ t11: 'open', t23: 'blocked' });
+    expect(next.order.status).toBe('draft');
+  });
+
+  it('nothing_opens_past_t11_while_the_order_is_a_draft', () => {
+    const { next } = step(input({ order: order({ status: 'draft' }), tasks: tasksWith({ t11: ['done', 'submitted'] }), submitIssues: [{ path: 'order.content', message: 'x' }] }));
+    expect(statuses(next.tasks).t23).toBe('blocked');
+  });
+
+  it('work_whose_predecessors_are_not_passed_is_reset', () => {
+    // A run read a return half applied: the order is a draft, t11 is open again, t23 is still done, t31 blocked.
+    const ord = order({ status: 'draft', stage: 1 });
+    const tasks = tasksWith({ t11: 'open', t23: ['done', 'completed'] }, ord);
+    const { next } = step(input({ order: ord, tasks }));
+    expect(statuses(next.tasks)).toMatchObject({ t11: 'open', t23: 'blocked', t31: 'blocked' });
+    expect(byCode(next.tasks, 't23')).toMatchObject({ outcome: null, done_at: null });
+    // And a done task whose predecessor went back is reset down the whole chain.
+    const chain = tasksWith({ t11: 'open', t23: ['done', 'completed'], t31: ['done', 'approved'], t40: 'open' }, ord);
+    expect(statuses(step(input({ order: ord, tasks: chain })).next.tasks)).toMatchObject({ t23: 'blocked', t31: 'blocked', t40: 'blocked' });
+  });
+
   it('advance_is_idempotent', () => {
     const scenarios = [
       input({ order: order() }),

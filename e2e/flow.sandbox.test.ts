@@ -133,9 +133,18 @@ describe('the 15-task flow in the sandbox', () => {
     expect(t11.am_user).toBe(userId('am'));
   });
 
+  it('t11_can_only_be_finished_as_submitted', async () => {
+    const t11 = await taskIs(orderId, 't11', 'open');
+    const out = await finish(as('am'), t11, 'completed');
+    expect(out.status, JSON.stringify(out.error)).toBe(422);
+    expect((await taskOf(orderId, 't11'))!.status).toBe('open');
+  });
+
   it('flow_fields_are_automatic', async () => {
     expect((await patch(as('am'), 'order', orderId, { approved: true })).status).toBe(422);
     expect((await patch(as('am'), 'order', orderId, { pending_roles: ['sd'] })).status).toBe(422);
+    // Which tasks apply and whether SD must approve follow these two: only the P&L workflow writes them.
+    expect((await patch(as('am'), 'order', orderId, { has_goods: false })).status).toBe(422);
     // The create form does not bind these fields, so asking for them on create changes nothing.
     const sneaky = await create(as('am'), 'order', { customer_name: TAG, am: userId('am'), approved: true });
     expect((await orderOf(sneaky.id)).approved).not.toBe(true);
@@ -147,6 +156,11 @@ describe('the 15-task flow in the sandbox', () => {
     expect(out.status, JSON.stringify(out.error)).toBeLessThan(300);
     const t23 = await taskIs(orderId, 't23', 'open');
     expect(t23.role).toBe('proc');
+    // The work list the module's My work reads: t23 is offered to Purchasing, in the shape OrdersApi.myWork expects.
+    const { data: work, response } = await as('proc').GET('/work' as never, { params: { query: { view: 'claimable' } } } as never) as { data?: any; response: Response };
+    expect(response.status).toBe(200);
+    const listed = (Array.isArray(work) ? work : work?.items ?? []) as { entity_id?: string; id?: string; record_id?: string }[];
+    expect(listed.some((w) => w.entity_id === entityId('order_task') && (w.record_id ?? w.id) === t23.id), JSON.stringify(work)?.slice(0, 300)).toBe(true);
     // The order itself is written after the tasks, in the same run.
     const order = await waitFor('the order to be in progress', async () => {
       const o = await orderOf(orderId);
@@ -214,6 +228,13 @@ describe('the 15-task flow in the sandbox', () => {
     expect((await patch(ADMIN(), 'order', orderId, { pl_requested_at: new Date().toISOString() })).status).toBeLessThan(300);
     await new Promise((resolve) => setTimeout(resolve, 20_000));
     expect((await listAll(ADMIN(), 'order_pl')).find((p) => p.order === orderId)!.computed_at).toBe(before);
+  });
+
+  it('a_finished_tasks_outcome_cannot_be_changed', async () => {
+    const t22Like = (await taskOf(orderId, 't23'))!;
+    expect(t22Like.status).toBe('done');
+    expect((await patch(as('proc'), 'order_task', t22Like.id, { outcome: 'approved' })).status).toBeGreaterThanOrEqual(400);
+    expect((await taskOf(orderId, 't23'))!.outcome).toBe('completed');
   });
 
   it('events_cannot_be_edited_or_deleted', async () => {

@@ -304,7 +304,15 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
           const task = taskOf(await getRecord('order_task', id));
           if (task.status !== 'open') continue;
           seen.add(id);
-          if (!orders.has(task.order)) orders.set(task.order, fieldsOf(await getRecord('order', task.order)));
+          if (!orders.has(task.order)) {
+            try {
+              orders.set(task.order, fieldsOf(await getRecord('order', task.order)));
+            } catch (error) {
+              // Offered to the whole group but on an order this person may not read: not theirs to take.
+              if (NOT_FOR_THEM(error)) continue;
+              throw error;
+            }
+          }
           const order = orders.get(task.order)!;
           items.push({ task, orderCode: String(order.code ?? ''), customerName: String(order.customer_name ?? ''), mine: view === 'mine' });
         }

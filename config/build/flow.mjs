@@ -77,14 +77,16 @@ function flowGraph(title, subjectEntity, orderIdPath) {
   const writeStatus = update("write_status", "Ghi trạng thái đơn", ORDER, "nodes.order.output.record.id", [bind("status", adv("order_status"))]);
   const events = each("each_event", "Ghi nhật ký", "nodes.advance.output.event_list",
     create("log_event", "Ghi nhật ký", EVENT, ["order", "task", "task_code", "role", "action", "note", "at"].map((field) => bind(field, item(field === "task" ? "task_id" : field)))));
-  const ids = ["start", ...reads.map((n) => n.id), "advance", "each_create", "each_update", "is_changed"];
+  // The order and the log go first: the task updates start the next runs, which must read the order as this run left it.
+  const ids = ["start", ...reads.map((n) => n.id), "advance", "each_create", "is_changed"];
   return graph(
     title,
     [
       start({ subject: subjectEntity }),
       ...reads,
       advance,
-      ...steps,
+      steps[0],
+      steps[1],
       decision("is_changed", "Đơn có đổi?", [
         when("e_changed", { "==": [{ var: "nodes.advance.output.order_changed" }, true] }),
         otherwise("e_unchanged"),
@@ -106,7 +108,8 @@ function flowGraph(title, subjectEntity, orderIdPath) {
       ["e_status", "is_status_changed", "write_status"],
       ["e_same_status", "is_status_changed", "each_event"],
       ["e_write_status", "write_status", "each_event"],
-      ["e_each_event", "each_event", "done"],
+      ["e_each_event", "each_event", "each_update"],
+      ["e_each_update", "each_update", "done"],
     ),
   );
 }

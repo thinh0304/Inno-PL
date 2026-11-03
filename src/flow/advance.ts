@@ -97,6 +97,8 @@ export function advanceOrder(input: AdvanceInput): AdvanceResult {
 
     // Sent for approval: the server checks the submission itself, whatever the screen did (BR-42).
     const t11 = get('t11');
+    // t11 finished some other way (the rule on order_task refuses it, but a run does not rely on that): it is still open.
+    if (t11.status === 'done' && t11.outcome !== 'submitted' && ord.status === 'draft') open(t11);
     if (t11.status === 'done' && t11.outcome === 'submitted' && ord.status === 'draft') {
       if (input.submitIssues.length) {
         open(t11);
@@ -115,10 +117,19 @@ export function advanceOrder(input: AdvanceInput): AdvanceResult {
       }
     }
 
+    // Work whose predecessors are no longer passed goes back (a run that read a return half applied, a task finished at the
+    // moment of a return): the tasks are in flow order, so one pass settles the whole chain.
+    for (const d of TASKS) {
+      const t = get(d.code);
+      if (d.code === 't11' || !['open', 'done', 'skipped'].includes(t.status)) continue;
+      if (!predecessors(d.code, flow()).every(passed)) reset(t, 'blocked');
+    }
+
     // Open what has all its predecessors finished; t31 approves itself when the order does not need SD (BR-40).
     for (const d of TASKS) {
       const t = get(d.code);
-      if (t.status !== 'blocked' || !predecessors(d.code, flow()).every(passed)) continue;
+      // Nothing but t11 opens while the order is a draft: it has not been sent for approval (or has been returned).
+      if (t.status !== 'blocked' || ord.status === 'draft' || !predecessors(d.code, flow()).every(passed)) continue;
       open(t);
       if (d.code === 't31' && !needsApproval(flow(), autoApproveLimit)) {
         t.status = 'skipped';
