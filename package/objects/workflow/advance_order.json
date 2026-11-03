@@ -745,7 +745,13 @@
             "kind": "reference",
             "value": "nodes.advance.output.order_fields.pl_requested_at"
           }
-        ]
+        ],
+        "expect": {
+          "fields": {
+            "stage": "{{ nodes.order.output.record.stage }}",
+            "approved": "{{ nodes.order.output.record.approved }}"
+          }
+        }
       },
       "settings": {}
     },

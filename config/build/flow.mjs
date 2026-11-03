@@ -71,7 +71,9 @@ function flowGraph(title, subjectEntity, orderIdPath) {
         { expect: { fields: { status: "{{ input.item.expect_status }}" } } })),
   ];
   const writeOrder = update("write_order", "Ghi trạng thái đơn", ORDER, "nodes.order.output.record.id",
-    ORDER_FIELDS.map((field) => bind(field, adv(`order_fields.${field}`))));
+    ORDER_FIELDS.map((field) => bind(field, adv(`order_fields.${field}`))),
+    // Of two runs that read the same order only the first writes it: the second finds the stage moved and skips.
+    { expect: { fields: { stage: "{{ nodes.order.output.record.stage }}", approved: "{{ nodes.order.output.record.approved }}" } } });
   const events = each("each_event", "Ghi nhật ký", "nodes.advance.output.event_list",
     create("log_event", "Ghi nhật ký", EVENT, ["order", "task", "task_code", "role", "action", "note", "at"].map((field) => bind(field, item(field === "task" ? "task_id" : field)))));
   const ids = ["start", ...reads.map((n) => n.id), "advance", "each_create", "each_update", "is_changed"];

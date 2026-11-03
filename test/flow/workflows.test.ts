@@ -54,6 +54,15 @@ describe('flow workflows', () => {
     expect(fields(update)).toEqual(['due_at', 'due_state', 'finished_at', 'late_days', 'opened_at', 'outcome', 'reason', 'status']);
   });
 
+  it('order_write_expects_the_stage_and_approval_it_read', () => {
+    // Two runs that saw the same unapproved order must not both approve it (each would ask for its own P&L).
+    for (const key of ['advance_order', 'init_order_tasks']) {
+      const expectation = JSON.stringify(node(key, 'write_order').parameters.expect);
+      expect(expectation, key).toContain('"stage"');
+      expect(expectation, key).toContain('"approved"');
+    }
+  });
+
   it('writes_every_field_the_code_returns', () => {
     const { create_list, event_list } = runAdvance({ ...TM1040_RECORDS, tasks: [], pl: [], config: null, now: '2026-11-03T10:00:00Z' } as any);
     const created = (node('init_order_tasks', 'each_create').parameters.body.nodes as Node[]).find((n) => n.parameters.operation === 'create')!;
