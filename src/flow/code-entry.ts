@@ -24,9 +24,12 @@ const TASK_VALUES = ['status', 'outcome', 'reason', 'opened_at', 'due_at', 'fini
 const values = (t: TaskRec) => Object.fromEntries(TASK_VALUES.map((f) => [f, f === 'finished_at' ? t.done_at ?? null : (t as unknown as Rec)[f] ?? null]));
 
 export interface AdvanceOutput extends AdvanceResult {
-  /** The order's seven flow fields as they stand after this run (what the update step writes), and whether any changed. */
+  /** The order's flow fields except its status, as they stand after this run (what the update step writes), and whether any field changed. */
   order_fields: Record<string, unknown>;
   order_changed: boolean;
+  /** The status is written on its own, and only when it changed: writing the unchanged status is refused where it is no valid start. */
+  status_changed: boolean;
+  order_status: string;
   create_list: Rec[];
   update_list: Rec[];
   event_list: Rec[];
@@ -55,9 +58,11 @@ export function runAdvance(args: { order: Rec; tasks: Rec[]; pl: Rec[]; lines: R
   const roleOf = (code: TaskCode | null) => TASKS.find((t) => t.code === code)?.role ?? null;
   const now = { ...order, ...result.order };
   return { ...result,
-    order_fields: { status: now.status, stage: now.stage, approved: now.approved, approved_at: now.approved_at,
+    order_fields: { stage: now.stage, approved: now.approved, approved_at: now.approved_at,
       contract_signed: now.contract_signed, pending_roles: now.pending_roles, pl_requested_at: now.pl_requested_at },
     order_changed: Object.keys(result.order).length > 0,
+    status_changed: result.order.status !== undefined,
+    order_status: now.status,
     create_list: result.creates.map((c) => ({ order: order.id, task_code: c.task_code, stage: c.set.stage, role: c.set.role, am_user: draft.order.am, ...values(c.set as TaskRec) })),
     update_list: result.updates.map((u) => {
       const full = { ...tasks.find((t) => t.task_code === u.task_code)!, ...u.set } as TaskRec;

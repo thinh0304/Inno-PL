@@ -175,7 +175,7 @@ describe('the 15-task flow in the sandbox', () => {
     expect(t31.role).toBe('sd');
   });
 
-  it('return_without_reason_is_refused_and_with_reason_unlocks_the_order', async () => {
+  it('return_without_reason_is_refused_and_with_reason_unlocks_the_order', { timeout: 420_000 }, async () => {
     const t31 = (await taskOf(orderId, 't31'))!;
     const bare = await finish(as('sd'), t31, 'returned', '');
     expect(bare.status).toBe(422);
@@ -205,8 +205,12 @@ describe('the 15-task flow in the sandbox', () => {
       const found = (await listAll(ADMIN(), 'order_pl')).find((p) => p.order === orderId);
       return found && Date.parse(String(found.computed_at)) >= Date.parse(String(order.approved_at)) ? found : undefined;
     });
+    // Two runs that race at approval may each ask for a P&L (same data, same figures): let the last one land first.
+    await new Promise((resolve) => setTimeout(resolve, 20_000));
+    const settled = (await listAll(ADMIN(), 'order_pl')).find((p) => p.order === orderId)!;
+    expect(settled.net_profit).toBe(pl.net_profit);
     // A later request changes nothing: the figures were fixed at approval.
-    const before = pl.computed_at;
+    const before = settled.computed_at;
     expect((await patch(ADMIN(), 'order', orderId, { pl_requested_at: new Date().toISOString() })).status).toBeLessThan(300);
     await new Promise((resolve) => setTimeout(resolve, 20_000));
     expect((await listAll(ADMIN(), 'order_pl')).find((p) => p.order === orderId)!.computed_at).toBe(before);

@@ -1114,7 +1114,6 @@ var PL = (() => {
     return {
       ...result,
       order_fields: {
-        status: now.status,
         stage: now.stage,
         approved: now.approved,
         approved_at: now.approved_at,
@@ -1123,6 +1122,8 @@ var PL = (() => {
         pl_requested_at: now.pl_requested_at
       },
       order_changed: Object.keys(result.order).length > 0,
+      status_changed: result.order.status !== void 0,
+      order_status: now.status,
       create_list: result.creates.map((c) => ({ order: order.id, task_code: c.task_code, stage: c.set.stage, role: c.set.role, am_user: draft.order.am, ...values(c.set) })),
       update_list: result.updates.map((u) => {
         const full = { ...tasks.find((t) => t.task_code === u.task_code), ...u.set };

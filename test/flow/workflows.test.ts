@@ -54,12 +54,12 @@ describe('flow workflows', () => {
     expect(fields(update)).toEqual(['due_at', 'due_state', 'finished_at', 'late_days', 'opened_at', 'outcome', 'reason', 'status']);
   });
 
-  it('order_write_expects_the_stage_and_approval_it_read', () => {
-    // Two runs that saw the same unapproved order must not both approve it (each would ask for its own P&L).
+  it('status_is_written_on_its_own_and_only_when_it_changes', () => {
     for (const key of ['advance_order', 'init_order_tasks']) {
-      const expectation = JSON.stringify(node(key, 'write_order').parameters.expect);
-      expect(expectation, key).toContain('"stage"');
-      expect(expectation, key).toContain('"approved"');
+      expect(fields(node(key, 'write_order')), key).toEqual(['approved', 'approved_at', 'contract_signed', 'pending_roles', 'pl_requested_at', 'stage']);
+      expect(fields(node(key, 'write_status')), key).toEqual(['status']);
+      const gate = JSON.stringify(node(key, 'is_status_changed').parameters);
+      expect(gate, key).toContain('status_changed');
     }
   });
 

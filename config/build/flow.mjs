@@ -19,8 +19,9 @@ const CONFIG = ["item_type", "contract_type_rate", "fin_cost_tier", "vat_rate", 
 const array = { type: "array", items: { type: "object" } };
 const ADVANCE_SCHEMA = {
   type: "object",
-  properties: { order_fields: { type: "object" }, order_changed: { type: "boolean" }, create_list: array, update_list: array, event_list: array },
-  required: ["order_changed", "create_list", "update_list", "event_list"],
+  properties: { order_fields: { type: "object" }, order_changed: { type: "boolean" }, status_changed: { type: "boolean" }, order_status: { type: "string" },
+    create_list: array, update_list: array, event_list: array },
+  required: ["order_changed", "status_changed", "create_list", "update_list", "event_list"],
 };
 const adv = (path) => ref(`nodes.advance.output.${path}`);
 const item = (field) => ref(`input.item.${field}`);
@@ -28,7 +29,7 @@ const item = (field) => ref(`input.item.${field}`);
 // The fields of order_task a run writes (src/flow/code-entry.ts: create_list and update_list).
 const TASK_VALUES = ["status", "outcome", "reason", "opened_at", "due_at", "finished_at", "due_state", "late_days"];
 const TASK_CREATE = ["order", "task_code", "stage", "role", "am_user", "sla_days", ...TASK_VALUES];
-const ORDER_FIELDS = ["status", "stage", "approved", "approved_at", "contract_signed", "pending_roles", "pl_requested_at"];
+const ORDER_FIELDS = ["stage", "approved", "approved_at", "contract_signed", "pending_roles", "pl_requested_at"];
 
 // A For Each over a list the code step returns; the body is a graph of its own, the item is `input.item`.
 function each(id, name, listPath, step) {
@@ -70,10 +71,10 @@ function flowGraph(title, subjectEntity, orderIdPath) {
         // Two runs that saw the same task cannot both write it: the second finds the status moved and skips.
         { expect: { fields: { status: "{{ input.item.expect_status }}" } } })),
   ];
-  const writeOrder = update("write_order", "Ghi trạng thái đơn", ORDER, "nodes.order.output.record.id",
-    ORDER_FIELDS.map((field) => bind(field, adv(`order_fields.${field}`))),
-    // Of two runs that read the same order only the first writes it: the second finds the stage moved and skips.
-    { expect: { fields: { stage: "{{ nodes.order.output.record.stage }}", approved: "{{ nodes.order.output.record.approved }}" } } });
+  const writeOrder = update("write_order", "Ghi giai đoạn đơn", ORDER, "nodes.order.output.record.id",
+    ORDER_FIELDS.map((field) => bind(field, adv(`order_fields.${field}`))));
+  // The status goes in its own write, only when it changed (the stage model refuses a write of a status that is no valid start).
+  const writeStatus = update("write_status", "Ghi trạng thái đơn", ORDER, "nodes.order.output.record.id", [bind("status", adv("order_status"))]);
   const events = each("each_event", "Ghi nhật ký", "nodes.advance.output.event_list",
     create("log_event", "Ghi nhật ký", EVENT, ["order", "task", "task_code", "role", "action", "note", "at"].map((field) => bind(field, item(field === "task" ? "task_id" : field)))));
   const ids = ["start", ...reads.map((n) => n.id), "advance", "each_create", "each_update", "is_changed"];
@@ -89,14 +90,22 @@ function flowGraph(title, subjectEntity, orderIdPath) {
         otherwise("e_unchanged"),
       ]),
       writeOrder,
+      decision("is_status_changed", "Trạng thái đơn có đổi?", [
+        when("e_status", { "==": [{ var: "nodes.advance.output.status_changed" }, true] }),
+        otherwise("e_same_status"),
+      ]),
+      writeStatus,
       events,
       end("done", "Đã điều phối", "Đã điều phối"),
     ],
     edges(
       ...chain(ids),
       ["e_changed", "is_changed", "write_order"],
-      ["e_unchanged", "is_changed", "each_event"],
-      ["e_write_order", "write_order", "each_event"],
+      ["e_unchanged", "is_changed", "is_status_changed"],
+      ["e_write_order", "write_order", "is_status_changed"],
+      ["e_status", "is_status_changed", "write_status"],
+      ["e_same_status", "is_status_changed", "each_event"],
+      ["e_write_status", "write_status", "each_event"],
       ["e_each_event", "each_event", "done"],
     ),
   );

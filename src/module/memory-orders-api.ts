@@ -109,7 +109,7 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
         row.updated_at = now();
       }
       const asked = out.order.pl_requested_at;
-      if (out.order_changed) Object.assign(order.body, out.order_fields);
+      if (out.order_changed) Object.assign(order.body, out.order_fields, out.status_changed ? { status: out.order_status } : {});
       for (const e of out.event_list) put('order_event', { order: orderId, task: e.task_id, task_code: e.task_code, role: e.role, action: e.action, note: e.note, at: e.at, warnings: [] });
       if (asked) compute(orderId);
       if (!out.create_list.length && !out.update_list.length && !out.order_changed && !out.event_list.length) return;
