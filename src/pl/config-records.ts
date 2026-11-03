@@ -15,7 +15,7 @@ const STAGES: DealStage[] = ['lead', 'opportunity', 'clarification', 'quotation'
 
 const str = (value: unknown) => (typeof value === 'string' ? value : '');
 // A number may come back from a record read as a string ("0.08"); anything else that is not a number is undefined.
-function parseNumber(value: unknown): number | undefined {
+export function parseNumber(value: unknown): number | undefined {
   const parsed = typeof value === 'string' && value.trim() !== '' ? Number(value) : value;
   return typeof parsed === 'number' && Number.isFinite(parsed) ? parsed : undefined;
 }
