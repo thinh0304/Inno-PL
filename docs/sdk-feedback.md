@@ -34,6 +34,7 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 | F-24 | Nhỏ | Tài liệu | Trả lời của `GET /work?view=` không được mô tả |
 | F-25 | Chặn | UI module | Ứng dụng đã cài không tải file lên được (`POST /attachments` → `APP_CEILING_DENIED`); host không có cách nào khác để người dùng tải file |
 | F-26 | Nhỏ | Dữ liệu | Trường `file` chỉ trả mảng id: tên file cần thêm một lần đọc `GET /attachments/{id}` mỗi file |
+| F-27 | Chặn | UI module | File do workflow sinh ra (bước `document`) trả `404` qua ứng dụng, kể cả khi đã gắn vào bản ghi ứng dụng đọc được |
 
 ---
 
@@ -249,3 +250,11 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 - **Bằng chứng:** `e2e/contract-files.sandbox.test.ts`, test `sa_uploads_a_pdf_and_attaches_it_to_a_contract`.
 - **Làm tạm:** đọc siêu dữ liệu từng file khi mở tab Hợp đồng.
 - **Đề xuất:** bản ghi trả kèm `{ id, original_filename, content_type, byte_size }` cho trường `file`, hoặc một lần đọc nhiều id.
+
+## F-27 · File do workflow sinh ra không tải về được qua ứng dụng
+
+- **Vướng:** dự thảo hợp đồng dựng từ mẫu (Thiết kế 9, FR-7.2): một workflow do người dùng khởi chạy từ module render `document_template` ra .docx (bước `document`), gắn file vào bản ghi `contract`, rồi người dùng xem / tải từ tab Hợp đồng của module.
+- **Cách tái hiện** (thiếu tính năng — theo tài liệu): `get_attachment` và `download_attachment` trong `@reflexify/agentflow-sdk/dist/generated/public.d.ts`: *"Through an installed app, a file is told of only when the app may read every owner it has and it has one. A file a run produced or holds, and a file nobody owns, answer `404`."*; chi tiết lượt chạy cũng ghi *"Files a run produced answer `404`"*. Ứng dụng khởi chạy được workflow (`start_instance`) nhưng không lấy được file nó sinh ra.
+- **Bằng chứng:** tài liệu trên; cùng với F-25 (ứng dụng không tải file lên), module không có đường nào đưa một file vào hay ra ngoài cách người dùng tải lên trực tiếp.
+- **Làm tạm:** kế hoạch 04 không dựng mẫu văn bản; để cho kế hoạch 05 (AI soạn dự thảo dùng cùng mẫu), khi nền tảng trả lời F-25 / F-27.
+- **Đề xuất:** khi file do lượt chạy sinh ra được gắn vào trường `file` của một bản ghi, coi bản ghi đó là chủ của file (ứng dụng đọc được bản ghi thì tải được file); hoặc cho bước `document` ghi thẳng vào trường `file` với chủ là bản ghi.
