@@ -1,8 +1,10 @@
 # Góp ý cho đội phát triển AgentFlow SDK
 
-Dự án: `inno/pl` (TeraBox · Hiệu quả đơn hàng P&L) · SDK `sdk-v0.7.0` · Bắt đầu: 02/11/2026
+Dự án: `inno/pl` (TeraBox · Hiệu quả đơn hàng P&L) · SDK `sdk-v0.7.0` (builder + `@reflexify/agentflow-sdk`) · AgentFlow `https://agentflow.innomation.vn` · Bắt đầu: 02/11/2026
 
-Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang làm tạm, và đề xuất. Mức độ: **Chặn** (không làm được trong package), **Lớn** (phải đi đường vòng tốn công), **Nhỏ** (bất tiện).
+Mỗi mục ghi: **Vướng** (việc cần làm), **Cách tái hiện** (lệnh hoặc thao tác tối thiểu để thấy đúng vấn đề), **Bằng chứng** (tài liệu hoặc kết quả chạy thật), **Làm tạm** (cách dự án đang làm) và **Đề xuất** (sửa SDK / nền tảng / tài liệu).
+Mức độ: **Chặn** (không làm được trong package), **Lớn** (phải đi đường vòng tốn công), **Nhỏ** (bất tiện).
+Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm lại là thấy), **Thiếu tính năng** (không có gì để chạy, chỉ có tài liệu), **Chưa chắc** (đã quan sát nhưng chưa xác định nguyên nhân; nói rõ trong mục).
 
 | # | Mức | Chủ đề | Tóm tắt |
 |---|---|---|---|
@@ -14,12 +16,29 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 | F-06 | Nhỏ | Formula | Formula không đọc được bản ghi cấu hình / tham số; không có hàm tra bậc |
 | F-07 | Nhỏ | Bước workflow | Không có ví dụ cho `webhook`, `extract_text`, `integration`; builder không kiểm tham số |
 | F-08 | Lớn | UI module | Module chỉ đếm được bản ghi; phép cộng số chỉ qua dashboard |
+| F-09 | Nhỏ | Công cụ | `build --check` hỏng trên Windows khi git đổi xuống dòng |
+| F-10 | Nhỏ | Workflow | Output `lit(...)` của bước End qua được build nhưng bị từ chối lúc cài |
+| F-11 | Lớn | Rule | Rule không gắn được trường với người đang ghi khi tạo; không đi nhiều bước tham chiếu |
+| F-12 | Nhỏ | Entity | Builder không kiểm màu của tùy chọn enum; lúc cài mới bị từ chối |
+| F-13 | Nhỏ | Work | `when` của luật giao việc phải là một toán tử json-logic; builder không kiểm |
+| F-14 | Nhỏ | Stage model | Ghi lại đúng trạng thái đang có có thể bị từ chối `STAGE_TRANSITION_NOT_ALLOWED` |
+| F-15 | Lớn | Rule | Rule không chặn được xóa bản ghi |
+| F-16 | Lớn | Code step | Code step hỏng không để lại thông báo lỗi nào |
+| F-17 | Lớn | Form tạo | Tạo bản ghi qua API âm thầm bỏ trường không có trong form (kể cả trường danh sách) |
+| F-18 | Nhỏ | UI module | `host.navigate` không có chế độ thay thế: chuyển hướng làm kẹt nút Back |
+| F-19 | Nhỏ | Dữ liệu | Thời gian trong bản ghi có 9 chữ số thập phân và `+07:00`; cách bộ chạy Code đọc nó chưa rõ |
+| F-20 | Nhỏ | Sandbox | Sau `deploy --sandbox` ("armed 7 triggers") trigger có thể chưa chạy trong vài phút đầu |
+| F-21 | Nhỏ | Workflow | Mỗi lượt chạy mất 7–18 giây và các lượt xếp hàng; không có số liệu về hàng đợi |
+| F-22 | Nhỏ | Test | `GET /app/objects` chỉ trả lời người gọi của chính ứng dụng: không dựng được `OrdersApi` từ người của sandbox |
+| F-23 | Nhỏ | Workflow | `expect` của bước Update: cách so giá trị số / boolean khi giá trị là template chưa rõ |
+| F-24 | Nhỏ | Tài liệu | Trả lời của `GET /work?view=` không được mô tả |
 
 ---
 
 ## F-01 · Package không mang được fork/join
 
 - **Vướng:** quy trình đơn hàng có 15 task chạy song song theo tiền đề (ví dụ t22 Kỹ thuật và t23 Mua hàng cùng mở sau t11; t31 chờ cả hai).
+- **Cách tái hiện** (tái hiện được): trong một file `config/build/*.mjs`, cho một bước hai cạnh đi ra, ví dụ `edges(["a","step","x"], ["b","step","y"])`, rồi chạy `pnpm build`: `merge` từ chối bước có nhiều hơn một cạnh ra.
 - **Bằng chứng:** `agentflow-app-authoring/reference/steps.md`, "Steps a package cannot carry": *"`fork` and `join`: merge refuses a plain step with more than one outbound edge … the builder cannot make a parallel branch yet."* Nền tảng (designer) thì có fork/join.
 - **Làm tạm:** mỗi task là một bản ghi entity có `work`; một workflow do trigger chạy, dùng Code step tính task nào được mở.
 - **Đề xuất:** helper `fork(id, name, [edges])` / `join(id, name, { wait: "all" | "any" })` trong builder, và `merge` kiểm tra các nhánh hội tụ đúng.
@@ -27,20 +46,23 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 ## F-02 · Package không cho graph có vòng lặp
 
 - **Vướng:** "Trả lại" (t22, t31) đưa đơn về GĐ1 rồi đi lại; "Yêu cầu sửa dự thảo" (t42) mở lại t40/t44.
-- **Bằng chứng:** builder README, mục `merge`: *"… everything is reachable from `start`; no loops"*.
-- **Làm tạm:** như F-01, quay lại bằng cách ghi dữ liệu, không phải cạnh graph.
+- **Cách tái hiện** (tái hiện được): thêm một cạnh quay từ bước sau về bước trước trong cùng graph (`["back","step2","step1"]`) rồi `pnpm build`: lỗi `loop through step2 -> step1`.
+- **Bằng chứng:** builder README, mục `merge`: *"… everything is reachable from `start`; no loops"*; `dist/workflow.js`, hàm `checkGraph`.
+- **Làm tạm:** như F-01: quay lại bằng cách ghi dữ liệu, không phải cạnh graph.
 - **Đề xuất:** cho phép cạnh quay lui tới một Human step (có giới hạn số vòng), hoặc một bước "go to" có điều kiện.
 
 ## F-03 · Không có quyền theo trường
 
 - **Vướng:** Kỹ thuật (TM) được xem thông số dòng hàng nhưng không được xem giá; giá mua đề xuất của Mua hàng chỉ PROC / SD / ACC xem.
+- **Cách tái hiện** (thiếu tính năng): thêm `"sensitive": true` vào một trường trong `config/entities/*.json` và `pnpm build`: bị từ chối. Thêm `"fields": [...]` vào một `operations` của grant: bị từ chối (grant chỉ nhận `operation`, `scope`, `record_scopes`).
 - **Bằng chứng:** `access.md`: grant chỉ có `operations` theo bản ghi; `entities.md`: `sensitive` bị builder từ chối (*"not a member the package's entity_field lists"*); `lint-problems.md`: `field_secured`.
-- **Làm tạm:** tách entity: `order_line` (không giá), `order_line_price`, `purchase_proposal`, `order_pl` — thêm 3 entity 1–1, nhiều lần đọc/ghi hơn.
+- **Làm tạm:** tách entity: `order_line` (không giá), `goods_line_price`, `service_line_price`, `purchase_proposal`, `order_pl` — thêm vài entity 1–1, nhiều lần đọc/ghi hơn, và quy tắc đúng-entity-đúng-nhóm chỉ kiểm bằng code (xem F-11).
 - **Đề xuất:** grant có `fields` (cho phép / loại trừ trường theo nhóm), hoặc cho package khai báo trường nhạy cảm kèm nhóm được xem, để Admin xác nhận khi cài.
 
 ## F-04 · Record scope không lọc theo giá trị trường
 
 - **Vướng:** TM chỉ nên thấy "đơn có dịch vụ", PROC chỉ "đơn có TB / license".
+- **Cách tái hiện** (thiếu tính năng): khai báo `record_scopes: [{ "kind": "condition", "where": [...] }]` rồi `pnpm build`: `kind` không thuộc `field`, `parent_field`, `work`.
 - **Bằng chứng:** `access.md`, "Record scopes": chỉ `field` (người), `parent_field`, `work`.
 - **Làm tạm:** TM / PROC đọc mọi đơn (phần không có tiền); module tự lọc hiển thị.
 - **Đề xuất:** scope `{ "kind": "condition", "where": [{ field, op, value }] }`.
@@ -48,42 +70,48 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 ## F-05 · SLA theo từng loại task
 
 - **Vướng:** mỗi task có SLA riêng (1, 2, 3, 7 ngày làm việc), Admin sửa được.
-- **Bằng chứng:** `work.md`, `deadline`: mục tiêu lấy từ `sla_policy` theo `work_surface.priority`.
-- **Làm tạm:** tự tính `due_at` bằng code (ngày làm việc T2–T6), workflow theo lịch quét quá hạn; không dùng đồng hồ của nền tảng.
+- **Cách tái hiện** (thiếu tính năng): đọc `work.md`, mục `deadline`: không có cách khai báo mục tiêu lấy từ một trường của bản ghi; `clocks[].sla_policy` chỉ nhận một `sla_policy_ref`, và chính sách chọn mục tiêu theo `work_surface.priority`.
+- **Bằng chứng:** `work.md`, `deadline`.
+- **Làm tạm:** tự tính `due_at` bằng code (ngày làm việc T2–T6, giờ Việt Nam; `src/flow/calendar.ts`), workflow theo lịch quét quá hạn (`sla_sweep`); không dùng đồng hồ của nền tảng.
 - **Đề xuất:** clock nhận mục tiêu từ một trường số / thời lượng của bản ghi (`target_field`), vẫn tính theo lịch làm việc của tổ chức.
 
 ## F-06 · Formula không đọc tham số
 
 - **Vướng:** P&L cần ngưỡng / tỷ lệ theo loại hợp đồng và bậc r theo hạng KH (Admin cấu hình).
-- **Bằng chứng:** `entities.md`, "Formulas and rollups": formula đọc trường của chính bản ghi; rollup chỉ count/sum bản ghi con.
-- **Làm tạm:** toàn bộ P&L bằng TypeScript (module) + Code step (workflow).
+- **Cách tái hiện** (thiếu tính năng): viết formula tham chiếu trường của bản ghi khác hoặc của một bản ghi cấu hình: formula chỉ đọc trường của chính bản ghi; rollup chỉ count/sum bản ghi con.
+- **Bằng chứng:** `entities.md`, "Formulas and rollups".
+- **Làm tạm:** toàn bộ P&L bằng TypeScript (module) + Code step (workflow), một bản nguồn `src/pl/`.
 - **Đề xuất:** formula đọc được trường của bản ghi tham chiếu (`customer.tier`) và một bản ghi cấu hình đơn (singleton); hàm `lookup_tier(value, [thresholds], [rates])`.
 
 ## F-07 · Thiếu ví dụ cho các bước dùng dịch vụ ngoài
 
 - **Vướng:** cần `webhook` (tra MST), `extract_text` (đọc báo giá / hợp đồng). (`document` thì đã có hướng dẫn trong `steps.md`.)
+- **Cách tái hiện** (thiếu tính năng): tìm ví dụ `webhook`, `integration`, `signature`, `extract_text` trong tài liệu và `examples/`: không có; thử dựng bước với tham số sai: builder không báo lỗi.
 - **Bằng chứng:** `steps.md`: *"There is no shipped example of a `webhook`, `integration`, `signature`, `extract_text` … and the builder does not check their parameters."*
 - **Làm tạm:** dựng thử trong designer, Pack, đọc bước đã chuyển đổi.
-- **Đề xuất:** helper có kiểu cho từng bước + một ví dụ trong `examples/`.
+- **Đề xuất:** helper có kiểu cho từng bước + một ví dụ trong `examples/`; builder kiểm tham số bắt buộc.
 
 ## F-08 · UI module không cộng được số
 
 - **Vướng:** màn hình KPI / Dashboard cần tổng doanh thu, LN thuần… theo kỳ, theo người, theo loại; Kỹ thuật và Mua hàng chỉ được thấy tổng phần dịch vụ / hàng hóa.
-- **Bằng chứng:** `agentflow-ui-module/reference/records-api.md`, "Counting, and figures over many records": module đếm được bản ghi; phép cộng chỉ có ở `/dashboards/{id}/compute`, trong phạm vi quyền người xem.
+- **Cách tái hiện** (thiếu tính năng): trong module, `POST /entities/{id}/records/query` chỉ có lọc, sắp xếp, `cursor`: không có `aggregate` hay `group_by`; chỉ đếm được.
+- **Bằng chứng:** `agentflow-ui-module/reference/records-api.md`, "Counting, and figures over many records": phép cộng chỉ có ở `/dashboards/{id}/compute`, trong phạm vi quyền người xem.
 - **Làm tạm:** khai báo dashboard trong package cho từng phép tổng; tách các con số theo vai trò ra entity riêng (`order_pl_service`, `order_pl_goods`) để mỗi vai trò cộng trên phần mình được đọc.
 - **Đề xuất:** API aggregate (`sum` / `avg` / `group_by`) cho module, cùng quy tắc quyền như list.
 
 ## F-09 · `build --check` hỏng trên Windows khi git đổi xuống dòng
 
 - **Vướng:** clone dự án trên Windows với `core.autocrlf=true` (mặc định của Git for Windows) thì `pnpm test` báo `PACKAGE_STALE` ngay trên bản sạch: git ghi `package/` ra CRLF, builder sinh LF, `--check` so từng byte.
-- **Bằng chứng:** clone `thinh0304/inno-pl` ngày 03/11/2026: `PACKAGE_STALE: package/ does not match the config (stale: manifest.json, …)` khi chưa sửa gì; hết lỗi sau khi checkout lại với `core.autocrlf=false`.
+- **Cách tái hiện** (tái hiện được): trên Windows, `git config --global core.autocrlf true`, `git clone https://github.com/thinh0304/Inno-PL`, `pnpm install`, `pnpm test`: lỗi `PACKAGE_STALE: package/ does not match the config (stale: manifest.json, …)` khi chưa sửa gì.
+- **Bằng chứng:** ngày 03/11/2026; hết lỗi sau khi checkout lại với `core.autocrlf=false`.
 - **Làm tạm:** `git config --local core.autocrlf false && git config --local core.eol lf`, rồi checkout lại.
 - **Đề xuất:** starter kèm `.gitattributes` (`* text=auto eol=lf`), hoặc `--check` so sánh không phân biệt CRLF / LF.
 
 ## F-10 · Output `lit(...)` của bước End qua được build nhưng bị từ chối lúc cài
 
 - **Vướng:** `end("locked", …, { skipped: lit(true) })` build và test xanh, nhưng khi cài: `APP_CONTRACT_UNDERIVABLE on workflow:compute_pl at INVALID_DEFINITION:/nodes/21/parameters`.
-- **Bằng chứng:** `steps.md` ghi `end(id, name, outcome?, outputs?)` với `outputs` là `{ name: ref(...) | lit(...) }`; deploy sandbox 03/11/2026 từ chối như trên; bỏ output thì cài được.
+- **Cách tái hiện** (tái hiện được): thêm `{ skipped: lit(true) }` làm output của một bước `end(...)`, `pnpm build` (xanh), `pnpm af deploy --sandbox`: lỗi như trên; bỏ output thì cài được.
+- **Bằng chứng:** `steps.md` ghi `end(id, name, outcome?, outputs?)` với `outputs` là `{ name: ref(...) | lit(...) }`.
 - **Làm tạm:** chỉ dùng `ref(...)` trong output của End.
 - **Đề xuất:** builder từ chối `lit` trong output của End (hoặc nền tảng nhận nó), và tài liệu nói rõ.
 
@@ -91,35 +119,115 @@ Mỗi mục ghi: chỗ vướng, bằng chứng trong SDK, cách dự án đang 
 
 - **Vướng:**
   - Muốn chặn AM tạo đơn với `am` là người khác, và bắt Sales Admin là `sa` của đơn mình tạo.
-  - Hai cách theo tài liệu đều không dùng được:
-    - `{ "field": "am", "op": "ne", "value": { "$bind": "viewer.id" } }` bị từ chối lúc cài: `ENTITY_VALIDATION_RULE_INVALID: 'am' compares against a binding, which a write cannot resolve`.
-    - Phép thử người ghi `in_field` không thấy giá trị mới khi tạo, nên rule chặn cả AM tạo đơn cho chính mình.
-  - Cũng không viết được rule "giá dòng phải nằm ở entity đúng nhóm của mã loại", vì cần hai bước tham chiếu (giá → dòng → `item_type` theo mã chữ). Một giá nằm sai entity khiến TM / PROC đọc được tiền không thuộc phần mình (Thiết kế C2 / C3).
-- **Bằng chứng:** deploy sandbox 03/11/2026, `e2e/orders.sandbox.test.ts`.
-- **Làm tạm:**
-  - `order.am` bắt buộc, không mặc định là người tạo, và khóa sau khi tạo (`am_is_fixed`).
-  - Màn hình đặt `am` / `sa` đúng người.
-  - `compute_pl` liệt kê giá nằm sai entity trong `order_pl.detail.misplacedPrices` để màn hình chuyển lại.
-- **Đề xuất:**
-  - Cho rule so một trường người với người đang ghi khi tạo (`$bind: viewer.id` trên write, hoặc `in_field` đọc giá trị mới).
-  - Cho rule đi nhiều bước tham chiếu, hoặc tra cứu theo khóa tự nhiên.
+  - Muốn chặn một giá nằm sai entity so với nhóm của mã loại (giá → dòng → mã loại): TM / PROC sẽ đọc được tiền không thuộc phần mình (Thiết kế C2 / C3).
+- **Cách tái hiện** (tái hiện được):
+  - Thêm rule `{ "field": "am", "op": "ne", "value": { "$bind": "viewer.id" } }` vào `config/entities/order.json`, `pnpm build` xanh, `deploy --sandbox`: `ENTITY_VALIDATION_RULE_INVALID: 'am' compares against a binding, which a write cannot resolve`.
+  - Thay bằng phép thử người ghi `in_field` (`am`): cài được nhưng khi AM tạo đơn cho chính mình, rule vẫn chặn, vì `in_field` không thấy giá trị mới.
+  - Rule đi hai bước tham chiếu (`order_line.item_type_code` rồi tra `item_type`): không có cú pháp.
+- **Bằng chứng:** `e2e/orders.sandbox.test.ts`, sandbox 03/11/2026.
+- **Làm tạm:** `order.am` bắt buộc, không mặc định là người tạo, và khóa sau khi tạo (`am_is_fixed`); màn hình đặt `am` / `sa` đúng người; `compute_pl` liệt kê giá nằm sai entity trong `order_pl.detail.misplacedPrices` để màn hình chuyển lại.
+- **Đề xuất:** cho rule so một trường người với người đang ghi khi tạo (`$bind: viewer.id` trên write, hoặc `in_field` đọc giá trị mới); cho rule đi nhiều bước tham chiếu, hoặc tra cứu theo khóa tự nhiên.
 
-## F-12 · Enum colours are not checked by the builder
+## F-12 · Builder không kiểm màu của tùy chọn enum
 
-`agentflow-app build` accepts any `color` on an `enum_values` option; the install refuses an unknown one (`unknown option color: slate`; `slate` is an accent, not an option colour). Allowed: gray, sky, teal, amber, emerald, violet, indigo, rose, fuchsia, `#RRGGBB`. Found on the sandbox, plan 03; `test/flow/entities.test.ts` now checks every entity file.
+- **Vướng:** màu tùy chọn sai chỉ bị phát hiện lúc cài, sau vài phút chờ.
+- **Cách tái hiện** (tái hiện được): trong `config/entities/*.json`, một tùy chọn `{ "value": "x", "label": "X", "color": "slate" }`; `pnpm build` xanh; `pnpm af deploy --sandbox`: `APP_STEP_FAILED on entity:order_task at VALIDATION_ERROR: unknown option color: slate` (và hàng chục dòng `APP_DEPENDS_ON_FAILED` che mất nguyên nhân thật).
+- **Bằng chứng:** `entities.md` liệt kê màu enum hợp lệ (gray, sky, teal, amber, emerald, violet, indigo, rose, fuchsia, `#RRGGBB`); `slate` chỉ hợp lệ làm `accent` của entity. Kế hoạch 03.
+- **Làm tạm:** `test/flow/entities.test.ts` kiểm mọi file entity.
+- **Đề xuất:** builder kiểm màu theo danh sách đó; khi cài, in nguyên nhân gốc trước các dòng `APP_DEPENDS_ON_FAILED`.
 
-## F-13 · A routing rule's `when` is one json-logic operator
+## F-13 · `when` của luật giao việc là một toán tử json-logic
 
-The builder only checks that `when` is an object; the install refuses `{ join, leaves }` (`WORK_ASSIGNMENT_RULE_INVALID`: "a condition applies exactly one operator"). It is written as a trigger filter is: `{ "==": [{ "var": "role" }, "tm"] }`.
+- **Vướng:** `work.assignable.rules[].when` viết theo hình dạng của `condition` ở rule (`{ join, leaves }`) bị từ chối lúc cài.
+- **Cách tái hiện** (tái hiện được): `when: { "join": "and", "leaves": [{ "kind": "field", "rule": { "field": "role", "op": "eq", "value": "tm" } }] }`; `pnpm build` xanh; `deploy --sandbox`: `WORK_ASSIGNMENT_RULE_INVALID: routing rule 1: when is not a valid condition: a condition applies exactly one operator, but this one lists 2 (join, leaves)`.
+- **Bằng chứng:** builder README chỉ nói `when` là "an object" (`dist/invariants.js` kiểm `isObject`). Viết như filter của trigger thì cài được: `{ "==": [{ "var": "role" }, "tm"] }`.
+- **Làm tạm:** dạng json-logic một toán tử.
+- **Đề xuất:** builder kiểm hình dạng `when`, và `work.md` có ví dụ.
 
-## F-14 · A write of an unchanged status can be refused
+## F-14 · Ghi lại đúng trạng thái đang có có thể bị từ chối
 
-An update that binds `status` to the value the record already has was refused with `STAGE_TRANSITION_NOT_ALLOWED` for an order whose stored status was no valid starting point. Write a status only when it changes.
+- **Vướng:** workflow cập nhật đơn với `status` bằng đúng giá trị hiện có thì hai lần bị từ chối: `STAGE_TRANSITION_NOT_ALLOWED on write_order`.
+- **Cách tái hiện** (chưa chắc): sandbox 03/11/2026, hai đơn tạo bằng `POST /entities/{order}/records` với `form_payload` có khóa ngoài form (`approved: true`); workflow `init_order_tasks` ghi lại `status: "draft"` bằng bước Update thì hỏng; các đơn tạo bình thường thì không. Chưa xác định vì sao trạng thái lưu của hai đơn đó không phải điểm bắt đầu hợp lệ.
+- **Bằng chứng:** `GET /instances/{id}`, `node_runs[].error_code`.
+- **Làm tạm:** trạng thái được ghi riêng và chỉ khi nó đổi (`write_status` sau một bước rẽ nhánh).
+- **Đề xuất:** coi việc ghi trạng thái không đổi là không phải chuyển trạng thái; thông báo lỗi nêu `from` và `to`.
 
-## F-15 · Rules cannot guard a delete
+## F-15 · Rule không chặn được xóa bản ghi
 
-Rules fire on `is_new` and `is_update`, so "no line or price may be deleted after submit" cannot be written; the AM / SA `delete` grant on `order_line` and the price entities stays and only the screens lock it.
+- **Vướng:** muốn "không xóa dòng hay giá của đơn đã gửi duyệt".
+- **Cách tái hiện** (thiếu tính năng): các phép thử ghi của rule là `is_new`, `is_update`, `changed`, `changed_any`, `was`, `actor`: không có `is_delete`. Với một grant `delete` cho AM trên `order_line`, AM xóa được dòng của đơn đã gửi duyệt qua `DELETE /entities/{id}/records/{id}` dù đã có rule khóa sửa.
+- **Bằng chứng:** builder README, mục Rules.
+- **Làm tạm:** màn hình khóa nút xóa; grant `delete` vẫn còn.
+- **Đề xuất:** thêm phép thử ghi `is_delete`, để rule áp dụng cho cả xóa.
 
-## F-16 · A Code step failure leaves no message
+## F-16 · Code step hỏng không để lại thông báo lỗi
 
-One `advance_order` Code step ended `CODE_EXECUTION_FAILED` (3.4 s, 1 of 66 runs) with `error_message: null`, empty `invocations`, and an empty `input` on the node run. The same records run fine in Node. A failed run leaves the order waiting for the next task change or an admin Retry.
+- **Vướng:** một lượt `advance_order` hỏng `CODE_EXECUTION_FAILED` sau 3,4 giây (1 trong 66 lượt); không thấy được lỗi gì. Đơn đứng yên tới lần đổi task kế tiếp hoặc Admin bấm Thử lại.
+- **Cách tái hiện** (chưa chắc, không tất định): chạy nhiều lượt `advance_order` (e2e `e2e/flow.sandbox.test.ts`); với lượt hỏng, `GET /instances/{id}` cho `error_code: CODE_EXECUTION_FAILED`, `error_message: null`, `node_runs[].error: null`, `invocations: []`, `input` rỗng. Chạy lại cùng bản ghi trong Node thì đúng.
+- **Bằng chứng:** tài liệu `workflows.md` nói *"The author's own message and traceback are recorded on the step"*, nhưng không có.
+- **Làm tạm:** ghi nhận là rủi ro đã biết; `reload` và các lần đổi task sau đó chạy lại.
+- **Đề xuất:** ghi traceback hoặc stderr vào `node_runs[].error`, và `input` đã nhận của Code step để chạy lại cục bộ.
+
+## F-17 · Tạo bản ghi qua API âm thầm bỏ trường không có trong form
+
+- **Vướng:** dòng nhật ký "Bỏ qua cảnh báo" mất danh sách cảnh báo; một đơn tạo với `approved: true` được 201 mà `approved` không được lưu. Không có lỗi hay cảnh báo nào.
+- **Cách tái hiện** (tái hiện được): entity có một trường danh sách `warnings` nhưng `create_form.schema.properties` không có nó; `POST /entities/{id}/records` với `form_payload: { …, warnings: [{ source: "system", level: "warning", text: "x" }] }` trả 201; đọc lại bản ghi: `warnings: []`. Thêm `"warnings": { "x-entityField": "warnings", "type": "array", "items": { "type": "object" } }` vào form thì lưu được.
+- **Bằng chứng:** `records-api.md` ("only the keys the entity's create form binds are kept"); `e2e/module-flow.sandbox.test.ts`, test `module_logs_ignored_warnings_with_the_action` hỏng trước khi sửa; `entities.md` không nói danh sách có gắn được vào form không.
+- **Làm tạm:** `test/flow/entities.test.ts` kiểm form có đủ mọi trường module ghi.
+- **Đề xuất:** trả 422 (hoặc một danh sách `ignored_fields` trong phản hồi) cho khóa không có trong form; `entities.md` nói rõ trường danh sách gắn thế nào.
+
+## F-18 · `host.navigate` không có chế độ thay thế
+
+- **Vướng:** trang `/tasks/<id>` (đích của `module_page`) muốn chuyển tới đơn; vì chỉ có thể thêm mục vào lịch sử, nút Back quay về `/tasks/<id>` rồi chuyển tiếp lần nữa.
+- **Cách tái hiện** (tái hiện được): một route gọi `host.navigate("/orders/o1")` trong effect khi vừa mở; mở route đó, rồi bấm Back: quay về route, effect chạy lại và chuyển tiếp lần nữa.
+- **Bằng chứng:** `@reflexify/agentflow-sdk/dist/modules/contract.d.ts`: `navigate(path)` không có tham số thứ hai.
+- **Làm tạm:** hiện đơn ngay tại `/tasks/<id>` thay vì chuyển hướng.
+- **Đề xuất:** `navigate(path, { replace: true })`.
+
+## F-19 · Định dạng thời gian của bản ghi
+
+- **Vướng:** bản ghi trả thời gian dạng `2026-11-03T18:54:44.945958101+07:00` (9 chữ số thập phân, múi giờ +07:00). Chưa biết bộ chạy Code đọc nó bằng `Date.parse` có chắc chắn đúng không. Một lần, sau phê duyệt, bước "bỏ qua nếu đã tính" so `computed_at` với `approved_at` không bỏ qua mà tính lại.
+- **Cách tái hiện** (chưa chắc): sandbox 03/11/2026: duyệt một đơn, đợi P&L chính thức, đặt lại `pl_requested_at` bằng tay: `computed_at` đổi. Chưa xác định nguyên nhân (có thể là hai lượt điều phối chạy chồng cùng xin tính P&L, có thể là cách đọc thời gian); dự án đọc thời gian bằng tay (`src/pl/time.ts`) cho chắc.
+- **Bằng chứng:** giá trị `computed_at` nêu trên.
+- **Làm tạm:** `parseTime` thay cho mọi `Date.parse` trong code chạy ở Code step.
+- **Đề xuất:** tài liệu định dạng thời gian của `datetime` trong bản ghi và cách đọc trong Code step; ưu tiên UTC có độ chính xác mili giây.
+
+## F-20 · Trigger có thể chưa chạy trong vài phút sau khi cài sandbox
+
+- **Vướng:** lần chạy e2e đầu tiên ngay sau `deploy --sandbox` có lúc không có lượt workflow nào (không `init_order_tasks`, không `compute_pl`) dù đã in `armed 7 triggers`; chạy lại sau vài phút thì bình thường.
+- **Cách tái hiện** (chưa chắc, không tất định): `pnpm af deploy --sandbox`, rồi ngay lập tức `pnpm test:sandbox`; một lần `GET /instances` chỉ có một lượt (`pl_selftest`) trong sandbox đã tồn tại hơn 10 phút.
+- **Bằng chứng:** ngày 03/11/2026, lần chạy sau lần cài thứ năm.
+- **Làm tạm:** chờ 4 phút sau khi cài rồi mới chạy test.
+- **Đề xuất:** `deploy --sandbox` chỉ báo xong khi trigger đã sẵn sàng nhận sự kiện, hoặc có lệnh `sandbox status` cho biết.
+
+## F-21 · Mỗi lượt chạy mất 7–18 giây, các lượt xếp hàng
+
+- **Vướng:** một lượt `advance_order` (đọc 15 danh sách, một Code step, vài bước ghi) mất trung vị 7,3 giây, tối đa 18 giây; Code step một mình thường 3–4 giây. Chạy nhiều bộ test cùng lúc làm các lượt xếp hàng quá 150 giây.
+- **Cách tái hiện** (tái hiện được): `GET /instances/{id}/trace` của một lượt `advance_order` rồi trừ `completed_at - started_at` của từng bước; chạy 5 bộ test sandbox song song thì quá thời gian chờ 150 giây.
+- **Bằng chứng:** 66 lượt `advance_order` đo ngày 03/11/2026.
+- **Làm tạm:** bộ test sandbox chạy từng tệp một; màn hình đợi tới 52 giây rồi báo "Chưa cập nhật".
+- **Đề xuất:** tài liệu độ trễ và độ song song của bộ chạy; thời gian xếp hàng nằm trong `trace`.
+
+## F-22 · `GET /app/objects` chỉ trả lời người gọi của chính ứng dụng
+
+- **Vướng:** muốn chạy `OrdersApi` của module trên sandbox bằng từng người (`as('am')`); `getAppObjects` cần `GET /app/objects` mà người của sandbox gọi không được trả lời.
+- **Cách tái hiện** (tái hiện được): `as('am').GET('/app/objects')` trong `e2e/`: không có danh sách đối tượng của ứng dụng; `createHttpOrdersApi({ api: as('am'), … })` ném `NOT_INSTALLED`.
+- **Bằng chứng:** `e2e/module-flow.sandbox.test.ts`.
+- **Làm tạm:** bọc client, trả danh sách đối tượng dựng từ `idsByKey()`.
+- **Đề xuất:** để `@reflexify/agentflow-sdk/testing` có `hostFor(handle)` trả host đầy đủ, hoặc cho người của sandbox đọc `/app/objects`.
+
+## F-23 · `expect` của bước Update với giá trị là template
+
+- **Vướng:** `update(…, { expect: { fields: { stage: "{{ … }}", approved: "{{ … }}" } } })` (số và boolean) dường như không khớp: các lượt ghi đơn bị bỏ qua. Với chuỗi (`status`) thì chạy đúng.
+- **Cách tái hiện** (chưa chắc): thêm `expect` trên `stage` và `approved` của bước ghi đơn trong `config/build/flow.mjs`; sau khi cài, một đơn bị trả lại không về nháp (bước ghi bị bỏ qua, không có lỗi); bỏ `expect` thì chạy lại. Chưa xác định là so chuỗi với số hay so khác.
+- **Bằng chứng:** các lượt e2e ngày 03/11/2026 trước và sau khi bỏ `expect`.
+- **Làm tạm:** `expect` chỉ dùng trên `status` (chuỗi) của task.
+- **Đề xuất:** tài liệu cách so (chuỗi hay có kiểu), và `trace` ghi `skipped` kèm lý do (`changed`) ở từng bước.
+
+## F-24 · Trả lời của `GET /work?view=mine|claimable` không được mô tả
+
+- **Vướng:** module cần liệt kê việc của người dùng; tài liệu chỉ nhắc `GET /work?view=claimable` trong một dòng của bảng, không có hình dạng của trả lời.
+- **Cách tái hiện** (thiếu tính năng): đọc `records-api.md`: không có mô tả phần tử. Dự án đoán `{ items: [{ entity_id, id | record_id }] }` và e2e xác nhận trên sandbox.
+- **Bằng chứng:** `e2e/flow.sandbox.test.ts` (test `submit_walks_to_t23_and_locks_the_order`, phần đọc `/work`).
+- **Làm tạm:** đọc chịu lỗi: nhận cả mảng lẫn `{ items }`, `record_id ?? id`.
+- **Đề xuất:** mô tả trả lời trong `records-api.md` và có kiểu trong `operations.d.ts`.
