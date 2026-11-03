@@ -1,4 +1,7 @@
 {
   "label": "Bước ngày công nợ",
-  "type": "number"
+  "type": "number",
+  "constraints": {
+    "minimum": 1
+  }
 }

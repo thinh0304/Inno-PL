@@ -51,6 +51,29 @@ describe('configFromRecords', () => {
     expect(rates[2].threshold).toBe(0.35);
   });
 
+  it('the setting record keyed "default" wins over any other', () => {
+    const records = seeds();
+    records.pl_setting = [{ key: 'x', warranty_rate: 0.5 }, ...records.pl_setting];
+    expect(configFromRecords(records).settings.warrantyRate).toBe(0.002);
+  });
+
+  it('numbers that arrive as strings are read as numbers', () => {
+    const asStrings = (rows: Record<string, unknown>[]) => rows.map((row) => Object.fromEntries(
+      Object.entries(row).map(([k, v]) => [k, typeof v === 'number' ? String(v) : v])));
+    const records = seeds();
+    for (const key of ENTITIES) records[key] = asStrings(records[key]);
+    expect(configFromRecords(records)).toEqual(DEFAULT_CONFIG);
+  });
+
+  it('no tier or weight records fall back to the defaults', () => {
+    const records = seeds();
+    records.fin_cost_tier = [];
+    records.deal_stage_weight = [];
+    const config = configFromRecords(records);
+    expect(config.finCostTiers).toEqual(DEFAULT_CONFIG.finCostTiers);
+    expect(config.dealStageWeights).toEqual(DEFAULT_CONFIG.dealStageWeights);
+  });
+
   it('a changed setting is read', () => {
     const records = seeds();
     records.pl_setting = [{ ...records.pl_setting[0], warranty_rate: 0.003 }];

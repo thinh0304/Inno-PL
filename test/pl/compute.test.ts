@@ -27,6 +27,19 @@ describe('computePl', () => {
     expect(standard.profitAfterSales).toBeCloseTo(48_000_000 - 10_000_000 - 4_285_714.2857, 3);
   });
 
+  it('a ratio exactly on a tier boundary takes that tier when cost is fractional', () => {
+    // LIC-NTNN cost is 80M × 1.12 = 89,600,000.00000001 in floats; 8,960,000 is exactly 10% of it.
+    const result = pl([line('LIC-NTNN', { unitPrice: 100_000_000, unitCost: 80_000_000 })], { salesCost: 8_960_000 });
+    expect(result.finCostRate).toBe(0.25);
+  });
+
+  it('a missing customer tier is charged as standard, the dearest tier', () => {
+    const result = pl([line('TB', { unitPrice: 120_000_000, unitCost: 100_000_000 })],
+      { salesCost: 20_000_000, customerTier: null as never });
+    expect(result.finCostRate).toBe(0.35);
+    expect(result.finCost).toBeGreaterThan(0);
+  });
+
   it('no_sales_cost_no_fin_cost', () => {
     expect(pl([cloud()], { salesCost: 0 }).finCost).toBe(0);
     expect(pl([cloud()], { salesCost: null }).finCost).toBe(0);

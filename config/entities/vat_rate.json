@@ -7,7 +7,7 @@
   "fields": [
     {"key":"code","label":"Mã","type":"text","required":true},
     {"key":"label","label":"Nhãn","type":"text"},
-    {"key":"rate","label":"Thuế suất","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"rate","label":"Thuế suất","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
     {"key":"is_default","label":"Mặc định","type":"boolean","default":{"kind":"literal","value":false}},
     {"key":"sort_order","label":"Thứ tự","type":"number"}
   ],

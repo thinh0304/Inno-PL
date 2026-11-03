@@ -7,12 +7,12 @@
   "fields": [
     {"key":"code","label":"Mã loại hợp đồng","type":"text","required":true},
     {"key":"name","label":"Tên","type":"text"},
-    {"key":"threshold","label":"Ngưỡng LN thuần / giá vốn","type":"number","format":"percent","format_options":{"decimal_places":2}},
-    {"key":"tech_support_bonus","label":"Thưởng hỗ trợ KT định kỳ","type":"number","format":"percent","format_options":{"decimal_places":2}},
-    {"key":"deploy_bonus","label":"Thưởng triển khai","type":"number","format":"percent","format_options":{"decimal_places":2}},
-    {"key":"consult_bonus","label":"Thưởng tư vấn (cơ sở)","type":"number","format":"percent","format_options":{"decimal_places":2}},
-    {"key":"sales_bonus","label":"Thưởng kinh doanh","type":"number","format":"percent","format_options":{"decimal_places":2}},
-    {"key":"provision","label":"Chi phí dự phòng","type":"number","format":"percent","format_options":{"decimal_places":2}}
+    {"key":"threshold","label":"Ngưỡng LN thuần / giá vốn","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
+    {"key":"tech_support_bonus","label":"Thưởng hỗ trợ KT định kỳ","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
+    {"key":"deploy_bonus","label":"Thưởng triển khai","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
+    {"key":"consult_bonus","label":"Thưởng tư vấn (cơ sở)","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
+    {"key":"sales_bonus","label":"Thưởng kinh doanh","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}},
+    {"key":"provision","label":"Chi phí dự phòng","type":"number","format":"percent","format_options":{"decimal_places":2},"constraints":{"minimum":0,"maximum":1}}
   ],
   "natural_key": [{"id":"by_code","name":"Mã loại hợp đồng","fields":["code"]}],
   "display_field": "name",

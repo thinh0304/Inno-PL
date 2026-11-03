@@ -114,7 +114,8 @@ var PL = (() => {
     const grossProfit = revenue - cost;
     const salesCost = num(input.salesCost);
     const ratio = cost > 0 ? salesCost / cost : 0;
-    const finCostRate = config.finCostTiers.filter((tier) => tier.tier === input.customerTier && tier.fromRatio <= ratio).reduce((best, tier) => best === null || tier.fromRatio > best.fromRatio ? tier : best, null)?.rate ?? 0;
+    const tier = config.finCostTiers.some((row) => row.tier === input.customerTier) ? input.customerTier : "standard";
+    const finCostRate = config.finCostTiers.filter((row) => row.tier === tier && row.fromRatio <= ratio + 1e-9).reduce((best, row) => best === null || row.fromRatio > best.fromRatio ? row : best, null)?.rate ?? 0;
     const finCost = salesCost > 0 && finCostRate < 1 ? salesCost * finCostRate / (1 - finCostRate) : 0;
     const profitAfterSales = grossProfit - salesCost - finCost;
     const warranty = sum(lines, (line) => {
@@ -129,8 +130,9 @@ var PL = (() => {
     const consultBonusRate = rate2.consultBonus + (input.proposal ? settings2.proposalBonus : 0) + (input.poc ? settings2.pocBonus : 0);
     const consultBonus = input.consultStaff ? Math.max(0, beforeConsult) * consultBonusRate : 0;
     const netProfitBeforeFund = beforeConsult - consultBonus;
-    const threshold = rate2.threshold + Math.floor(Math.max(0, num(input.debtDays) - settings2.debtBaseDays) / settings2.debtStepDays) * settings2.debtStepRate;
-    const need = Math.max(0, threshold * cost - netProfitBeforeFund);
+    const debtSteps = settings2.debtStepDays > 0 ? Math.floor(Math.max(0, num(input.debtDays) - settings2.debtBaseDays) / settings2.debtStepDays) : 0;
+    const threshold = rate2.threshold + debtSteps * settings2.debtStepRate;
+    const need = cost > 0 ? Math.max(0, threshold * cost - netProfitBeforeFund) : 0;
     const provisionFundDraw = input.useProvisionFund ? Math.min(need, Math.max(0, num(input.provisionFundBalance))) : 0;
     const netProfit = netProfitBeforeFund + provisionFundDraw;
     const netMargin = cost > 0 ? netProfit / cost : null;
@@ -331,7 +333,11 @@ var PL = (() => {
   var WEIGHT_SETS = ["new_tm", "new_dvdk", "tmdk", "dvdk"];
   var STAGES = ["lead", "opportunity", "clarification", "quotation", "negotiation", "close", "contract"];
   var str = (value) => typeof value === "string" ? value : "";
-  var num2 = (value) => typeof value === "number" && Number.isFinite(value) ? value : 0;
+  function parseNumber(value) {
+    const parsed = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
+    return typeof parsed === "number" && Number.isFinite(parsed) ? parsed : void 0;
+  }
+  var num2 = (value) => parseNumber(value) ?? 0;
   var bool = (value) => value === true;
   var rank = (order, value) => order.indexOf(value) + 1 || order.length + 1;
   var snake = (key) => key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
@@ -369,10 +375,7 @@ var PL = (() => {
   function settings(r) {
     const defaults = DEFAULT_CONFIG.settings;
     if (!r) return { ...defaults };
-    return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) => {
-      const value = r[snake(key)];
-      return [key, typeof value === "number" && Number.isFinite(value) ? value : fallback];
-    }));
+    return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) => [key, parseNumber(r[snake(key)]) ?? fallback]));
   }
   function configFromRecords(r) {
     const itemTypes = r.item_type.filter((row) => row.active !== false).map(itemType2).sort((a, b) => a.sortOrder - b.sortOrder);
@@ -381,7 +384,7 @@ var PL = (() => {
       ...DEFAULT_CONFIG.contractTypeRates.map((rate2) => recordedRates.get(rate2.code) ?? rate2),
       ...[...recordedRates.values()].filter((rate2) => !CONTRACT_TYPE_ORDER2.includes(rate2.code))
     ];
-    const finCostTiers = r.fin_cost_tier.map((row) => ({ tier: str(row.tier), fromRatio: num2(row.from_ratio), rate: num2(row.rate) })).sort((a, b) => rank(TIER_ORDER, a.tier) - rank(TIER_ORDER, b.tier) || a.fromRatio - b.fromRatio);
+    const finCostTiers = r.fin_cost_tier.length === 0 ? [...DEFAULT_CONFIG.finCostTiers] : r.fin_cost_tier.map((row) => ({ tier: str(row.tier), fromRatio: num2(row.from_ratio), rate: num2(row.rate) })).sort((a, b) => rank(TIER_ORDER, a.tier) - rank(TIER_ORDER, b.tier) || a.fromRatio - b.fromRatio);
     const vatRates = [...r.vat_rate].sort((a, b) => num2(a.sort_order) - num2(b.sort_order)).map((row) => ({ code: str(row.code), label: str(row.label), rate: num2(row.rate), isDefault: bool(row.is_default) }));
     const taskSlas = [...r.task_sla].sort((a, b) => num2(a.sort_order) - num2(b.sort_order)).map((row) => ({
       taskCode: str(row.task_code),
@@ -389,18 +392,19 @@ var PL = (() => {
       role: str(row.role),
       slaDays: num2(row.sla_days)
     }));
-    const dealStageWeights = Object.fromEntries(WEIGHT_SETS.map((set) => [set, Object.fromEntries(STAGES.map((stage) => [stage, 0]))]));
+    const dealStageWeights = Object.fromEntries(WEIGHT_SETS.map((set) => [set, Object.fromEntries(STAGES.map((stage) => [stage, r.deal_stage_weight.length === 0 ? DEFAULT_CONFIG.dealStageWeights[set][stage] : 0]))]));
     for (const row of r.deal_stage_weight) {
       const set = str(row.weight_set);
       const stage = str(row.stage);
       if (dealStageWeights[set] && stage in dealStageWeights[set]) dealStageWeights[set][stage] = num2(row.weight);
     }
+    const setting = r.pl_setting.find((row) => row.key === "default") ?? r.pl_setting[0];
     return {
       itemTypes,
       contractTypeRates,
       finCostTiers,
       vatRates,
-      settings: settings(r.pl_setting[0]),
+      settings: settings(setting),
       dealStageWeights,
       taskSlas
     };

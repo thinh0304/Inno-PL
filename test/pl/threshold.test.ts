@@ -81,6 +81,23 @@ describe('provision fund draw', () => {
     expect(result.provisionFundDraw).toBe(0);
   });
 
+  it('a cost-zero order draws nothing from the fund', () => {
+    const result = pl([line('DVTK-I', { unitPrice: 10_000_000, unitCost: 0 })],
+      { salesCost: 20_000_000, useProvisionFund: true, provisionFundBalance: 100_000_000 });
+    expect(result.netProfitBeforeFund).toBeLessThan(0);
+    expect(result.provisionFundDraw).toBe(0);
+    expect(result.passed).toBe(false);
+  });
+
+  it('a zero debt step in the settings leaves the threshold at its base', () => {
+    const config = { ...DEFAULT_CONFIG, settings: { ...DEFAULT_CONFIG.settings, debtStepDays: 0 } };
+    for (const debtDays of [20, 90]) {
+      const result = computePl(order(shortOrder(), { debtDays }), config);
+      expect(result.threshold).toBe(0.08);
+      expect(Number.isFinite(result.netProfit)).toBe(true);
+    }
+  });
+
   it('no draw when the fund is not chosen', () => {
     const result = pl(shortOrder(), { provisionFundBalance: 50_000_000 });
     expect(result.provisionFundDraw).toBe(0);

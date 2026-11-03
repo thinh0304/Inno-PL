@@ -4,5 +4,9 @@
   "format": "percent",
   "format_options": {
     "decimal_places": 2
+  },
+  "constraints": {
+    "minimum": 0,
+    "maximum": 1
   }
 }

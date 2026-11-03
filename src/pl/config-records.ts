@@ -14,7 +14,12 @@ const WEIGHT_SETS: WeightSet[] = ['new_tm', 'new_dvdk', 'tmdk', 'dvdk'];
 const STAGES: DealStage[] = ['lead', 'opportunity', 'clarification', 'quotation', 'negotiation', 'close', 'contract'];
 
 const str = (value: unknown) => (typeof value === 'string' ? value : '');
-const num = (value: unknown) => (typeof value === 'number' && Number.isFinite(value) ? value : 0);
+// A number may come back from a record read as a string ("0.08"); anything else that is not a number is undefined.
+function parseNumber(value: unknown): number | undefined {
+  const parsed = typeof value === 'string' && value.trim() !== '' ? Number(value) : value;
+  return typeof parsed === 'number' && Number.isFinite(parsed) ? parsed : undefined;
+}
+const num = (value: unknown) => parseNumber(value) ?? 0;
 const bool = (value: unknown) => value === true;
 const rank = <T>(order: T[], value: T) => (order.indexOf(value) + 1 || order.length + 1);
 const snake = (key: string) => key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
@@ -42,10 +47,8 @@ function contractTypeRate(r: Rec): ContractTypeRate {
 function settings(r: Rec | undefined): PlSettings {
   const defaults = DEFAULT_CONFIG.settings;
   if (!r) return { ...defaults };
-  return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) => {
-    const value = r[snake(key)];
-    return [key, typeof value === 'number' && Number.isFinite(value) ? value : fallback];
-  })) as unknown as PlSettings;
+  return Object.fromEntries(Object.entries(defaults).map(([key, fallback]) =>
+    [key, parseNumber(r[snake(key)]) ?? fallback])) as unknown as PlSettings;
 }
 
 export function configFromRecords(r: ConfigRecords): PlConfig {
@@ -55,7 +58,8 @@ export function configFromRecords(r: ConfigRecords): PlConfig {
   const recordedRates = new Map(r.contract_type_rate.map(contractTypeRate).map((rate) => [rate.code, rate]));
   const contractTypeRates = [...DEFAULT_CONFIG.contractTypeRates.map((rate) => recordedRates.get(rate.code) ?? rate),
     ...[...recordedRates.values()].filter((rate) => !CONTRACT_TYPE_ORDER.includes(rate.code))];
-  const finCostTiers: FinCostTier[] = r.fin_cost_tier
+  // No tier records at all → the default tiers, not a finance cost of 0.
+  const finCostTiers: FinCostTier[] = r.fin_cost_tier.length === 0 ? [...DEFAULT_CONFIG.finCostTiers] : r.fin_cost_tier
     .map((row) => ({ tier: str(row.tier) as CustomerTier, fromRatio: num(row.from_ratio), rate: num(row.rate) }))
     .sort((a, b) => rank(TIER_ORDER, a.tier) - rank(TIER_ORDER, b.tier) || a.fromRatio - b.fromRatio);
   const vatRates: VatRate[] = [...r.vat_rate].sort((a, b) => num(a.sort_order) - num(b.sort_order))
@@ -64,15 +68,19 @@ export function configFromRecords(r: ConfigRecords): PlConfig {
     .map((row) => ({ taskCode: str(row.task_code), name: str(row.name), role: str(row.role) as TaskSla['role'],
       slaDays: num(row.sla_days) }));
 
-  // A weight with no record counts as 0.
+  // No weight records at all → the default weights; otherwise a weight with no record counts as 0.
   const dealStageWeights = Object.fromEntries(WEIGHT_SETS.map((set) =>
-    [set, Object.fromEntries(STAGES.map((stage) => [stage, 0]))])) as PlConfig['dealStageWeights'];
+    [set, Object.fromEntries(STAGES.map((stage) =>
+      [stage, r.deal_stage_weight.length === 0 ? DEFAULT_CONFIG.dealStageWeights[set][stage] : 0]))])) as
+    PlConfig['dealStageWeights'];
   for (const row of r.deal_stage_weight) {
     const set = str(row.weight_set) as WeightSet;
     const stage = str(row.stage) as DealStage;
     if (dealStageWeights[set] && stage in dealStageWeights[set]) dealStageWeights[set][stage] = num(row.weight);
   }
 
-  return { itemTypes, contractTypeRates, finCostTiers, vatRates, settings: settings(r.pl_setting[0]),
+  // The setting record keyed "default" (the seed's) wins, whatever order the records come back in.
+  const setting = r.pl_setting.find((row) => row.key === 'default') ?? r.pl_setting[0];
+  return { itemTypes, contractTypeRates, finCostTiers, vatRates, settings: settings(setting),
     dealStageWeights, taskSlas };
 }

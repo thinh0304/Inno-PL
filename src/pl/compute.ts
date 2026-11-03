@@ -71,10 +71,13 @@ export function computePl(input: PlOrderInput, config: PlConfig): PlResult {
 
   const salesCost = num(input.salesCost);
   const ratio = cost > 0 ? salesCost / cost : 0;
+  // A customer with no tier (or a tier with no rows) is charged as standard, the dearest tier.
+  const tier = config.finCostTiers.some((row) => row.tier === input.customerTier) ? input.customerTier : 'standard';
+  // Fractional costs (×1.12, ÷1.08) put a ratio that is exactly on a boundary a hair below it: allow for that.
   const finCostRate = config.finCostTiers
-    .filter((tier) => tier.tier === input.customerTier && tier.fromRatio <= ratio)
-    .reduce<{ fromRatio: number; rate: number } | null>((best, tier) =>
-      best === null || tier.fromRatio > best.fromRatio ? tier : best, null)?.rate ?? 0;
+    .filter((row) => row.tier === tier && row.fromRatio <= ratio + 1e-9)
+    .reduce<{ fromRatio: number; rate: number } | null>((best, row) =>
+      best === null || row.fromRatio > best.fromRatio ? row : best, null)?.rate ?? 0;
   const finCost = salesCost > 0 && finCostRate < 1 ? salesCost * finCostRate / (1 - finCostRate) : 0;
   const profitAfterSales = grossProfit - salesCost - finCost;
 
@@ -100,11 +103,14 @@ export function computePl(input: PlOrderInput, config: PlConfig): PlResult {
   const netProfitBeforeFund = beforeConsult - consultBonus;
 
   // Step 14: +debtStepRate for each whole debtStepDays of debt beyond debtBaseDays, never less than the base.
-  const threshold = rate.threshold
-    + Math.floor(Math.max(0, num(input.debtDays) - settings.debtBaseDays) / settings.debtStepDays) * settings.debtStepRate;
+  // A debt step of 0 days in the settings adds nothing rather than dividing by zero.
+  const debtSteps = settings.debtStepDays > 0
+    ? Math.floor(Math.max(0, num(input.debtDays) - settings.debtBaseDays) / settings.debtStepDays) : 0;
+  const threshold = rate.threshold + debtSteps * settings.debtStepRate;
 
   // Thiết kế 6.5: when Sale chooses the fund, draw just enough to reach the threshold, up to the fund's balance.
-  const need = Math.max(0, threshold * cost - netProfitBeforeFund);
+  // With no cost the order passes only on a profit above 0, which no draw sized to the threshold reaches: draw nothing.
+  const need = cost > 0 ? Math.max(0, threshold * cost - netProfitBeforeFund) : 0;
   const provisionFundDraw = input.useProvisionFund ? Math.min(need, Math.max(0, num(input.provisionFundBalance))) : 0;
   const netProfit = netProfitBeforeFund + provisionFundDraw;
   const netMargin = cost > 0 ? netProfit / cost : null;
