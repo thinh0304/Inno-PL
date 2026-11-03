@@ -13,7 +13,7 @@ These commands run in the project's folder, after `pnpm install`:
 
 | Command | What it does |
 |---|---|
-| `pnpm build` | Writes `package/` from `config/`. |
+| `pnpm build` | Bundles the P&L engine into `config/code/compute_pl.js` (`pnpm build:code`), then writes `package/` from `config/`. |
 | `pnpm check` | Checks that the committed `package/` is what `config/` builds, and changes nothing. |
 | `pnpm test` | The Vitest tests, if the project has any, then `pnpm check`. |
 | `pnpm exec agentflow-app keygen --key-id <id>` | Once per publisher: writes the signing key `keys/<id>.pem` and prints where it is and its key id. Never commit `keys/`. |
@@ -26,6 +26,14 @@ These commands run in the project's folder, after `pnpm install`:
 `pnpm demo` serves the Cases screen on in-memory sample data at `http://localhost:5174/module.html`: nothing is sent anywhere, and `?empty` shows no cases, `?fail` a refused create.
 
 `node_modules/@reflexify/agentflow-app-builder/README.md` documents `config/`. [Install the package](#install-the-package) puts it in an organization.
+
+## The P&L engine and the configuration
+
+- `src/pl/` is the P&L engine, plain TypeScript with no React and no I/O: `types.ts` (configuration and order input), `defaults.ts` (the default configuration, Đặc tả 4.1–4.3), `line.ts` (one line's revenue, cost and VAT), `compute.ts` (`computePl()`: the order's P&L, threshold, verdict and provision fund draw), `kpi.ts` (the sales KPI split by deal stage), `config-records.ts` (the configuration entities' records into `PlConfig`) and `code-entry.ts` (what the Code step runs). `test/pl/` tests it; `golden-tm1040.test.ts` checks order TM-1040 against `docs/source/TM-1040.xlsx` cell by cell.
+- `scripts/build-code.mjs` bundles `src/pl/code-entry.ts` with esbuild into `config/code/compute_pl.js`, the source of the `compute_pl` Code step. The file is generated and committed: never edit it by hand; `test/pl/code-bundle.test.ts` fails when it is behind the source.
+- The configuration entities, which the admin edits and the install seeds with the defaults: `item_type`, `contract_type_rate`, `fin_cost_tier`, `vat_rate`, `pl_setting`, `task_sla`, `deal_stage_weight`, `business_plan` (seeded) and `kpi_target` (not seeded). `test/pl/config-records.test.ts` keeps their seeds equal to `src/pl/defaults.ts`.
+- The shared records: `customer`, `supplier` and `staff` (`config/entities/`).
+- The workflow "Tự kiểm bộ tính P&L" (`pl_selftest`, `config/build/pl-selftest.mjs`) runs the Code step on TM-1040 with the default configuration; an admin starts it to check a deployment's Code runner (it should end with net profit 46,272,444.44 and passed).
 
 ## The module
 
