@@ -4,6 +4,7 @@ import { StrictMode, useEffect, useLayoutEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.js';
 import type { ThemeMode } from './kit.js';
+import type { OrdersApi } from './orders-api.js';
 import css from './styles.css?inline';
 import { langOf } from './text.js';
 
@@ -14,7 +15,7 @@ export type ScreenHost = Pick<AppHost, 'context' | 'onLocaleChange' | 'onThemeCh
  * Renders the order screens in `root`, and returns how to take them away again. Its one stylesheet, the kit's and its
  * own, goes into the shadow root that holds `root`, so the page around it neither styles it nor is styled by it.
  */
-export function mountApp(root: ShadowRoot | Element, host: ScreenHost): () => void {
+export function mountApp(root: ShadowRoot | Element, host: ScreenHost, api: OrdersApi): () => void {
   const doc = root.ownerDocument;
   const scope = root instanceof ShadowRoot ? root : root.getRootNode();
   const style = doc.createElement('style');
@@ -27,7 +28,7 @@ export function mountApp(root: ShadowRoot | Element, host: ScreenHost): () => vo
   element.tabIndex = -1;
   root.append(element);
   const react = createRoot(element);
-  react.render(<StrictMode><Following host={host} element={element} /></StrictMode>);
+  react.render(<StrictMode><Following host={host} api={api} element={element} /></StrictMode>);
   return () => {
     react.unmount();
     element.remove();
@@ -35,7 +36,7 @@ export function mountApp(root: ShadowRoot | Element, host: ScreenHost): () => vo
   };
 }
 
-function Following({ host, element }: { host: ScreenHost; element: HTMLElement }) {
+function Following({ host, api, element }: { host: ScreenHost; api: OrdersApi; element: HTMLElement }) {
   const [locale, setLocale] = useState(host.context.locale);
   const [theme, setTheme] = useState<ThemeMode>(host.context.theme.mode);
   // A language or theme switch re-renders in place, so an open dialog and what is typed in it stay. Neither listener is
@@ -55,5 +56,5 @@ function Following({ host, element }: { host: ScreenHost; element: HTMLElement }
     element.dataset.theme = theme;
     element.lang = lang;
   }, [element, theme, lang]);
-  return <App host={host} lang={lang} locale={locale} theme={theme} />;
+  return <App host={host} api={api} lang={lang} locale={locale} theme={theme} />;
 }

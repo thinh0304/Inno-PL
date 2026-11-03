@@ -1,12 +1,24 @@
 import { AF_DEFAULT_PALETTE, applyTheme, createModuleContainer, type AppTheme } from '@reflexify/agentflow-sdk';
+import { createMemoryOrdersApi } from './memory-orders-api.js';
 import { mountApp, type ScreenHost } from './mount.js';
 
 /**
  * The module on its in-memory demo data, in a shadow root as AgentFlow gives it one, following the browser's language
  * and colour scheme. This is the page's code, not the module's, so it may listen on the window. The path lives in the
- * address bar's hash, so back and forward work.
+ * address bar's hash, so back and forward work. `?empty` starts with no orders; `?role=tm|proc|sd|admin` shows what that
+ * role sees.
  */
 function mountDemo(element: HTMLElement): void {
+  const query = new URLSearchParams(location.search);
+  const ROLES = {
+    tm: { seesPl: false, seesGoodsPrices: false, seesProposals: false, seesPlGoods: false, canCreateOrder: false },
+    proc: { seesPl: false, seesServicePrices: false, seesProposals: true, seesPlService: false, canCreateOrder: false },
+    sd: { seesProposals: true, canCreateOrder: false },
+    admin: { isAdmin: true, canCreateOrder: false },
+  } as const;
+  const role = query.get('role') as keyof typeof ROLES | null;
+  const api = createMemoryOrdersApi({ empty: query.has('empty'), delayMs: 300, access: role ? ROLES[role] : undefined,
+    me: role ? { id: `u-${role}`, name: role.toUpperCase() } : undefined });
   const scheme = matchMedia('(prefers-color-scheme: dark)');
   const theme = (): AppTheme => ({ mode: scheme.matches ? 'dark' : 'light', brand: 'agentflow' });
   const themes = new Set<(theme: AppTheme) => void>();
@@ -46,7 +58,7 @@ function mountDemo(element: HTMLElement): void {
   });
 
   applyTheme(element, host.context.theme, AF_DEFAULT_PALETTE);
-  mountApp(createModuleContainer(element).root, host);
+  mountApp(createModuleContainer(element).root, host, api);
 }
 
 mountDemo(document.getElementById('app')!);

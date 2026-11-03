@@ -23,6 +23,12 @@
   --ok-soft: color-mix(in oklab, var(--ok) 12%, var(--surface));
   --info-ink: color-mix(in oklab, var(--info) 80%, var(--ink));
   --info-soft: color-mix(in oklab, var(--info) 12%, var(--surface));
+  --warn: var(--af-warning, oklch(0.769 0.188 70.08));
+  --warn-ink: color-mix(in oklab, var(--warn) 62%, var(--ink));
+  --warn-soft: color-mix(in oklab, var(--warn) 14%, var(--surface));
+  --neutral-soft: color-mix(in oklab, var(--ink) 6%, var(--surface));
+  --accent-soft: color-mix(in oklab, var(--accent) 12%, var(--surface));
+  --selected: color-mix(in oklab, var(--accent) 8%, var(--surface));
 
   container: pl / inline-size;
   min-height: 100%;
@@ -75,11 +81,17 @@
 .pill, .tag { display: inline-flex; align-items: center; gap: 4px; height: 20px; font-size: 11px; font-weight: 600; line-height: 16px;
   white-space: nowrap; }
 .pill { padding: 0 8px; border-radius: 999px; }
-.pill[data-status='open'] { background: var(--info-soft); color: var(--info-ink); }
-.pill[data-status='approved'] { background: var(--ok-soft); color: var(--ok-ink); }
-.pill[data-status='rejected'] { background: var(--danger-soft); color: var(--danger-ink); }
+.pill[data-status='draft'] { background: var(--neutral-soft); color: var(--muted); }
+.pill[data-status='in_progress'] { background: var(--info-soft); color: var(--info-ink); }
+.pill[data-status='done'] { background: var(--ok-soft); color: var(--ok-ink); }
+.pill[data-status='close_lost'] { color: var(--muted); box-shadow: inset 0 0 0 1px var(--line-strong); }
 .tag { padding: 1px 6px; border-radius: max(0px, calc(var(--r) - 4px)); }
+.tag { background: var(--neutral-soft); color: var(--ink); }
 .tag[data-tone='danger'] { background: var(--danger-soft); color: var(--danger-ink); }
+.tag[data-tone='ok'] { background: var(--ok-soft); color: var(--ok-ink); }
+.tag[data-tone='info'] { background: var(--info-soft); color: var(--info-ink); }
+.tag[data-tone='warn'] { background: var(--warn-soft); color: var(--warn-ink); }
+.tag[data-tone='muted'] { color: var(--muted); }
 
 @container pl (width < 560px) {
   .col-opened { display: none; }
@@ -124,4 +136,32 @@
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton { animation-delay: 0s; }
+}
+
+/* The order list */
+.screen-wide { max-width: 1320px; }
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 12px; }
+.segmented { display: inline-flex; padding: 2px; gap: 2px; border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); }
+.segment { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: max(0px, calc(var(--r) - 3px));
+  font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; }
+.segment input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.segment:hover { background: var(--hover); }
+.segment[data-on] { background: var(--selected); color: var(--ink); box-shadow: inset 0 0 0 1px var(--accent); }
+.segment:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.stepper { display: inline-flex; align-items: center; gap: 4px; }
+.period-name { min-width: 112px; text-align: center; font-weight: 500; font-variant-numeric: tabular-nums; }
+.flip .icon { transform: scaleX(-1); }
+.select { height: 32px; padding: 0 8px; font-size: 13px; }
+.table .num, .num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table tr.clickable { cursor: pointer; }
+.link { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; text-align: start; cursor: pointer; }
+.link:hover { text-decoration: underline; }
+.link:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.sub { margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 18px; font-variant-numeric: tabular-nums; }
+.code { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.col-owner { width: 180px; }
+.col-result { width: 112px; }
+.col-actions { width: 48px; text-align: end; }
+@container pl (width < 720px) {
+  .orders .col-owner, .orders .col-result { display: none; }
 }
