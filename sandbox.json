@@ -1,0 +1,49 @@
+{
+  "owner": "admin",
+  "roles": [
+    { "name": "PL User", "permissions": ["entity.read", "entity.list", "entity.write"] },
+    { "name": "PL Admin", "permissions": ["entity.read", "entity.list", "entity.write", "entity.delete"] }
+  ],
+  "groups": [
+    { "key": "pl_users", "name": "Người dùng PL" },
+    { "key": "am", "name": "AM · Nhân viên Sale" },
+    { "key": "sa", "name": "Sales Admin" },
+    { "key": "tm", "name": "Technical Manager" },
+    { "key": "sd", "name": "Sales Director" },
+    { "key": "proc", "name": "Mua hàng" },
+    { "key": "acc", "name": "Kế toán bán hàng" },
+    { "key": "pl_admin", "name": "Quản trị viên PL" },
+    { "key": "automation", "name": "Tự động hóa PL" }
+  ],
+  "principals": [
+    { "key": "pl_bot", "name": "PL automation", "roles": ["PL User"], "groups": ["automation"], "owner_eligible": true }
+  ],
+  "settings": { "timezone": "Asia/Ho_Chi_Minh", "locale": "vi" },
+  "people": [
+    { "handle": "admin", "name": "Sandbox Admin", "roles": ["admin"] },
+    { "handle": "am", "name": "Nguyễn Thuận (AM)", "roles": ["PL User"], "groups": ["pl_users", "am"] },
+    { "handle": "am2", "name": "Lê Minh (AM khác)", "roles": ["PL User"], "groups": ["pl_users", "am"] },
+    { "handle": "sa", "name": "Đỗ Thu (Sales Admin)", "roles": ["PL User"], "groups": ["pl_users", "sa"] },
+    { "handle": "tm", "name": "Trần Kỹ (Technical Manager)", "roles": ["PL User"], "groups": ["pl_users", "tm"] },
+    { "handle": "sd", "name": "Phạm Duyệt (Sales Director)", "roles": ["PL User"], "groups": ["pl_users", "sd"] },
+    { "handle": "proc", "name": "Vũ Mua (Mua hàng)", "roles": ["PL User"], "groups": ["pl_users", "proc"] },
+    { "handle": "acc", "name": "Hoàng Toán (Kế toán)", "roles": ["PL User"], "groups": ["pl_users", "acc"] },
+    { "handle": "pladmin", "name": "Ngô Quản (Quản trị PL)", "roles": ["PL Admin"], "groups": ["pl_users", "pl_admin"] },
+    { "handle": "bot", "name": "Tài khoản tự động hóa", "groups": ["automation"] },
+    { "handle": "outsider", "name": "Người ngoài PL" }
+  ],
+  "install": {
+    "parameters": {
+      "app_users": "@group:pl_users",
+      "am_group": "@group:am",
+      "sa_group": "@group:sa",
+      "tm_group": "@group:tm",
+      "sd_group": "@group:sd",
+      "proc_group": "@group:proc",
+      "acc_group": "@group:acc",
+      "admin_group": "@group:pl_admin",
+      "automation_group": "@group:automation"
+    },
+    "decisions": {}
+  }
+}

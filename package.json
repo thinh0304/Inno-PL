@@ -14,7 +14,12 @@
     "seal": "agentflow-app seal",
     "demo": "vite --config vite.module.config.ts --open /module.html",
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit",
-    "test": "vitest run && agentflow-app build --check && agentflow-app types --check"
+    "test": "vitest run && agentflow-app build --check && agentflow-app types --check",
+    "af": "node --env-file-if-exists=.env node_modules/@reflexify/agentflow-app-builder/bin/agentflow-app.mjs",
+    "lint": "node --env-file-if-exists=.env node_modules/@reflexify/agentflow-app-builder/bin/agentflow-app.mjs lint",
+    "deploy:app": "node --env-file-if-exists=.env node_modules/@reflexify/agentflow-app-builder/bin/agentflow-app.mjs deploy --wait",
+    "sandbox": "node --env-file-if-exists=.env node_modules/@reflexify/agentflow-app-builder/bin/agentflow-app.mjs sandbox",
+    "test:sandbox": "vitest run --config vitest.sandbox.config.ts"
   },
   "dependencies": {
     "@reflexify/agentflow-elements": "github:reflexify/agentflow-sdk#sdk-v0.7.0&path:packages/agentflow-elements",

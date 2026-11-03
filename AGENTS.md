@@ -34,6 +34,8 @@ GitHub), one folder each under `claude-plugin/skills/`, a `SKILL.md` and its `re
   `pnpm check` compares package/ui with the module when package/ui exists (git ignores that folder; `pnpm build`
   writes it).
 - `pnpm test`: the Vitest tests, if the project has any, then the check.
+- `pnpm test:sandbox`: the black-box tests in `e2e/*.sandbox.test.ts` against the sandbox in `.agentflow/sandbox.json`
+  (made by `pnpm af deploy --sandbox` from `sandbox.json`); `pnpm test` never runs them.
 - `pnpm typecheck`: TypeScript over the project's `.ts` and `.tsx` files.
 - `pnpm exec agentflow-app types`: TypeScript for the package's objects (`LogicalKey`, `EntityFields`,
   `WorkflowInputs`), from `package/`: run `pnpm build` first.
@@ -46,6 +48,11 @@ GitHub), one folder each under `claude-plugin/skills/`, a `SKILL.md` and its `re
 - `pnpm exec agentflow-app lint`: checks `package/` against the AgentFlow at `AGENTFLOW_URL`, with the key in `AGENTFLOW_TOKEN`.
 - `pnpm exec agentflow-app deploy --wait`: uploads the sealed package and asks for it to be installed; an admin approves it at the
   link it prints.
+
+`AGENTFLOW_URL`, `AGENTFLOW_TOKEN` and `AGENTFLOW_SANDBOX_KEY` live in `.env` (git ignores it; `.env.example` is
+the template). `pnpm af <command>` runs any `agentflow-app` command with `.env` loaded; `pnpm lint`,
+`pnpm deploy:app` (`deploy --wait`) and `pnpm sandbox` are shortcuts. Use these instead of asking for the values,
+and never print, read back or commit `.env`.
 
 Every `agentflow-app` command takes `--json` for one JSON value on stdout. A refusal prints `<CODE>: <message>` and exits `1`.
 
