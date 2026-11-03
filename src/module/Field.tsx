@@ -62,7 +62,7 @@ export function Field({ hook, path, label, required, wide, locked, onKeyDown, on
         <div className="field-input">
           <input id={id} className="input" value={editing.value} aria-required={required || undefined}
             aria-invalid={issue ? true : undefined} aria-describedby={issue ? `${id}-issue` : undefined}
-            onChange={(e) => editing.onChange(e.target.value)} onKeyDown={onKeyDown}
+            readOnly={hook.saving} onChange={(e) => editing.onChange(e.target.value)} onKeyDown={onKeyDown}
             onFocus={() => { editing.onFocus(); onFocus?.(); }} onBlur={editing.onBlur} autoComplete="off" {...inputProps} />
           {listbox}
         </div>

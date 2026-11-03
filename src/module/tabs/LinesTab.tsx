@@ -14,11 +14,15 @@ import type { OrderDraftHook } from '../useOrderDraft.js';
 function Cell({ hook, path, label, numeric }: { hook: OrderDraftHook; path: string; label: string; numeric?: boolean }) {
   const editing = useEditing(hook, path);
   const issue = hook.issueAt(path);
+  const id = useId();
   if (!hook.editor) return <span className={numeric ? 'num' : undefined}>{shownValue(path, getIn(hook.draft, path)) || '—'}</span>;
   return (
-    <input className={`input cell${numeric ? ' num' : ''}`} aria-label={label} value={editing.value} title={issue ?? undefined}
-      aria-invalid={issue ? true : undefined} onChange={(e) => editing.onChange(e.target.value)} onFocus={editing.onFocus}
-      onBlur={editing.onBlur} autoComplete="off" />
+    <>
+      <input className={`input cell${numeric ? ' num' : ''}`} aria-label={label} value={editing.value} readOnly={hook.saving}
+        aria-invalid={issue ? true : undefined} aria-describedby={issue ? id : undefined} onChange={(e) => editing.onChange(e.target.value)}
+        onFocus={editing.onFocus} onBlur={editing.onBlur} autoComplete="off" />
+      {issue && <span id={id} className="cell-error">{issue}</span>}
+    </>
   );
 }
 
@@ -57,7 +61,7 @@ export function LinesTab({ hook, api, lang }: TabProps) {
 
   const addLine = () => hook.setDraft((d) => ({ ...d, lines: [...d.lines,
     newLine(`new:${Date.now().toString(36)}${d.lines.length}`, Math.max(0, ...d.lines.map((l) => l.line_no)) + 1, config)] }));
-  const removeLine = (id: string) => hook.setDraft((d) => ({ ...d, lines: d.lines.filter((l) => l.id !== id) }));
+  const removeLine = (id: string) => hook.removeLine(id);
   const toggle = (id: string) => setOpen((now) => {
     const next = new Set(now);
     if (next.has(id)) next.delete(id); else next.add(id);

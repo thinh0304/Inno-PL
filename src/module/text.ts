@@ -178,6 +178,8 @@ const vi = {
   },
   officialAt: (when: string) => `Số chính thức tính lúc ${when}`,
   staleOfficial: 'Chưa tính lại — bấm Lưu để tính P&L chính thức.',
+  computingOfficial: 'Đang tính P&L chính thức…',
+  conflict: 'Đơn vừa được người khác sửa ở cùng ô. Tải lại trang để xem bản mới rồi nhập lại thay đổi của bạn.',
   lockedOfficial: 'Đã chốt số liệu (nhập từ Excel) — không tính lại.',
   noOfficial: 'Chưa có số chính thức.',
   byTypeTitle: 'Doanh thu – giá vốn theo loại',
@@ -392,6 +394,8 @@ const en: Text = {
   },
   officialAt: (when: string) => `Official figures computed ${when}`,
   staleOfficial: 'Not computed yet — Save to compute the official P&L.',
+  computingOfficial: 'Computing the official P&L…',
+  conflict: 'Someone else just changed the same field. Reload the page to see their version, then enter your change again.',
   lockedOfficial: 'Figures locked (imported from Excel) — not recomputed.',
   noOfficial: 'No official figures yet.',
   byTypeTitle: 'Revenue and cost by type',
@@ -443,6 +447,7 @@ export function errorText(error: unknown, t: Text, fallback: string): string {
   if (error instanceof OrdersError) {
     if (error.code === 'NOT_INSTALLED') return t.notInstalled(error.reason ?? '');
     if (error.code === 'NETWORK') return t.offline;
+    if (error.code === 'CONFLICT') return t.conflict;
     if (error.reason) return error.reason;
   }
   return fallback;

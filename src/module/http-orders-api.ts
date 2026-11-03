@@ -16,7 +16,7 @@ function toOrdersError(error: unknown): OrdersError {
   // A field's own message is the most precise; a refusal's detail starts with its code, which people do not read.
   const field = (error.fieldErrors?.[0] as { message?: unknown } | undefined)?.message;
   const said = typeof field === 'string' ? field : error.detail ?? null;
-  return new OrdersError(error.code, said ? said.replace(/^[A-Z][A-Z0-9_]+:\s*/, '') : null);
+  return new OrdersError(error.code, said ? said.replace(/^[A-Z][A-Z0-9_]+:\s*/, '') : null, {}, error.status);
 }
 
 async function call<T>(request: Promise<{ data?: T; error?: unknown; response: Response }>): Promise<T> {
@@ -28,13 +28,16 @@ async function call<T>(request: Promise<{ data?: T; error?: unknown; response: R
 }
 
 // 403: no grant for it; 404: nothing the person may read. Either way the screen shows less, not a failure.
-const NOT_FOR_THEM = (error: unknown) => error instanceof OrdersError && /^(FORBIDDEN|HTTP_403|HTTP_404|ENTITY_NOT_FOUND|ENTITY_RECORD_NOT_FOUND|.*_FORBIDDEN|.*_DENIED)$/.test(error.code);
+const NOT_FOR_THEM = (error: unknown) => error instanceof OrdersError && (error.status === 403 || error.status === 404
+  || /^(FORBIDDEN|HTTP_403|HTTP_404|ENTITY_NOT_FOUND|ENTITY_RECORD_NOT_FOUND|.*_FORBIDDEN|.*_DENIED)$/.test(error.code));
 
 export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): OrdersApi & { canRead(entity: string): Promise<boolean> } {
   const api = host.api;
   const objects = getAppObjects(api);
   // Each record's updated_at as last read, for the next PATCH (a stale one is 409 STALE_VERSION).
   const versions = new Map<string, string>();
+  // Each record's fields as last read: a stale write retries only when the fields it changes are still as read.
+  const snapshots = new Map<string, Rec>();
 
   async function entityId(key: string): Promise<string> {
     // A failed load is not kept, so the next call asks again and Try again can recover.
@@ -46,8 +49,9 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
     return id;
   }
 
-  const remember = (record: { id: string; updated_at?: string }) => {
+  const remember = (record: { id: string; updated_at?: string; body?: unknown }) => {
     if (record.updated_at) versions.set(record.id, record.updated_at);
+    if (record.body && typeof record.body === 'object') snapshots.set(record.id, { ...(record.body as Rec) });
     return record;
   };
 
@@ -87,7 +91,11 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
     } catch (error) {
       // Another writer (compute_pl writing the order's code) moved updated_at on: read the record again, write once more.
       if (!retried && error instanceof OrdersError && error.code === 'STALE_VERSION') {
-        await getRecord(key, id);
+        const before = snapshots.get(id) ?? {};
+        const now = fieldsOf(await getRecord(key, id));
+        const same = (a: unknown, b: unknown) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+        // Someone else changed a field this write changes too: report it rather than overwrite it.
+        if (Object.keys(changes).some((k) => !same(now[k], before[k]) && !same(now[k], changes[k]))) throw new OrdersError('CONFLICT', null, {}, 409);
         return patch(key, id, changes, true);
       }
       throw error;
@@ -181,10 +189,14 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
       });
     },
     async load(id: string): Promise<LoadedOrder> {
+      const access = await self.access();
+      const none = Promise.resolve([] as Rec[]);
       const [order, lines, goods, service, finance, pl, plService, plGoods, proposals, config] = await Promise.all([
-        getRecord('order', id), ofOrder('order_line', id), ofOrder('goods_line_price', id), ofOrder('service_line_price', id),
-        ofOrder('order_finance', id), ofOrder('order_pl', id), ofOrder('order_pl_service', id), ofOrder('order_pl_goods', id),
-        ofOrder('purchase_proposal', id), self.config(),
+        getRecord('order', id), ofOrder('order_line', id),
+        access.seesGoodsPrices ? ofOrder('goods_line_price', id) : none, access.seesServicePrices ? ofOrder('service_line_price', id) : none,
+        access.seesPl ? ofOrder('order_finance', id) : none, access.seesPl ? ofOrder('order_pl', id) : none,
+        access.seesPlService ? ofOrder('order_pl_service', id) : none, access.seesPlGoods ? ofOrder('order_pl_goods', id) : none,
+        access.seesProposals ? ofOrder('purchase_proposal', id) : none, self.config(),
       ]);
       const records: OrderRecords = { order, lines, goods_prices: goods, service_prices: service, finance };
       const first = (rows: Rec[]) => (rows[0] ? fieldsOf(rows[0]) : null);

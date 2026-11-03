@@ -278,3 +278,6 @@
 .lines .col-supplier .cell { min-width: 180px; }
 .lines .col-note .cell { min-width: 140px; }
 .mh .cell { min-width: 120px; }
+
+.cell-error { display: block; margin-top: 2px; color: var(--danger-ink); font-size: 11px; line-height: 14px; white-space: normal; }
+.input[readonly] { background: var(--neutral-soft); }

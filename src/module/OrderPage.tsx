@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactElement } from 'react';
+import { useEffect, useId, useRef, useState, type ReactElement } from 'react';
 import { tabsFor } from './access.js';
 import { CustomerCard } from './CustomerCard.js';
 import { DeliveryCard } from './DeliveryCard.js';
@@ -31,6 +31,8 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
   const toasts = useToasts({ locale, theme });
   const reasonId = useId();
   const pressed = useRef(false);
+  // A new order has no address of its own yet: its tab lives here until it is saved.
+  const [localTab, setLocalTab] = useState<TabKey | null>(null);
 
   // A saved new order moves to its own address.
   const created = useRef<string | null>(null);
@@ -55,7 +57,8 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
   const { order } = hook.draft;
   const nameOf = (user: string | null) => (user ? hook.staff.find((s) => s.user === user)?.name ?? null : null);
   const visible = tabsFor(hook.access!, hook.editor);
-  const current = tab && visible.includes(tab) ? tab : visible[0];
+  const chosen = id ? tab : localTab;
+  const current = chosen && visible.includes(chosen) ? chosen : visible[0];
   const Tab = tabs[current];
   const reason = !hook.dirty ? t.noChanges : hook.formatErrors > 0 || !hook.canSave ? t.fixFormats : '';
 
@@ -103,7 +106,7 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
       <div className="tabs" role="tablist" aria-label={t.tabsLabel}>
         {visible.map((key) => (
           <button key={key} type="button" role="tab" id={`tab-${key}`} aria-selected={key === current} aria-controls={`panel-${key}`}
-            className="tab" onClick={() => id && navigate(routePath({ name: 'order', id, tab: key }))}>{t.tabs[key]}</button>
+            className="tab" onClick={() => (id ? navigate(routePath({ name: 'order', id, tab: key })) : setLocalTab(key))}>{t.tabs[key]}</button>
         ))}
       </div>
       <section role="tabpanel" id={`panel-${current}`} aria-labelledby={`tab-${current}`} className="tab-panel">

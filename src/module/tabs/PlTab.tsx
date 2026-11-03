@@ -47,7 +47,8 @@ export function PlTab({ hook, lang }: TabProps) {
   const baseThreshold = rate?.threshold ?? view.threshold;
 
   const stale = hook.editor && (!official || Math.abs(num(official.net_profit) - live.netProfit) > 1);
-  const status = official?.locked === true ? t.lockedOfficial
+  const status = hook.computing ? t.computingOfficial
+    : official?.locked === true ? t.lockedOfficial
     : stale ? (official ? t.staleOfficial : t.noOfficial)
     : official ? t.officialAt(formatDateTime(String(official.computed_at ?? ''))) : t.noOfficial;
 
@@ -90,7 +91,7 @@ export function PlTab({ hook, lang }: TabProps) {
 
   return (
     <div className="tab-body">
-      <p className="status-line" role="status" data-tone={stale ? 'warn' : undefined}>{status}</p>
+      <p className="status-line" role="status" data-tone={stale && !hook.computing ? 'warn' : undefined}>{status}</p>
 
       <div className="stats">
         <div className="stat" data-tone={view.passed ? 'ok' : 'danger'}>

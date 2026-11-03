@@ -21,6 +21,8 @@ export interface MemoryOptions {
   access?: Partial<Access>;
   me?: Person;
   delayMs?: number;
+  /** compute_pl runs this long after pl_requested_at changes, as a trigger does (0: at once). */
+  computeDelayMs?: number;
 }
 
 const ALL: Access = { seesPl: true, seesGoodsPrices: true, seesServicePrices: true, seesProposals: false, seesPlService: true,
@@ -158,7 +160,8 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       const id = draft.order.id && !draft.order.id.startsWith('new:') ? draft.order.id : created['new:order'];
       table('order').get(id)!.body.created_at ??= now();
       await writer.patch('order', id, { pl_requested_at: now() });
-      compute(id);
+      if (options.computeDelayMs) setTimeout(() => compute(id), options.computeDelayMs);
+      else compute(id);
       return load(id);
     },
     async saveProposal(lineId, orderId, fields) {

@@ -1,7 +1,7 @@
 // One order being edited: the draft, what is typed but not yet valid, the live P&L, the issues, and saving.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { checkFormat } from '../order/formats';
-import { toPlOrderInput } from '../order/records';
+import { fieldsOf, toPlOrderInput } from '../order/records';
 import type { OrderDraft } from '../order/types';
 import { validateOrder, type FieldIssue } from '../order/validate';
 import { computePl, type PlResult } from '../pl/compute';
@@ -11,7 +11,7 @@ import type { PlConfig } from '../pl/types';
 import { isEditor } from './access.js';
 import { OrdersError, type Access, type LoadedOrder, type OrdersApi, type Person, type StaffMember } from './orders-api.js';
 import { getIn, kindOf, setIn } from './paths.js';
-import { applyCreatedIds, blankDraft, savePlan } from './save-plan.js';
+import { applyCreatedIds, blankDraft, saveOrder, savePlan } from './save-plan.js';
 
 interface Ready { config: PlConfig; access: Access; staff: StaffMember[]; me: Person }
 export type DraftState = 'loading' | 'ready' | 'failed';
@@ -36,8 +36,12 @@ export interface OrderDraftHook {
   dirty: boolean;
   canSave: boolean;
   saving: boolean;
+  /** compute_pl is running after a save: the official P&L is on its way. */
+  computing: boolean;
   set(path: string, raw: string | boolean | number | null): void;
   setDraft(update: (draft: OrderDraft) => OrderDraft): void;
+  /** Removes a line, with what is typed but not valid in it; the lines after it keep theirs. */
+  removeLine(id: string): void;
   save(): Promise<LoadedOrder>;
   reload(): void;
   /** Reads the order again without showing the loading state (after a write a trigger follows up on). */
@@ -64,8 +68,16 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
   const [saved, setSaved] = useState<LoadedOrder | null>(null);
   const [raw, setRaw] = useState<Record<string, { text: string; message: string }>>({});
   const [saving, setSaving] = useState(false);
+  const [computing, setComputing] = useState(false);
   const inFlight = useRef(false);
+  // A save failed part way: the next one reads the order back first (saveOrder), so nothing is created twice.
+  const reread = useRef(false);
   const reads = useRef(0);
+  const polls = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // The latest draft and saved order, for reads that land after a render.
+  const latest = useRef({ draft, saved });
+  latest.current = { draft, saved };
+  useEffect(() => () => polls.current.forEach(clearTimeout), []);
 
   const reload = useCallback(() => {
     const mine = ++reads.current;
@@ -88,13 +100,17 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
   }, [api, id, me]);
   useEffect(reload, [reload]);
 
-  const refresh = useCallback(() => {
-    if (!id) return;
-    api.load(id).then((loaded) => {
+  // Reads the order again quietly. The draft follows only when nothing was edited since; the saved order always does.
+  const refresh = useCallback((orderId: string | null = id) => {
+    if (!orderId) return Promise.resolve(null);
+    return api.load(orderId).then((loaded) => {
+      const { draft: now, saved: before } = latest.current;
+      const edited = ready ? savePlan(now, before?.records ?? null, ready.config).length > 0 : false;
       setSaved(loaded);
-      setDraftState(loaded.draft);
-    }, () => {});
-  }, [api, id]);
+      if (!edited) setDraftState(loaded.draft);
+      return loaded;
+    }, () => null);
+  }, [api, id, ready]);
 
   // Until the configuration loads, the defaults stand in (nothing is shown or saved before then).
   const config = ready?.config ?? DEFAULT_CONFIG;
@@ -111,6 +127,8 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
   const editor = Boolean(ready && (id ? isEditor(draft.order, me) : ready.access.canCreateOrder));
 
   const set = useCallback((path: string, value: string | boolean | number | null) => {
+    // Nothing is taken while a save runs: what it writes would overwrite it (the fields are read-only meanwhile).
+    if (inFlight.current) return;
     const kind = kindOf(path);
     if (kind && typeof value === 'string') {
       const result = checkFormat(kind, value);
@@ -129,29 +147,69 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
     setDraftState((now) => setIn(now, path, value));
   }, []);
 
+  // compute_pl runs on its trigger a few seconds after a save: read the order again until its P&L is newer than the request.
+  const waitForOfficial = useCallback((orderId: string) => {
+    polls.current.forEach(clearTimeout);
+    setComputing(true);
+    const done = (loaded: LoadedOrder | null) => {
+      const order = loaded ? fieldsOf(loaded.records.order) : {};
+      const requested = Date.parse(String(order.pl_requested_at ?? ''));
+      const computed = Date.parse(String(loaded?.official.order_pl?.computed_at ?? ''));
+      return !Number.isNaN(requested) && !Number.isNaN(computed) && computed >= requested;
+    };
+    const delays = [300, 1000, 2000, 4000, 8000, 15000, 30000];
+    let step = 0;
+    const tick = () => {
+      refresh(orderId).then((loaded) => {
+        if (done(loaded) || ++step >= delays.length) {
+          setComputing(false);
+          return;
+        }
+        polls.current.push(setTimeout(tick, delays[step]));
+      });
+    };
+    polls.current.push(setTimeout(tick, delays[0]));
+  }, [refresh]);
+
   const save = useCallback(async () => {
     if (inFlight.current) throw new OrdersError('BUSY', null);
     inFlight.current = true;
     setSaving(true);
     try {
-      const loaded = await api.save(draft, saved?.records ?? null, config);
+      const loaded = await saveOrder(api, draft, saved?.records ?? null, config, reread.current);
+      reread.current = false;
       setSaved(loaded);
       setDraftState(loaded.draft);
       setRaw({});
+      if (loaded.draft.order.id) waitForOfficial(loaded.draft.order.id);
       return loaded;
     } catch (error) {
-      // What a failed save did create keeps its id, so Save again continues instead of creating it twice.
+      // What a failed save did create keeps its id; the next save reads the order back before writing again.
       if (error instanceof OrdersError && Object.keys(error.created).length) {
-        const next = applyCreatedIds(draft, error.created);
-        setDraftState(next);
-        if (next.order.id) api.load(next.order.id).then((loaded) => setSaved(loaded), () => {});
+        setDraftState(applyCreatedIds(draft, error.created));
+        reread.current = true;
       }
       throw error;
     } finally {
       inFlight.current = false;
       setSaving(false);
     }
-  }, [api, draft, saved, config]);
+  }, [api, draft, saved, config, waitForOfficial]);
+
+  const removeLine = useCallback((lineId: string) => {
+    if (inFlight.current) return;
+    const index = latest.current.draft.lines.findIndex((line) => line.id === lineId);
+    if (index < 0) return;
+    setDraftState((now) => ({ ...now, lines: now.lines.filter((line) => line.id !== lineId) }));
+    // Format errors are kept by line position: drop the removed line's, move the later lines' up by one.
+    setRaw((now) => Object.fromEntries(Object.entries(now).flatMap(([path, value]) => {
+      const match = /^lines\[(\d+)\](.*)$/.exec(path);
+      if (!match) return [[path, value]];
+      const at = Number(match[1]);
+      if (at === index) return [];
+      return [[at > index ? `lines[${at - 1}]${match[2]}` : path, value]];
+    })));
+  }, []);
 
   return {
     state, loadError, draft, saved, config, access: ready?.access ?? null, staff: ready?.staff ?? [], me, editor, live, issues,
@@ -161,10 +219,12 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
     dirty: dirty || formatErrors > 0,
     canSave: editor && dirty && formatErrors === 0 && draftErrors === 0 && !saving,
     saving,
+    computing,
     set,
-    setDraft: (update) => setDraftState(update),
+    setDraft: (update) => { if (!inFlight.current) setDraftState(update); },
+    removeLine,
     save,
     reload,
-    refresh,
+    refresh: () => { void refresh(); },
   };
 }

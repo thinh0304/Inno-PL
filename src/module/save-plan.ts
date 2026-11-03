@@ -3,7 +3,7 @@
 import { fieldsOf, lineGroup, refId } from '../order/records';
 import type { LineDraft, OrderDraft, OrderRecords, Rec } from '../order/types';
 import type { PlConfig } from '../pl/types';
-import { OrdersError } from './orders-api.js';
+import { OrdersError, type LoadedOrder, type OrdersApi } from './orders-api.js';
 
 export type WriteEntity = 'order' | 'order_line' | 'goods_line_price' | 'service_line_price' | 'order_finance';
 export type SaveOp =
@@ -159,7 +159,7 @@ export async function executeSavePlan(ops: SaveOp[], writer: Writer): Promise<Re
     }
   } catch (error) {
     const known = error instanceof OrdersError ? error : new OrdersError('NETWORK', null);
-    throw new OrdersError(known.code, known.reason, { ...known.created, ...created });
+    throw new OrdersError(known.code, known.reason, { ...known.created, ...created }, known.status);
   }
   return created;
 }
@@ -180,4 +180,14 @@ export function blankDraft(am: string | null): OrderDraft {
     lines: [],
     finance: { sales_cost: null, prev_sales_cost: null, prev_revenue: null, prev_net_profit: null },
   };
+}
+
+/**
+ * Saves the draft. After a save that failed part way (`reread`), the order is read back first, so what that save did
+ * create is patched, never created twice; when it cannot be read back, nothing is written.
+ */
+export async function saveOrder(api: OrdersApi, draft: OrderDraft, saved: OrderRecords | null, config: PlConfig,
+  reread: boolean): Promise<LoadedOrder> {
+  const records = reread && !isNew(draft.order.id) ? (await api.load(draft.order.id!)).records : saved;
+  return api.save(draft, records, config);
 }

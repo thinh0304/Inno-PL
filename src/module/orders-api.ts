@@ -46,7 +46,8 @@ export interface OrdersApi {
  */
 export class OrdersError extends Error {
   override name = 'OrdersError';
-  constructor(readonly code: string, readonly reason: string | null, readonly created: Record<string, string> = {}) {
+  constructor(readonly code: string, readonly reason: string | null, readonly created: Record<string, string> = {},
+    readonly status?: number) {
     super(reason ? `${code}: ${reason}` : code);
   }
 }
