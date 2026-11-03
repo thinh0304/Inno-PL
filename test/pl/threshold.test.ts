@@ -53,8 +53,9 @@ describe('provision fund draw', () => {
   });
 
   it('a draw sized to the threshold passes on an uneven cost', () => {
-    const result = pl([tb(380_000_000, 150_920_000 / 1.08 + 200_000_000)],
-      { useProvisionFund: true, provisionFundBalance: 50_000_000 });
+    // With these numbers netProfit / cost comes out 1 ulp under the threshold after an exact top-up.
+    const result = pl([tb(400_000_000, 150_920_000 / 1.08 + 200_000_000)],
+      { salesCost: 47_428_000, useProvisionFund: true, provisionFundBalance: 1_000_000_000 });
     expect(result.provisionFundDraw).toBeGreaterThan(0);
     expect(result.passed).toBe(true);
   });
