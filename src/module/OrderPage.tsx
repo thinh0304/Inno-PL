@@ -53,7 +53,7 @@ export function OrderPage({ api, id, tab, lang, locale, theme, navigate, tabs = 
   );
 
   const { order } = hook.draft;
-  const nameOf = (user: string | null) => hook.staff.find((s) => s.user === user)?.name ?? null;
+  const nameOf = (user: string | null) => (user ? hook.staff.find((s) => s.user === user)?.name ?? null : null);
   const visible = tabsFor(hook.access!, hook.editor);
   const current = tab && visible.includes(tab) ? tab : visible[0];
   const Tab = tabs[current];

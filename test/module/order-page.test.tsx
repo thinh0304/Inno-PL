@@ -25,6 +25,8 @@ describe('the order page', () => {
     await screen.findByRole('heading', { name: 'Tạo đơn hàng mới' });
     // The person is ThuanNG (sales): the AM, and the person of every deal stage.
     expect(screen.getByText('AM · Nguyễn Thuận')).toBeTruthy();
+    // No Inside Sales yet: no IS tag (staff without a user account must not match an empty field).
+    expect(screen.queryByText(/^IS · /)).toBeNull();
     void api;
   });
 

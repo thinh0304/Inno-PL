@@ -1,4 +1,4 @@
-import { useId, type KeyboardEvent, type ReactNode } from 'react';
+import { useId, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { formatDay, formatMoney } from './format.js';
 import type { OrderDraftHook } from './useOrderDraft.js';
 import { getIn, kindOf } from './paths.js';
@@ -29,20 +29,41 @@ export function shownValue(path: string, value: unknown): string {
   return String(value);
 }
 
+/**
+ * Typing into a field of the draft. While the field has focus it shows exactly what was typed, so a space between two
+ * words or "21." on the way to "21.000" survives the normalising; on blur it shows the stored, normalised value.
+ */
+export function useEditing(hook: OrderDraftHook, path: string, onEdit?: (text: string) => void) {
+  const [text, setText] = useState<string | null>(null);
+  const stored = shownValue(path, getIn(hook.draft, path));
+  return {
+    value: text ?? hook.rawAt(path) ?? stored,
+    onFocus: () => setText(hook.rawAt(path) ?? stored),
+    onBlur: () => setText(null),
+    onChange: (next: string) => {
+      setText((now) => (now === null ? null : next));
+      hook.set(path, next);
+      onEdit?.(next);
+    },
+  };
+}
+
 /** A labelled field of the draft: an input for the order's editor, the value as text for everyone else (FR-1.6). */
 export function Field({ hook, path, label, required, wide, locked, onKeyDown, onFocus, onEdit, listbox, inputProps }: FieldProps) {
   const id = useId();
   const issue = hook.issueAt(path);
   const value = shownValue(path, getIn(hook.draft, path));
+  const editing = useEditing(hook, path, onEdit);
   const editable = hook.editor && !locked;
   return (
     <div className="field" data-wide={wide || undefined}>
       <label htmlFor={id} className="label">{label}{required && <span className="req" aria-hidden="true"> *</span>}</label>
       {editable ? (
         <div className="field-input">
-          <input id={id} className="input" value={hook.rawAt(path) ?? value} aria-required={required || undefined}
+          <input id={id} className="input" value={editing.value} aria-required={required || undefined}
             aria-invalid={issue ? true : undefined} aria-describedby={issue ? `${id}-issue` : undefined}
-            onChange={(e) => { hook.set(path, e.target.value); onEdit?.(e.target.value); }} onKeyDown={onKeyDown} onFocus={onFocus} autoComplete="off" {...inputProps} />
+            onChange={(e) => editing.onChange(e.target.value)} onKeyDown={onKeyDown}
+            onFocus={() => { editing.onFocus(); onFocus?.(); }} onBlur={editing.onBlur} autoComplete="off" {...inputProps} />
           {listbox}
         </div>
       ) : (
