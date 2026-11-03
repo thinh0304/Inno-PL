@@ -1,4 +1,5 @@
 // One order's P&L: Đặc tả 4.2 steps 3–15, with Thiết kế 13.1–13.3 and 6.5 where they replace it.
+import { splitKpi } from './kpi';
 import { computeLine, num, type PlLineResult } from './line';
 import type { ContractType, ContractTypeRate, PlConfig, PlOrderInput, PurchaseGroup, RevenueStructure,
   WeightSet } from './types';
@@ -109,6 +110,7 @@ export function computePl(input: PlOrderInput, config: PlConfig): PlResult {
   const netMargin = cost > 0 ? netProfit / cost : null;
   // A draw sized to the threshold lands on it only up to rounding, so compare with a tolerance far below 1 VND.
   const passed = cost > 0 ? netProfit >= threshold * cost - 1e-6 : netProfit > 0;
+  const kpi = splitKpi(input, config.dealStageWeights, netProfit, appliedContractType);
 
   return {
     lines, unknownItemTypes, byType, byStructure, byPurchaseGroup, contractTypes, appliedContractType,
@@ -116,6 +118,6 @@ export function computePl(input: PlOrderInput, config: PlConfig): PlResult {
     salesCost, finCostRate, finCost, profitAfterSales,
     warranty, licenseSupport, techSupport, deployBonus, provision, consultBonusRate, consultBonus,
     netProfitBeforeFund, provisionFundDraw, netProfit, netMargin, threshold, passed,
-    weightSet: 'new_tm', kpiSplit: [],
+    weightSet: kpi.weightSet, kpiSplit: kpi.split,
   };
 }
