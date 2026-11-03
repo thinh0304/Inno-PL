@@ -1,0 +1,16 @@
+{
+  "name": "P&L phần dịch vụ",
+  "type": "grid",
+  "columns": [
+    "order",
+    "revenue",
+    "cost",
+    "gross_profit",
+    "one_time_revenue",
+    "one_time_cost"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

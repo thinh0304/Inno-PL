@@ -1,0 +1,19 @@
+{
+  "label": "Nguồn số liệu",
+  "type": "enum",
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "computed",
+      "label": "Tính theo công thức"
+    },
+    {
+      "value": "excel",
+      "label": "Nhập từ Excel"
+    }
+  ],
+  "default": {
+    "kind": "literal",
+    "value": "computed"
+  }
+}

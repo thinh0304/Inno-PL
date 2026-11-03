@@ -1,0 +1,9 @@
+{
+  "label": "Chi phí bảo hành",
+  "type": "number",
+  "format": "currency",
+  "format_options": {
+    "currency_code": "VND",
+    "decimal_places": 0
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "name": "P&L đơn hàng",
+  "description": "Kết quả P&L chính thức của đơn do workflow compute_pl ghi: các tổng, ngưỡng, kết luận, chi tiết, chia KPI, cấu hình đã dùng (Thiết kế 6.2).",
+  "icon": "target",
+  "accent": "emerald",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:order_pl/order",
+    "@obj:entity_field:order_pl/revenue",
+    "@obj:entity_field:order_pl/cost",
+    "@obj:entity_field:order_pl/gross_profit",
+    "@obj:entity_field:order_pl/vat_out",
+    "@obj:entity_field:order_pl/vat_in",
+    "@obj:entity_field:order_pl/sales_cost",
+    "@obj:entity_field:order_pl/fin_cost",
+    "@obj:entity_field:order_pl/warranty",
+    "@obj:entity_field:order_pl/license_support",
+    "@obj:entity_field:order_pl/tech_support",
+    "@obj:entity_field:order_pl/deploy_bonus",
+    "@obj:entity_field:order_pl/provision",
+    "@obj:entity_field:order_pl/consult_bonus",
+    "@obj:entity_field:order_pl/provision_fund_draw",
+    "@obj:entity_field:order_pl/net_profit",
+    "@obj:entity_field:order_pl/net_margin",
+    "@obj:entity_field:order_pl/threshold",
+    "@obj:entity_field:order_pl/passed",
+    "@obj:entity_field:order_pl/applied_contract_type",
+    "@obj:entity_field:order_pl/detail",
+    "@obj:entity_field:order_pl/kpi_split",
+    "@obj:entity_field:order_pl/config_snapshot",
+    "@obj:entity_field:order_pl/computed_at",
+    "@obj:entity_field:order_pl/source",
+    "@obj:entity_field:order_pl/locked"
+  ],
+  "natural_key": [
+    {
+      "id": "by_order",
+      "name": "Đơn hàng",
+      "fields": [
+        "order"
+      ]
+    }
+  ],
+  "display_field": "revenue"
+}

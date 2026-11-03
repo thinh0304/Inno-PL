@@ -1,0 +1,49 @@
+{
+  "key": "order_pl",
+  "name": "P&L đơn hàng",
+  "description": "Kết quả P&L chính thức của đơn do workflow compute_pl ghi: các tổng, ngưỡng, kết luận, chi tiết, chia KPI, cấu hình đã dùng (Thiết kế 6.2).",
+  "icon": "target",
+  "accent": "emerald",
+  "fields": [
+    {"key":"order","label":"Đơn hàng","type":"reference","target_entity_id":"${entity:order}","required":true,"on_target_delete":"cascade","inverse_key":"pl","inverse_label":"P&L đơn hàng"},
+    {"key":"revenue","label":"Doanh thu","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"cost","label":"Giá vốn","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"gross_profit","label":"LN gộp","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"vat_out","label":"VAT đầu ra","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"vat_in","label":"VAT đầu vào","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"sales_cost","label":"Chi phí bán hàng","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"fin_cost","label":"Chi phí tài chính","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"warranty","label":"Chi phí bảo hành","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"license_support","label":"Hỗ trợ license","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"tech_support","label":"Hỗ trợ kỹ thuật","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"deploy_bonus","label":"Thưởng triển khai","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"provision","label":"Chi phí dự phòng","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"consult_bonus","label":"Thưởng tư vấn","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"provision_fund_draw","label":"Bù từ quỹ dự phòng","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"net_profit","label":"LN thuần","type":"number","format":"currency","format_options":{"currency_code":"VND","decimal_places":0}},
+    {"key":"net_margin","label":"Tỷ suất LN thuần / giá vốn","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"threshold","label":"Ngưỡng LN tối thiểu","type":"number","format":"percent","format_options":{"decimal_places":2}},
+    {"key":"passed","label":"Đạt ngưỡng LN","type":"boolean","default":{"kind":"literal","value":false}},
+    {"key":"applied_contract_type","label":"Loại HĐ áp dụng ngưỡng","type":"enum","facetable":true,"enum_values":[{"value":"tm_once","label":"Thương mại 1 lần"},{"value":"tmdk","label":"Thương mại định kỳ"},{"value":"dv_once","label":"Dịch vụ 1 lần"},{"value":"dv_recurring","label":"Dịch vụ định kỳ"},{"value":"fulfillment","label":"Fulfillment"}]},
+    {"key":"detail","label":"Chi tiết (JSON)","type":"text","format":"richtext"},
+    {"key":"kpi_split","label":"Chia chỉ tiêu KD (JSON)","type":"text","format":"richtext"},
+    {"key":"config_snapshot","label":"Cấu hình đã dùng (JSON)","type":"text","format":"richtext"},
+    {"key":"computed_at","label":"Tính lúc","type":"datetime"},
+    {"key":"source","label":"Nguồn số liệu","type":"enum","facetable":true,"enum_values":[{"value":"computed","label":"Tính theo công thức"},{"value":"excel","label":"Nhập từ Excel"}],"default":{"kind":"literal","value":"computed"}},
+    {"key":"locked","label":"Đã chốt số liệu","type":"boolean","default":{"kind":"literal","value":false}}
+  ],
+  "natural_key": [{"id":"by_order","name":"Đơn hàng","fields":["order"]}],
+  "display_field": "revenue",
+  "views": [
+    {"key":"all","name":"P&L đơn hàng","columns":["order","revenue","cost","gross_profit","vat_out","vat_in"]}
+  ],
+  "access": { "mode": "restricted", "grants": [
+    {"principal":{"kind":"group","id":"${param:am_group}"},"design":false,"operations":[{"operation":"read","record_scopes":[{"kind":"parent_field","field":"order","parent_field":"am"}]},{"operation":"list","record_scopes":[{"kind":"parent_field","field":"order","parent_field":"am"}]}]},
+    {"principal":{"kind":"group","id":"${param:sa_group}"},"design":false,"operations":[{"operation":"read","record_scopes":[{"kind":"parent_field","field":"order","parent_field":"sa"}]},{"operation":"list","record_scopes":[{"kind":"parent_field","field":"order","parent_field":"sa"}]}]},
+    {"principal":{"kind":"group","id":"${param:sd_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:acc_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:admin_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"}]},
+    {"principal":{"kind":"group","id":"${param:automation_group}"},"design":false,"operations":[{"operation":"read","scope":"organization"},{"operation":"list","scope":"organization"},{"operation":"create","scope":"organization"},{"operation":"update","scope":"organization"}]}
+  ] },
+  "conversation": null
+}

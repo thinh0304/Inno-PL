@@ -1,0 +1,9 @@
+{
+  "label": "Doanh thu 1 lần",
+  "type": "number",
+  "format": "currency",
+  "format_options": {
+    "currency_code": "VND",
+    "decimal_places": 0
+  }
+}

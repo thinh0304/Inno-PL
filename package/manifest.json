@@ -841,6 +841,206 @@
       "kind": "form"
     },
     {
+      "key": "entity:order_pl",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order_pl/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/revenue",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/gross_profit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/vat_out",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/vat_in",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/sales_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/fin_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/warranty",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/license_support",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/tech_support",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/deploy_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/provision",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/consult_bonus",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/provision_fund_draw",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/net_profit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/net_margin",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/threshold",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/passed",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/applied_contract_type",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/detail",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/kpi_split",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/config_snapshot",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/computed_at",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/source",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl/locked",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order_pl/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:order_pl_goods",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order_pl_goods/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_goods/cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_goods/sale_cost_total",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_goods/proposed_cost_total",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_goods/actual_cost_total",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_goods/proc_saving",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_goods/detail",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order_pl_goods/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "entity:order_pl_service",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:order_pl_service/order",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/revenue",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/gross_profit",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/one_time_revenue",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/one_time_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/recurring_revenue",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/recurring_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/internal_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/outsource_cost",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:order_pl_service/detail",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:order_pl_service/all",
+      "kind": "entity_view"
+    },
+    {
       "key": "entity:pl_setting",
       "kind": "entity"
     },
@@ -1861,6 +2061,264 @@
       "operations": {
         "read": "organization",
         "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "order_pl_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order_pl",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_pl_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order_pl",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_pl_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order_pl",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order_pl",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order_pl",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order_pl",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "order_pl_goods_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order_pl_goods",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_pl_goods_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order_pl_goods",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_pl_goods_proc_group",
+      "to": "@param:proc_group",
+      "entity": "@obj:entity:order_pl_goods",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_goods_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order_pl_goods",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_goods_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order_pl_goods",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_goods_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order_pl_goods",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_goods_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order_pl_goods",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "order_pl_service_am_group",
+      "to": "@param:am_group",
+      "entity": "@obj:entity:order_pl_service",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "am"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_pl_service_sa_group",
+      "to": "@param:sa_group",
+      "entity": "@obj:entity:order_pl_service",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "order",
+            "parent_field": "sa"
+          }
+        ]
+      }
+    },
+    {
+      "key": "order_pl_service_tm_group",
+      "to": "@param:tm_group",
+      "entity": "@obj:entity:order_pl_service",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_service_sd_group",
+      "to": "@param:sd_group",
+      "entity": "@obj:entity:order_pl_service",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_service_acc_group",
+      "to": "@param:acc_group",
+      "entity": "@obj:entity:order_pl_service",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_service_admin_group",
+      "to": "@param:admin_group",
+      "entity": "@obj:entity:order_pl_service",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "order_pl_service_automation_group",
+      "to": "@param:automation_group",
+      "entity": "@obj:entity:order_pl_service",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "create": "organization",
         "update": "organization"
       }
     },

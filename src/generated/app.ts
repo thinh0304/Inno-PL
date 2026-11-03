@@ -18,6 +18,9 @@ export const OBJECTS = {
   'entity:order': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order_finance': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:order_line': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:order_pl': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:order_pl_goods': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:order_pl_service': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:pl_setting': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:purchase_proposal': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:service_line_price': { kind: 'entity', contractVersion: '0.1.0' },
@@ -163,6 +166,50 @@ export const OBJECTS = {
   'entity_field:order_line/start_date': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order_line/supplier_priority': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:order_line/unit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/applied_contract_type': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/computed_at': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/config_snapshot': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/consult_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/deploy_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/detail': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/fin_cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/gross_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/kpi_split': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/license_support': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/locked': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/net_margin': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/passed': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/provision': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/provision_fund_draw': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/sales_cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/source': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/tech_support': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/threshold': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/vat_in': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/vat_out': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl/warranty': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_goods/actual_cost_total': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_goods/cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_goods/detail': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_goods/order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_goods/proc_saving': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_goods/proposed_cost_total': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_goods/sale_cost_total': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/detail': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/gross_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/internal_cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/one_time_cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/one_time_revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/order': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/outsource_cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/recurring_cost': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/recurring_revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:order_pl_service/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/annual_interest': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/auto_approve_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:pl_setting/contract_file_limit': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -225,6 +272,9 @@ export const OBJECTS = {
   'entity_view:order/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order_finance/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:order_line/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:order_pl/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:order_pl_goods/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:order_pl_service/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:pl_setting/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:purchase_proposal/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:service_line_price/all': { kind: 'entity_view', contractVersion: '0.1.0' },
@@ -247,7 +297,7 @@ export const OBJECTS = {
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_finance' | 'order_line' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
+export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
 export type WorkflowKey = 'open_case' | 'pl_selftest';
 
 /** The value of each field of each entity, as a record carries it. */
@@ -413,6 +463,56 @@ export interface EntityFields {
     start_date?: string | null;
     supplier_priority?: string | null;
     unit?: string | null;
+  };
+  order_pl: {
+    applied_contract_type?: 'tm_once' | 'tmdk' | 'dv_once' | 'dv_recurring' | 'fulfillment' | null;
+    computed_at?: string | null;
+    config_snapshot?: string | null;
+    consult_bonus?: number | null;
+    cost?: number | null;
+    deploy_bonus?: number | null;
+    detail?: string | null;
+    fin_cost?: number | null;
+    gross_profit?: number | null;
+    kpi_split?: string | null;
+    license_support?: number | null;
+    locked?: boolean | null;
+    net_margin?: number | null;
+    net_profit?: number | null;
+    order?: string | null;
+    passed?: boolean | null;
+    provision?: number | null;
+    provision_fund_draw?: number | null;
+    revenue?: number | null;
+    sales_cost?: number | null;
+    source?: 'computed' | 'excel' | null;
+    tech_support?: number | null;
+    threshold?: number | null;
+    vat_in?: number | null;
+    vat_out?: number | null;
+    warranty?: number | null;
+  };
+  order_pl_goods: {
+    actual_cost_total?: number | null;
+    cost?: number | null;
+    detail?: string | null;
+    order?: string | null;
+    proc_saving?: number | null;
+    proposed_cost_total?: number | null;
+    sale_cost_total?: number | null;
+  };
+  order_pl_service: {
+    cost?: number | null;
+    detail?: string | null;
+    gross_profit?: number | null;
+    internal_cost?: number | null;
+    one_time_cost?: number | null;
+    one_time_revenue?: number | null;
+    order?: string | null;
+    outsource_cost?: number | null;
+    recurring_cost?: number | null;
+    recurring_revenue?: number | null;
+    revenue?: number | null;
   };
   pl_setting: {
     annual_interest?: number | null;

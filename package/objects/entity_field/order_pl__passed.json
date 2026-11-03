@@ -1,0 +1,8 @@
+{
+  "label": "Đạt ngưỡng LN",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

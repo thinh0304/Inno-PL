@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { draftFromRecords } from '../../src/order/records';
+import { plRecordsFromResult } from '../../src/order/pl-records';
+import { draftFromRecords, toPlOrderInput } from '../../src/order/records';
+import { computePl } from '../../src/pl/compute';
+import { DEFAULT_CONFIG } from '../../src/pl/defaults';
 import { TM1040_RECORDS } from './fixtures/tm1040-records';
 
 type Field = { key: string; type: string; format?: string; required?: boolean };
@@ -79,6 +82,31 @@ describe('order and order_line', () => {
   it('shared_records_have_create_forms', () => {
     for (const key of ['customer', 'supplier', 'staff', 'goods_line_price', 'service_line_price', 'order_finance',
       'purchase_proposal']) expect(entity(key).create_form, key).toBeTruthy();
+  });
+
+  it('pl_bodies_fit_entities', () => {
+    const draft = draftFromRecords(TM1040_RECORDS);
+    const bodies = plRecordsFromResult(draft, computePl(toPlOrderInput(draft), DEFAULT_CONFIG), DEFAULT_CONFIG, [], 'now');
+    // order: the natural key the workflow binds; locked: set by Admin, never by compute_pl.
+    const notWritten: Record<string, string[]> = { order_pl: ['order', 'locked'], order_pl_service: ['order'], order_pl_goods: ['order'] };
+    for (const key of ['order_pl', 'order_pl_service', 'order_pl_goods'] as const) {
+      expect(Object.keys(bodies[key]).sort(), key).toEqual(fieldKeys(key).filter((f) => !notWritten[key].includes(f)).sort());
+    }
+  });
+
+  it('am_cannot_write_pl', () => {
+    for (const key of ['order_pl', 'order_pl_service', 'order_pl_goods']) {
+      expect(opsOf(key, 'am_group'), key).toEqual(['list', 'read']);
+      expect(opsOf(key, 'sa_group'), key).toEqual(['list', 'read']);
+      expect(opsOf(key, 'automation_group'), key).toEqual(['create', 'list', 'read', 'update']);
+      expect(entity(key).create_form, key).toBeUndefined();
+    }
+    expect(grantOf('order_pl', 'tm_group')).toBeUndefined();
+    expect(grantOf('order_pl', 'proc_group')).toBeUndefined();
+    expect(opsOf('order_pl_service', 'tm_group')).toEqual(['list', 'read']);
+    expect(grantOf('order_pl_service', 'proc_group')).toBeUndefined();
+    expect(opsOf('order_pl_goods', 'proc_group')).toEqual(['list', 'read']);
+    expect(grantOf('order_pl_goods', 'tm_group')).toBeUndefined();
   });
 
   it('both have a create form', () => {

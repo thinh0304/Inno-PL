@@ -1,0 +1,8 @@
+{
+  "label": "Đã chốt số liệu",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}
