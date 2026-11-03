@@ -151,7 +151,7 @@ export function CustomerCard({ hook, api, lang }: Props) {
                 <span>{String(getIn(hook.draft, `order.${c.key}`) ?? '')}</span>
                 <span className="sub">→ {c.profile}</span>
                 <button type="button" className="af-button sm" aria-label={t.keepField(t.labels[c.key])}
-                  onClick={() => setConflicts((now) => now.filter((x) => x.key !== c.key))}>{t.keep}</button>
+                  onClick={() => { hook.noteIgnoredSuggestion(t.history.ignoredSuggestionNote(t.labels[c.key])); setConflicts((now) => now.filter((x) => x.key !== c.key)); }}>{t.keep}</button>
                 <button type="button" className="af-button sm secondary" aria-label={t.updateField(t.labels[c.key])}
                   onClick={() => { hook.set(`order.${c.key}`, c.profile); setConflicts((now) => now.filter((x) => x.key !== c.key)); }}>{t.update}</button>
               </li>

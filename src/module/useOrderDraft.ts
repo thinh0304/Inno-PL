@@ -12,7 +12,7 @@ import type { PlConfig } from '../pl/types';
 import { isEditor } from './access.js';
 import { OrdersError, type Access, type LoadedOrder, type OrdersApi, type Person, type StaffMember } from './orders-api.js';
 import { getIn, kindOf, setIn } from './paths.js';
-import { applyCreatedIds, blankDraft, saveOrder, savePlan } from './save-plan.js';
+import { applyCreatedIds, blankDraft, isNew, saveOrder, savePlan } from './save-plan.js';
 
 interface Ready { config: PlConfig; access: Access; staff: StaffMember[]; me: Person }
 export type DraftState = 'loading' | 'ready' | 'failed';
@@ -47,6 +47,8 @@ export interface OrderDraftHook {
   reload(): void;
   /** Reads the order again without showing the loading state (after a write a trigger follows up on). */
   refresh(): void;
+  /** Logs that the person kept what they typed against a suggestion (FR-1.6a): at once for a saved order, after the first save for a new one. */
+  noteIgnoredSuggestion(note: string): void;
 }
 
 /** A new order: the person is its AM when they are in Sales; an SA names an AM and is the order's SA (plan 02). */
@@ -75,6 +77,8 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
   const reread = useRef(false);
   const reads = useRef(0);
   const polls = useRef<ReturnType<typeof setTimeout>[]>([]);
+  // Notes of kept suggestions on an order that has no id yet.
+  const unsent = useRef<string[]>([]);
   // The latest draft and saved order, for reads that land after a render.
   const latest = useRef({ draft, saved });
   latest.current = { draft, saved };
@@ -182,7 +186,11 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
       setSaved(loaded);
       setDraftState(loaded.draft);
       setRaw({});
-      if (loaded.draft.order.id) waitForOfficial(loaded.draft.order.id);
+      if (loaded.draft.order.id) {
+        const orderId = loaded.draft.order.id;
+        waitForOfficial(orderId);
+        for (const note of unsent.current.splice(0)) void api.logEvent(orderId, { action: 'ignored_suggestion', note }).catch(() => {});
+      }
       return loaded;
     } catch (error) {
       // What a failed save did create keeps its id; the next save reads the order back before writing again.
@@ -196,6 +204,12 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
       setSaving(false);
     }
   }, [api, draft, saved, config, waitForOfficial]);
+
+  const noteIgnoredSuggestion = useCallback((note: string) => {
+    const orderId = latest.current.draft.order.id;
+    if (orderId && !isNew(orderId)) void api.logEvent(orderId, { action: 'ignored_suggestion', note }).catch(() => {});
+    else unsent.current.push(note);
+  }, [api]);
 
   const removeLine = useCallback((lineId: string) => {
     if (inFlight.current) return;
@@ -227,5 +241,6 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
     save,
     reload,
     refresh: () => { void refresh(); },
+    noteIgnoredSuggestion,
   };
 }

@@ -331,3 +331,13 @@
 .tcard-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; color: var(--muted); font-size: 12px; }
 .due[data-tone='danger'] { color: var(--danger-ink); font-weight: 600; }
 .due[data-tone='warn'] { color: var(--warn-ink); font-weight: 600; }
+
+/* The history */
+.history { display: grid; gap: 12px; }
+.eventlog { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.event { display: grid; gap: 4px; padding: 10px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.event[data-tone='warn'] { border-color: var(--warn); background: var(--warn-soft); }
+.event[data-tone='danger'] { border-color: var(--danger); background: var(--danger-soft); }
+.event-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 0; }
+.event-warns { display: grid; gap: 4px; margin: 0; padding-inline-start: 16px; }
+.event-why, .event-note { margin: 0; overflow-wrap: anywhere; }
