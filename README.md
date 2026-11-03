@@ -1,6 +1,6 @@
-# Pl
+# TeraBox · Hiệu quả đơn hàng (P&L)
 
-`inno/pl` is an AgentFlow app, built with the AgentFlow SDK. It holds:
+`inno/pl` is an AgentFlow app, built with the AgentFlow SDK: Sales enter a sales order, the app computes its P&L (revenue, cost, sales and financial costs, provisions, net profit against the contract type's threshold), routes the 15 approval and fulfilment tasks between departments with SLAs and AI assistance, and tracks KPIs. The design is `docs/superpowers/specs/2026-11-02-pl-agentflow-design.md`; the build plans are in `docs/superpowers/plans/`. Until plan 02 replaces it, the starter's case desk (the `case` entity, "Open a case", the Cases screen) is still in the package. It holds:
 
 - **An app package** that AgentFlow installs, described by `config/`. `agentflow-app build` turns `config/` into `package/`, which is committed, so a reviewer reads what ships.
   It holds the `case` entity, its create form, a view, its access, a rule and a stage model (`config/entities/case.json`), and the workflow "Open a case" (`config/build/open-case.mjs`).
@@ -63,7 +63,7 @@ The module's files, in `src/module/`:
    - It uploads `dist-app/inno-pl-<version>.afpkg`, asks for it to be installed, and prints `awaiting approval: <link>`. An admin opens the link, which leads to the app's setup page, completes the setup (any setting `parameters.json` left out), reviews what the app asks for, and presses **Approve and activate** (or approves it and activates it later). `--wait` waits until it is installed; Ctrl-C stops the waiting, not the deployment.
    - `parameters.json` holds the setup answers: `{ "app_users": "<the group's id>" }`, the group of the app's users. Leave `--parameters` out to fill everything in on the setup page.
 
-Installing asks for `app_users`, the group of the app's users (its label is "Pl users"). Who may do what comes with the package: everyone in that group may read, list and create cases, may change the cases they opened, and may start "Open a case", which runs as the person who starts it. Its step "Review case" goes to that same person, who decides with **Approve** or **Reject**. When the person who opened the case cannot take the review, it goes to the app's users group, `app_users`, instead.
+Installing asks for nine groups (`group_ref` parameters, all required): `app_users` ("Người dùng PL", everyone who uses the app, the audience), one group per role — `am_group` (AM · Nhân viên Sale), `sa_group` (Sales Admin), `tm_group` (Technical Manager), `sd_group` (Sales Director), `proc_group` (Mua hàng), `acc_group` (Kế toán bán hàng), `admin_group` (Quản trị viên PL) — and `automation_group` ("Tự động hóa PL"), which holds the service principal the automatic workflows run as and nothing else. Each must be a different group (a group may not receive two sets of grants on the same entity); people may be in several, and everyone in a role group must also be in `app_users`.
 
-A role does not come from a group, so give the group's members a role with `entity.read`, `entity.list` and `entity.write`. The package has no trigger, so there is nothing to turn on after the install. This paragraph, and the parts of this file about cases, describe the starter's own objects: rewrite them when your objects replace those.
+A role does not come from a group, so give the members of every group except `automation_group` a role with `entity.read`, `entity.list` and `entity.write`; give the service principal the same. The case desk part of the package has no trigger, so there is nothing to turn on after the install yet.
 

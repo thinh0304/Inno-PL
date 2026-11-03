@@ -1,6 +1,6 @@
 # Notes for coding agents
 
-This project is an AgentFlow app, built with the AgentFlow SDK. `config/` describes an app package, and the builder turns
+This project is an AgentFlow app, built with the AgentFlow SDK: `inno/pl`, "TeraBox · Hiệu quả đơn hàng (P&L)" — sales orders, their P&L, the 15-task approval flow and KPIs (design: `docs/superpowers/specs/2026-11-02-pl-agentflow-design.md`, plans: `docs/superpowers/plans/`). The starter's case desk objects stay until plan 02 replaces them. `config/` describes an app package, and the builder turns
 it into `package/`.
 `src/module/` is the package's UI module.
 
