@@ -100,7 +100,8 @@ describe('useFlow', () => {
     });
     expect(result.current.busy).toBeNull();
     expect(result.current.stale).toBe(true);
-    expect(changed).not.toHaveBeenCalled();
+    // Giving up still lets the page read the order again: the board may be behind, and so may the header.
+    expect(changed).toHaveBeenCalledTimes(1);
     release();
     await act(async () => { result.current.reload(); await vi.advanceTimersByTimeAsync(10); });
     expect(result.current.stale).toBe(false);

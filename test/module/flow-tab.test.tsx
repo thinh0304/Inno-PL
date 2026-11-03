@@ -85,7 +85,7 @@ describe('your work', () => {
     // The same task held by Trần Văn Kỳ: the card says so, and nobody else gets its buttons.
     const base = memory({ roles: ['proc'] });
     await walkTo(base, ['t11', 'submitted']);
-    show({ ...base, tasks: async (id) => (await base.tasks(id)).map((t) => (t.task_code === 't23' ? { ...t, claimedBy: 'u-tm' } : t)), myWork: async () => [] });
+    show({ ...base, tasks: async (id) => (await base.tasks(id)).map((t) => (t.task_code === 't23' ? { ...t, claimedBy: 'u-tm' } : t)), actionable: async () => new Set<string>() });
     expect(await within(await screen.findByRole('article', { name: /^T23 · / })).findByText('Do Trần Văn Kỳ giữ')).toBeTruthy();
     expect(within(await yourWork()).queryByRole('button')).toBeNull();
   });

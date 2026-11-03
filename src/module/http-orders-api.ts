@@ -5,6 +5,7 @@ import { TASKS } from '../flow/tasks';
 import { draftFromRecords, fieldsOf, lineGroup, refId } from '../order/records';
 import type { OrderRecords, Rec } from '../order/types';
 import { configFromRecords, parseNumber, type ConfigRecords } from '../pl/config-records';
+import { parseTime } from '../pl/time';
 import { probeAccess } from './access.js';
 import { OrdersError, type Access, type LoadedOrder, type OrderEvent, type OrderSummary, type OrderTask, type OrdersApi, type StaffMember,
   type WorkItem } from './orders-api.js';
@@ -268,7 +269,8 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
       return (await ofOrder('order_event', orderId)).map(fieldsOf).map((e): OrderEvent => ({ id: String(e.id), order: orderId,
         task_code: optStr(e.task_code), at: String(e.at ?? ''), actor: refId(e.actor), role: optStr(e.role), action: String(e.action ?? ''),
         note: String(e.note ?? ''), reason: String(e.reason ?? ''), warnings: (Array.isArray(e.warnings) ? e.warnings : []) as OrderEvent['warnings'] }))
-        .sort((a, b) => a.at.localeCompare(b.at));
+        // By time, not by text: client and workflow write times in different forms.
+        .sort((a, b) => parseTime(a.at) - parseTime(b.at));
     },
     async act(task, outcome, reason, warnings) {
       const me = self.me().id;
@@ -336,9 +338,37 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
       }
       return items;
     },
+    async actionable(orderId: string) {
+      const ids = new Set((await ofOrder('order_task', orderId)).map((t) => String(t.id)));
+      const entity = await entityId('order_task');
+      const mine = new Set<string>();
+      for (const view of ['mine', 'claimable'] as const) {
+        let listed: unknown;
+        try {
+          listed = await call(api.GET('/work' as never, { params: { query: { view } } } as never) as never);
+        } catch (error) {
+          if (NOT_FOR_THEM(error)) continue;
+          throw error;
+        }
+        const list = (Array.isArray(listed) ? listed : (listed as { items?: unknown[] } | null)?.items ?? []) as
+          { entity_id?: string; id?: string; record_id?: string }[];
+        for (const row of list) {
+          const id = row.record_id ?? row.id;
+          if (row.entity_id === entity && id && ids.has(id)) mine.add(id);
+        }
+      }
+      return mine;
+    },
     async closeLost(orderId: string, reason: string) {
       await getRecord('order', orderId);
       await patch('order', orderId, { status: 'close_lost', close_reason: reason });
+      // The workflow logs its processing of it; the person's own line (who, and why) is written here, as for a return.
+      try {
+        await writer.create('order_event' as never, { order: orderId, action: 'close_lost', reason, actor: self.me().id, at: new Date().toISOString() });
+      } catch (error) {
+        const known = toOrdersError(error);
+        throw new OrdersError('EVENT_NOT_LOGGED', known.reason, {}, known.status);
+      }
     },
   };
   return self;

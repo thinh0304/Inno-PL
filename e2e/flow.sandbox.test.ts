@@ -143,7 +143,7 @@ describe('the 15-task flow in the sandbox', () => {
     expect((await patch(as('am'), 'order', id, { status: 'close_lost' })).status).toBe(422);
     expect((await patch(as('am'), 'order', id, { status: 'close_lost', close_reason: 'Khách chọn nhà thầu khác' })).status).toBeLessThan(300);
     await waitFor('the tasks to be cancelled', async () => (await tasksOf(id)).filter((t) => t.status === 'open' || t.status === 'blocked').length === 0);
-    expect((await eventsOf(id)).find((e) => e.action === 'close_lost')?.reason).toBe('Khách chọn nhà thầu khác');
+    expect((await eventsOf(id)).find((e) => e.action === 'close_lost_processed')?.reason).toBe('Khách chọn nhà thầu khác');
   });
 
   it('parallel_completion_opens_t31_once', { timeout: 420_000 }, async () => {

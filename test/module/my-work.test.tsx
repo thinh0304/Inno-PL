@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, configure, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, configure, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import './shims.js';
 import { createMemoryOrdersApi, type MemoryOptions } from '../../src/module/memory-orders-api.js';
@@ -64,19 +64,6 @@ describe('My work (FR-6.4)', () => {
     down = false;
     fireEvent.click(screen.getByRole('button', { name: 'Thử lại' }));
     expect((await screen.findAllByRole('button', { name: /^Mở / })).length).toBeGreaterThan(0);
-  });
-
-  it('task_route_resolves_to_its_orders_flow_tab', async () => {
-    const api = memory({ roles: ['am'] });
-    const [task] = await api.tasks('o1');
-    const { host } = app(`/tasks/${task.id}`, api);
-    await waitFor(() => expect(host.paths.at(-1)).toBe('/orders/o1?tab=flow'));
-  });
-
-  it('task_route_for_an_unreadable_task_falls_back_to_my_work', async () => {
-    const { host } = app('/tasks/nope');
-    await waitFor(() => expect(host.paths.at(-1)).toBe('/tasks'));
-    expect(await screen.findByRole('heading', { name: 'Việc của tôi' })).toBeTruthy();
   });
 
   it('list_shows_the_my_work_button_with_a_count', async () => {

@@ -25,7 +25,14 @@ export function FlowTab({ hook, lang, locale, theme, flow }: TabProps) {
       </div>
     );
   }
-  if (flow.tasks.length === 0) return <p className="muted">{t.empty}</p>;
+  if (flow.tasks.length === 0) {
+    return (
+      <div className="state" role="status">
+        <p>{t.empty}</p>
+        <button type="button" className="af-button secondary" onClick={flow.reload}>{t.reload}</button>
+      </div>
+    );
+  }
 
   const nameOf = (code: string) => hook.config.taskSlas.find((s) => s.taskCode === code)?.name ?? code.toUpperCase();
   const person = (user: string | null) => (user ? hook.staff.find((s) => s.user === user)?.name ?? t.unknownPerson : null);

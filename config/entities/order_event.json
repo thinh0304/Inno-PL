@@ -131,6 +131,10 @@
           "label": "Close-lost"
         },
         {
+          "value": "close_lost_processed",
+          "label": "Đã xử lý Close-lost"
+        },
+        {
           "value": "ignored_warnings",
           "label": "Bỏ qua cảnh báo"
         },
@@ -279,6 +283,7 @@
             "revise_processed",
             "completed_order",
             "close_lost",
+            "close_lost_processed",
             "ignored_warnings",
             "ignored_suggestion"
           ]

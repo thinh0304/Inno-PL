@@ -25,6 +25,7 @@ export function HistoryTab({ hook, lang, flow }: TabProps) {
   }
   if (flow.events.length === 0) return <p className="muted">{t.empty}</p>;
 
+  const taskName = (code: string) => `${code.toUpperCase()} · ${hook.config.taskSlas.find((s) => s.taskCode === code)?.name ?? ''}`.replace(/ · $/, '');
   const person = (user: string | null) => (user ? hook.staff.find((s) => s.user === user)?.name ?? T.flow.unknownPerson : T.flow.system);
   const ignored = flow.events.filter((e) => e.action === 'ignored_warnings');
   const shown = [...(onlyIgnored ? ignored : flow.events)].reverse();
@@ -50,7 +51,7 @@ export function HistoryTab({ hook, lang, flow }: TabProps) {
                   <b>{person(e.actor)}</b>
                   {e.role && <span className="muted">{roles[e.role] ?? e.role}</span>}
                   <span className="tag">{known[e.action] ?? e.action}</span>
-                  {e.task_code && <span>{e.task_code.toUpperCase()}</span>}
+                  {e.task_code && <span>{taskName(e.task_code)}</span>}
                   <span className="muted">{formatDateTime(e.at)}</span>
                 </p>
                 {e.warnings.length > 0 && (

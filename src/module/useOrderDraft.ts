@@ -113,6 +113,8 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
       const edited = ready ? savePlan(now, before?.records ?? null, ready.config).length > 0 : false;
       setSaved(loaded);
       if (!edited) setDraftState(loaded.draft);
+      // What only the workflow changes shows whatever the person has typed meanwhile (the page, the stage bar and the lock follow it).
+      else setDraftState((d) => ({ ...d, order: { ...d.order, status: loaded.draft.order.status, stage: loaded.draft.order.stage } }));
       return loaded;
     }, () => null);
   }, [api, id, ready]);

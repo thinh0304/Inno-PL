@@ -12,7 +12,7 @@ export interface FlowHook {
   events: OrderEvent[];
   /** Ids of this order's tasks this person may act on: held by them, or offered to a group they are in. */
   actionable: ReadonlySet<string>;
-  /** The task being acted on, until the board shows what the workflow did about it. */
+  /** The task being acted on ('order' for Close-lost), until the board shows what the workflow did about it. */
   busy: string | null;
   /** The wait for the workflow ran out: the board may be behind. */
   stale: boolean;
@@ -21,9 +21,11 @@ export interface FlowHook {
   reload(): void;
 }
 
-// Seconds after an action at which the board is read again (the workflow takes a few seconds, sometimes tens).
+// Milliseconds after an action at which the board is read again (the workflow takes a few seconds, sometimes tens); the
+// same schedule re-reads a saved order whose tasks the first workflow run has not made yet.
 const DELAYS = [0, 1000, 2000, 3000, 5000, 8000, 13000, 20000];
 const NO_IDS: ReadonlySet<string> = new Set();
+const is = (error: unknown, code: string) => error instanceof OrdersError && error.code === code;
 
 export function useFlow(api: OrdersApi, orderId: string | null, onChanged: () => void): FlowHook {
   const [state, setState] = useState<FlowHook['state']>(orderId ? 'loading' : 'ready');
@@ -37,8 +39,11 @@ export function useFlow(api: OrdersApi, orderId: string | null, onChanged: () =>
   const changed = useRef(onChanged);
   changed.current = onChanged;
   const reads = useRef(0);
+  // Each wait takes a number; starting another wait or stopping them all makes the one in flight give way.
+  const waits = useRef(0);
 
   const stop = useCallback(() => {
+    waits.current += 1;
     timers.current.forEach(clearTimeout);
     timers.current = [];
   }, []);
@@ -55,11 +60,11 @@ export function useFlow(api: OrdersApi, orderId: string | null, onChanged: () =>
     if (!orderId) return [];
     const mine = ++reads.current;
     try {
-      const [nextTasks, nextEvents, work] = await Promise.all([api.tasks(orderId), api.events(orderId), api.myWork().catch(() => [])]);
+      const [nextTasks, nextEvents, ids] = await Promise.all([api.tasks(orderId), api.events(orderId), api.actionable(orderId)]);
       if (!alive.current || mine !== reads.current) return nextTasks;
       setTasks(nextTasks);
       setEvents(nextEvents);
-      setActionable(new Set(work.filter((w) => w.task.order === orderId).map((w) => w.task.id)));
+      setActionable(ids);
       setState('ready');
       return nextTasks;
     } catch (error) {
@@ -77,20 +82,35 @@ export function useFlow(api: OrdersApi, orderId: string | null, onChanged: () =>
     void read();
   }, [read, orderId]);
 
+  // A saved order whose first workflow run has not made its tasks yet is read again until they are there.
+  useEffect(() => {
+    if (!orderId || state !== 'ready' || tasks.length > 0) return;
+    let step = 1;
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      void read();
+      if (step < DELAYS.length) timer = setTimeout(tick, DELAYS[step++]);
+    };
+    timer = setTimeout(tick, DELAYS[step++]);
+    return () => clearTimeout(timer);
+  }, [orderId, state, tasks.length, read]);
+
   const reload = useCallback(() => {
     stop();
     setStale(false);
     setBusy(null);
-    void read();
+    // The order may have moved too (the wait gave up before the page read it): read it again with the board.
+    void read().then(() => alive.current && changed.current());
   }, [read, stop]);
 
   /** Reads until `done(tasks)`, then lets the page read the order again; after the last read, gives up as stale. */
   const settle = useCallback((done: (tasks: OrderTask[]) => boolean) => {
     stop();
+    const mine = waits.current;
     let step = 0;
     const tick = async () => {
       const now = await read();
-      if (!alive.current) return;
+      if (!alive.current || mine !== waits.current) return;
       if (now && done(now)) {
         setBusy(null);
         changed.current();
@@ -99,12 +119,20 @@ export function useFlow(api: OrdersApi, orderId: string | null, onChanged: () =>
       if (++step >= DELAYS.length) {
         setBusy(null);
         setStale(true);
+        changed.current();
         return;
       }
       timers.current.push(setTimeout(tick, DELAYS[step]));
     };
     timers.current.push(setTimeout(tick, DELAYS[0]));
   }, [read, stop]);
+
+  /** What an action that went through, or was refused, leaves to do: refused means the board was out of date, so it is read again. */
+  const refused = useCallback((error: unknown) => {
+    setBusy(null);
+    void read();
+    return error;
+  }, [read]);
 
   const act = useCallback(async (task: OrderTask, outcome: TaskOutcome, reason: string, warnings: IgnoredWarning[]) => {
     setBusy(task.id);
@@ -114,10 +142,7 @@ export function useFlow(api: OrdersApi, orderId: string | null, onChanged: () =>
       await api.act(task, outcome, reason, warnings);
     } catch (error) {
       // The outcome stands when only its log line was refused: wait for the workflow, then say so.
-      if (!(error instanceof OrdersError && error.code === 'EVENT_NOT_LOGGED')) {
-        setBusy(null);
-        throw error;
-      }
+      if (!is(error, 'EVENT_NOT_LOGGED')) throw refused(error);
       logged = error;
     }
     // The workflow has dealt with the task when it has stamped the finish time on it, or taken it back (a return).
@@ -127,20 +152,22 @@ export function useFlow(api: OrdersApi, orderId: string | null, onChanged: () =>
       return !!after && (after.done_at !== null || after.status !== finished);
     });
     if (logged) throw logged;
-  }, [api, settle]);
+  }, [api, settle, refused]);
 
   const closeLost = useCallback(async (reason: string) => {
     if (!orderId) return;
     setBusy('order');
     setStale(false);
+    let logged: unknown = null;
     try {
       await api.closeLost(orderId, reason);
     } catch (error) {
-      setBusy(null);
-      throw error;
+      if (!is(error, 'EVENT_NOT_LOGGED')) throw refused(error);
+      logged = error;
     }
     settle((now) => now.every((t) => t.status !== 'open' && t.status !== 'blocked'));
-  }, [api, orderId, settle]);
+    if (logged) throw logged;
+  }, [api, orderId, settle, refused]);
 
   return useMemo(() => ({ state, tasks, events, actionable, busy, stale, act, closeLost, reload }),
     [state, tasks, events, actionable, busy, stale, act, closeLost, reload]);

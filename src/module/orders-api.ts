@@ -58,6 +58,8 @@ export interface OrdersApi {
   act(task: OrderTask, outcome: TaskOutcome, reason: string, warnings: IgnoredWarning[]): Promise<void>;
   /** Tasks held by this person, then tasks offered to them. */
   myWork(): Promise<WorkItem[]>;
+  /** Which of this order's tasks this person may act on (held by them or offered to them): the work list, without reading every row. */
+  actionable(orderId: string): Promise<ReadonlySet<string>>;
   /** One task, or null when the person may not read it (a 403 or 404). */
   task(id: string): Promise<OrderTask | null>;
   /** A line of the order's log that the screens themselves write (ignoring a suggestion, ...); people's outcomes go through act. */

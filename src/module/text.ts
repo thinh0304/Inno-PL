@@ -90,6 +90,7 @@ const vi = {
   tabs: { form: 'Phiếu khảo sát', lines: 'Danh mục Thiết bị / Dịch vụ', suppliers: 'Nhà cung cấp', pl: 'Kết quả P&L', purchase: 'Đơn mua hàng', flow: 'Quy trình', history: 'Lịch sử' },
   flow: {
     stageBarLabel: 'Các giai đoạn của đơn',
+    stageN: (n: number) => `GĐ${n}`,
     stages: ['Khởi tạo đơn hàng', 'Thẩm định', 'Phê duyệt đơn hàng', 'Hợp đồng', 'Tạm ứng', 'Giao hàng – Triển khai', 'Hóa đơn & Đóng đơn'],
     stageShort: ['Khởi tạo', 'Thẩm định', 'Phê duyệt', 'Hợp đồng', 'Tạm ứng', 'Giao hàng', 'Hóa đơn'],
     stateLabel: { done: 'Hoàn tất', current: 'Đang xử lý', parallel: 'Song song', waiting: 'Chờ', returned: 'Bị trả lại', lost: 'Close-lost' },
@@ -166,7 +167,7 @@ const vi = {
     actions: {
       submitted: 'Gửi duyệt', approved: 'Duyệt', returned: 'Trả lại', agreed: 'Đồng ý trình ký', revise: 'Yêu cầu sửa dự thảo', completed: 'Hoàn thành',
       not_applicable: 'Không áp dụng', auto_approved: 'Tự duyệt', reopened_missing_fields: 'Mở lại vì thiếu trường bắt buộc',
-      returned_processed: 'Đã xử lý trả lại', revise_processed: 'Đã xử lý yêu cầu sửa', completed_order: 'Hoàn tất đơn', close_lost: 'Close-lost',
+      returned_processed: 'Đã xử lý trả lại', revise_processed: 'Đã xử lý yêu cầu sửa', completed_order: 'Hoàn tất đơn', close_lost: 'Close-lost', close_lost_processed: 'Đã xử lý Close-lost',
       ignored_warnings: 'Bỏ qua cảnh báo', ignored_suggestion: 'Bỏ qua gợi ý',
     },
   },
@@ -391,6 +392,7 @@ const en: Text = {
   tabs: { form: 'Survey', lines: 'Equipment / services', suppliers: 'Suppliers', pl: 'P&L result', purchase: 'Purchase order', flow: 'Flow', history: 'History' },
   flow: {
     stageBarLabel: 'Order stages',
+    stageN: (n: number) => `Stage ${n}`,
     stages: ['Order creation', 'Appraisal', 'Order approval', 'Contract', 'Advance payment', 'Delivery – Implementation', 'Invoice & Closing'],
     stageShort: ['Create', 'Appraisal', 'Approval', 'Contract', 'Advance', 'Delivery', 'Invoice'],
     stateLabel: { done: 'Complete', current: 'In progress', parallel: 'In parallel', waiting: 'Waiting', returned: 'Sent back', lost: 'Close-lost' },
@@ -459,7 +461,7 @@ const en: Text = {
     listLabel: 'Processing history',
     empty: 'Nothing has been done yet.',
     noMatch: 'No entries.',
-    count: (n: number) => `${n} actions`,
+    count: (n: number) => `${n} action(s)`,
     ignoredBadge: (n: number) => `⚠ ${n} ignored warning(s)`,
     onlyIgnored: 'Only ignored warnings',
     reason: 'Reason',
@@ -467,7 +469,7 @@ const en: Text = {
     actions: {
       submitted: 'Sent for approval', approved: 'Approved', returned: 'Sent back', agreed: 'Agreed, sent for signing', revise: 'Asked for a revision',
       completed: 'Completed', not_applicable: 'Not applicable', auto_approved: 'Auto-approved', reopened_missing_fields: 'Reopened: required fields missing',
-      returned_processed: 'Return processed', revise_processed: 'Revision request processed', completed_order: 'Order completed', close_lost: 'Close-lost',
+      returned_processed: 'Return processed', revise_processed: 'Revision request processed', completed_order: 'Order completed', close_lost: 'Close-lost', close_lost_processed: 'Close-lost processed',
       ignored_warnings: 'Ignored warnings', ignored_suggestion: 'Ignored a suggestion',
     },
   },

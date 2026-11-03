@@ -121,7 +121,7 @@
           {
             "field": "action",
             "kind": "literal",
-            "value": "close_lost"
+            "value": "close_lost_processed"
           },
           {
             "field": "reason",

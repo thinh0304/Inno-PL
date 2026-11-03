@@ -12,7 +12,7 @@ export function StageBar({ tasks, status, returned, lang }: { tasks: BoardTask[]
       {stages.map((s) => {
         const roles = s.waitingRoles.map((r) => t.roles[r]).join(', ');
         const shows = s.state === 'current' || s.state === 'returned' || s.state === 'lost' || s.state === 'parallel';
-        const label = `GĐ${s.stage} ${t.stages[s.stage - 1]}: ${t.stateLabel[s.state]}${roles && s.state !== 'done' ? ` · ${t.awaiting(roles)}` : ''}`;
+        const label = `${t.stageN(s.stage)} ${t.stages[s.stage - 1]}: ${t.stateLabel[s.state]}${roles && s.state !== 'done' ? ` · ${t.awaiting(roles)}` : ''}`;
         return (
           <li key={s.stage} className="stage" data-state={s.state} aria-label={label} aria-current={s.state === 'current' || s.state === 'returned' ? 'step' : undefined}>
             <span className="stage-mark" aria-hidden="true">

@@ -59,6 +59,7 @@
           "revise_processed",
           "completed_order",
           "close_lost",
+          "close_lost_processed",
           "ignored_warnings",
           "ignored_suggestion"
         ]

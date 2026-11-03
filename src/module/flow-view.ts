@@ -16,4 +16,4 @@ export function returnedInfo(events: OrderEvent[], status: string): { returned: 
 }
 
 /** Why the order was closed, from the log (the order record itself carries `close_reason` only for the server). */
-export const closedReason = (events: OrderEvent[]): string => lastOf(events, 'close_lost')?.reason ?? '';
+export const closedReason = (events: OrderEvent[]): string => (lastOf(events, 'close_lost') ?? lastOf(events, 'close_lost_processed'))?.reason ?? '';

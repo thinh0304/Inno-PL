@@ -143,7 +143,7 @@ export const workflows = {
         updateMany("cancel_blocked", "Hủy task chưa tới lượt", TASK,
           [flt("order", "eq", ref("subject.record_id")), flt("status", "eq", lit("blocked"))], [bind("status", lit("cancelled"))]),
         create("log", "Ghi nhật ký", EVENT, [
-          bind("order", ref("subject.record_id")), bind("action", lit("close_lost")), bind("reason", ref("subject.record.close_reason")), bind("at", NOW),
+          bind("order", ref("subject.record_id")), bind("action", lit("close_lost_processed")), bind("reason", ref("subject.record.close_reason")), bind("at", NOW),
         ]),
         end("done", "Đã hủy", "Đã hủy"),
       ],

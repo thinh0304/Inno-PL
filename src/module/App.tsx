@@ -30,7 +30,12 @@ export function App({ host, api, lang, locale, theme }: AppProps) {
     return <MyWorkScreen api={api} lang={lang} locale={locale} theme={theme} onBack={() => host.navigate(routePath({ name: 'list' }))}
       onOpen={(id) => host.navigate(routePath({ name: 'order', id, tab: 'flow' }))} />;
   }
-  if (route.name === 'task') return <TaskRoute api={api} id={route.id} lang={lang} navigate={(path) => host.navigate(path)} />;
+  const work = () => <MyWorkScreen api={api} lang={lang} locale={locale} theme={theme} onBack={() => host.navigate(routePath({ name: 'list' }))}
+    onOpen={(id) => host.navigate(routePath({ name: 'order', id, tab: 'flow' }))} />;
+  if (route.name === 'task') {
+    return <TaskRoute api={api} id={route.id} lang={lang} missing={work}
+      found={(orderId) => <OrderPage key={orderId} api={api} id={orderId} tab="flow" lang={lang} locale={locale} theme={theme} navigate={(path) => host.navigate(path)} tabs={TABS} />} />;
+  }
   return <OrderPage key={route.name === 'order' ? route.id : 'new'} api={api} id={route.name === 'order' ? route.id : null}
     tab={route.name === 'order' ? route.tab : null} lang={lang} locale={locale} theme={theme} navigate={(path) => host.navigate(path)} tabs={TABS} />;
 }

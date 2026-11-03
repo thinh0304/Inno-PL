@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { dueState } from '../flow/calendar';
 import { configFromRecords } from '../pl/config-records';
 import { formatDay } from './format.js';
 import { AlertIcon, ChevronIcon } from './icons.js';
 import type { ThemeMode } from './kit.js';
 import type { OrdersApi, WorkItem } from './orders-api.js';
-import { routePath } from './routes.js';
 import { errorText, TEXT, type Lang } from './text.js';
 
 type Load = { state: 'loading' } | { state: 'ready'; items: WorkItem[]; names: Map<string, string> } | { state: 'failed'; error: unknown };
@@ -83,16 +82,20 @@ export function MyWorkScreen({ api, lang, onOpen, onBack }: Props) {
   );
 }
 
-/** `/tasks/<id>`, where AgentFlow's My Work sends a person: straight to that task's order, flow tab. */
-export function TaskRoute({ api, id, navigate, lang }: { api: OrdersApi; id: string; navigate(path: string): void; lang: Lang }) {
+/**
+ * `/tasks/<id>`, where AgentFlow's My Work sends a person: that task's order on its flow tab, or My work when the task cannot
+ * be read. Both are shown in place: the host cannot replace a history entry, so a redirect would trap the Back button.
+ */
+export function TaskRoute({ api, id, lang, found, missing }: { api: OrdersApi; id: string; lang: Lang; found(orderId: string): ReactNode; missing(): ReactNode }) {
   const t = TEXT[lang];
+  const [order, setOrder] = useState<string | null | undefined>(undefined);
   useEffect(() => {
     let alive = true;
-    api.task(id).then(
-      (task) => alive && navigate(task ? routePath({ name: 'order', id: task.order, tab: 'flow' }) : routePath({ name: 'work' })),
-      () => alive && navigate(routePath({ name: 'work' })),
-    );
+    setOrder(undefined);
+    api.task(id).then((task) => alive && setOrder(task ? task.order : null), () => alive && setOrder(null));
     return () => { alive = false; };
-  }, [api, id, navigate]);
+  }, [api, id]);
+  if (order) return <>{found(order)}</>;
+  if (order === null) return <>{missing()}</>;
   return <main className="screen"><div className="panel skeleton" aria-busy="true" aria-label={t.loading}><div className="skeleton-row"><span className="af-skeleton" style={{ width: '50%' }} /></div></div></main>;
 }

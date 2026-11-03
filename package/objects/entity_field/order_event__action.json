@@ -57,6 +57,10 @@
       "label": "Close-lost"
     },
     {
+      "value": "close_lost_processed",
+      "label": "Đã xử lý Close-lost"
+    },
+    {
       "value": "ignored_warnings",
       "label": "Bỏ qua cảnh báo"
     },

@@ -276,6 +276,9 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       await wait();
       put('order_event', { order: orderId, task: null, task_code: null, role: null, actor: who().id, at: now(), note: '', reason: '', warnings: [], ...event });
     },
+    async actionable(orderId) {
+      return new Set((await api.myWork()).filter((w) => w.task.order === orderId).map((w) => w.task.id));
+    },
     async closeLost(orderId, reason) {
       await wait();
       const order = table('order').get(orderId);
@@ -285,6 +288,7 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       Object.assign(order.body, { status: 'close_lost', close_reason: reason });
       order.updated_at = now();
       put('order_event', { order: orderId, task: null, task_code: null, role: null, actor: who().id, at: now(), action: 'close_lost', reason, note: '', warnings: [] });
+      put('order_event', { order: orderId, task: null, task_code: null, role: null, at: now(), action: 'close_lost_processed', reason, note: '', warnings: [] });
       reconcile(orderId);
     },
   };
