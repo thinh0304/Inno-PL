@@ -53,10 +53,15 @@ export interface OrdersApi {
   tasks(orderId: string): Promise<OrderTask[]>;
   /** The order's log, oldest first. */
   events(orderId: string): Promise<OrderEvent[]>;
-  /** Takes the task if nobody holds it, sets its outcome (with a reason where one is needed) and logs what the person did. */
+  /** Takes the task if nobody holds it, sets its outcome (with a reason where one is needed) and logs what the person did.
+   *  When the task is done but its log line was refused it throws OrdersError('EVENT_NOT_LOGGED'): the outcome stands. */
   act(task: OrderTask, outcome: TaskOutcome, reason: string, warnings: IgnoredWarning[]): Promise<void>;
   /** Tasks held by this person, then tasks offered to them. */
   myWork(): Promise<WorkItem[]>;
+  /** One task, or null when the person may not read it (a 403 or 404). */
+  task(id: string): Promise<OrderTask | null>;
+  /** A line of the order's log that the screens themselves write (ignoring a suggestion, ...); people's outcomes go through act. */
+  logEvent(orderId: string, event: { action: string; note?: string; reason?: string; warnings?: IgnoredWarning[] }): Promise<void>;
   /** Close-lost: needs a reason, and is refused once the customer's contract is signed (BR-4A). */
   closeLost(orderId: string, reason: string): Promise<void>;
 }

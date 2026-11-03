@@ -280,8 +280,25 @@ export function createHttpOrdersApi(host: Pick<AppHost, 'api' | 'context'>): Ord
       await getRecord('order_task', task.id);
       await patch('order_task', task.id, { status: statusFor(outcome), outcome, reason });
       const log = { order: task.order, task: task.id, task_code: task.task_code, role: task.role, actor: me, at: new Date().toISOString() };
-      await writer.create('order_event' as never, { ...log, action: outcome, reason });
-      if (warnings.length) await writer.create('order_event' as never, { ...log, action: 'ignored_warnings', warnings });
+      try {
+        await writer.create('order_event' as never, { ...log, action: outcome, reason });
+        if (warnings.length) await writer.create('order_event' as never, { ...log, action: 'ignored_warnings', warnings });
+      } catch (error) {
+        // The task is finished: only its log line is missing, which the screen says instead of calling the action failed.
+        const known = toOrdersError(error);
+        throw new OrdersError('EVENT_NOT_LOGGED', known.reason, {}, known.status);
+      }
+    },
+    async task(id: string) {
+      try {
+        return taskOf(await getRecord('order_task', id));
+      } catch (error) {
+        if (NOT_FOR_THEM(toOrdersError(error))) return null;
+        throw error;
+      }
+    },
+    async logEvent(orderId: string, event) {
+      await writer.create('order_event' as never, { order: orderId, ...event, actor: self.me().id, at: new Date().toISOString() });
     },
     async myWork() {
       const entity = await entityId('order_task');

@@ -141,3 +141,40 @@ describe('the flow through the HTTP API', () => {
     expect((await createHttpOrdersApi(b.host).tasks('o1')).map((t) => t.task_code)).toEqual(['t11', 't31']);
   });
 });
+
+describe('plan 03b additions to OrdersApi', () => {
+  it('task_reads_one_task_or_null', async () => {
+    const memory = createMemoryOrdersApi();
+    const [first] = await memory.tasks('o1');
+    expect((await memory.task(first.id))?.task_code).toBe('t11');
+    expect(await memory.task('nope')).toBeNull();
+
+    const b = fakeBackend((method, entity, id) => (method === 'GET' && entity === 'order_task' && id === 'hidden' ? { status: 403, type: 'FORBIDDEN' } : null));
+    b.seed('order_task', { order: 'o1', task_code: 't22', role: 'tm', status: 'open', stage: 2 }, 'task-1');
+    b.seed('order_task', { order: 'o1', task_code: 't23', role: 'proc', status: 'open', stage: 2 }, 'hidden');
+    const http = createHttpOrdersApi(b.host);
+    expect(await http.task('task-1')).toMatchObject({ id: 'task-1', order: 'o1', task_code: 't22' });
+    expect(await http.task('hidden')).toBeNull();
+    expect(await http.task('missing')).toBeNull();
+  });
+
+  it('log_event_writes_an_order_event', async () => {
+    const memory = createMemoryOrdersApi();
+    await memory.logEvent('o1', { action: 'ignored_suggestion', note: 'Giữ nguyên: Địa chỉ' });
+    expect((await memory.events('o1')).find((e) => e.action === 'ignored_suggestion')).toMatchObject({ note: 'Giữ nguyên: Địa chỉ', actor: 'u-am' });
+
+    const b = fakeBackend();
+    await createHttpOrdersApi(b.host).logEvent('o1', { action: 'ignored_suggestion', note: 'Giữ nguyên: Địa chỉ' });
+    expect(b.all('order_event')[0].body).toMatchObject({ order: 'o1', action: 'ignored_suggestion', note: 'Giữ nguyên: Địa chỉ', actor: 'u-am' });
+    expect(typeof b.all('order_event')[0].body.at).toBe('string');
+  });
+
+  it('act_reports_event_not_logged_after_finishing_the_task', async () => {
+    const b = fakeBackend((method, entity) => (method === 'POST' && entity === 'order_event' ? { status: 403, type: 'FORBIDDEN', detail: 'FORBIDDEN: no grant' } : null));
+    b.seed('order_task', { order: 'o1', task_code: 't40', role: 'sa', status: 'open', stage: 4, claimed_by: 'u-am' }, 'task-1');
+    const api = createHttpOrdersApi(b.host);
+    const [t] = await api.tasks('o1');
+    await expect(api.act(t, 'completed', '', [])).rejects.toMatchObject({ code: 'EVENT_NOT_LOGGED', status: 403 });
+    expect(b.all('order_task')[0].body.status).toBe('done');
+  });
+});

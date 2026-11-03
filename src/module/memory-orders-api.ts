@@ -267,6 +267,15 @@ export function createMemoryOrdersApi(options: MemoryOptions = {}) {
       }
       return items.sort((a, b) => Number(b.mine) - Number(a.mine));
     },
+    async task(id) {
+      await wait();
+      const row = table('order_task').get(id);
+      return row ? taskViews(refId(row.body.order)!).find((t) => t.id === id) ?? null : null;
+    },
+    async logEvent(orderId, event) {
+      await wait();
+      put('order_event', { order: orderId, task: null, task_code: null, role: null, actor: who().id, at: now(), note: '', reason: '', warnings: [], ...event });
+    },
     async closeLost(orderId, reason) {
       await wait();
       const order = table('order').get(orderId);
