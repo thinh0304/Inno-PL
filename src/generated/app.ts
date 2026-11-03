@@ -7,7 +7,6 @@ export const PACKAGE = { id: 'inno/pl', version: '0.1.0' } as const;
 /** Every object of the package, with the version of the contract this code was written against. */
 export const OBJECTS = {
   'entity:business_plan': { kind: 'entity', contractVersion: '0.1.0' },
-  'entity:case': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:contract_type_rate': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:customer': { kind: 'entity', contractVersion: '0.1.0' },
   'entity:deal_stage_weight': { kind: 'entity', contractVersion: '0.1.0' },
@@ -31,13 +30,6 @@ export const OBJECTS = {
   'entity_field:business_plan/net_profit': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:business_plan/revenue': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:business_plan/year': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:case/amount': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:case/opened_by': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:case/opened_on': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:case/status': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:case/summary': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:case/title': { kind: 'entity_field', contractVersion: '0.1.0' },
-  'entity_field:case/urgent': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/code': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/consult_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:contract_type_rate/deploy_bonus': { kind: 'entity_field', contractVersion: '0.1.0' },
@@ -262,7 +254,6 @@ export const OBJECTS = {
   'entity_field:vat_rate/rate': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_field:vat_rate/sort_order': { kind: 'entity_field', contractVersion: '0.1.0' },
   'entity_view:business_plan/all': { kind: 'entity_view', contractVersion: '0.1.0' },
-  'entity_view:case/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:contract_type_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:customer/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:deal_stage_weight/all': { kind: 'entity_view', contractVersion: '0.1.0' },
@@ -283,7 +274,6 @@ export const OBJECTS = {
   'entity_view:supplier/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:task_sla/all': { kind: 'entity_view', contractVersion: '0.1.0' },
   'entity_view:vat_rate/all': { kind: 'entity_view', contractVersion: '0.1.0' },
-  'form:case': { kind: 'form', contractVersion: '0.1.0' },
   'form:customer': { kind: 'form', contractVersion: '0.1.0' },
   'form:goods_line_price': { kind: 'form', contractVersion: '0.1.0' },
   'form:order': { kind: 'form', contractVersion: '0.1.0' },
@@ -295,13 +285,12 @@ export const OBJECTS = {
   'form:supplier': { kind: 'form', contractVersion: '0.1.0' },
   'trigger:compute_pl_on_request': { kind: 'trigger', contractVersion: null },
   'workflow:compute_pl': { kind: 'workflow', contractVersion: '0.1.0' },
-  'workflow:open_case': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:pl_selftest': { kind: 'workflow', contractVersion: '0.1.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
-export type WorkflowKey = 'compute_pl' | 'open_case' | 'pl_selftest';
+export type EntityKey = 'business_plan' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
+export type WorkflowKey = 'compute_pl' | 'pl_selftest';
 
 /** The value of each field of each entity, as a record carries it. */
 export interface EntityFields {
@@ -309,15 +298,6 @@ export interface EntityFields {
     net_profit?: number | null;
     revenue?: number | null;
     year?: number | null;
-  };
-  case: {
-    amount?: number | null;
-    opened_by?: string | null;
-    opened_on?: string | null;
-    status?: 'open' | 'approved' | 'rejected' | null;
-    summary?: string | null;
-    title?: string | null;
-    urgent?: boolean | null;
   };
   contract_type_rate: {
     code?: 'tm_once' | 'tmdk' | 'dv_once' | 'dv_recurring' | 'fulfillment' | null;
@@ -587,9 +567,5 @@ export interface EntityFields {
 /** What starting each workflow takes. */
 export interface WorkflowInputs {
   compute_pl: Record<string, never>;
-  open_case: {
-    amount?: number;
-    summary: string;
-  };
   pl_selftest: Record<string, never>;
 }

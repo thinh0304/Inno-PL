@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import type { CaseStatus } from './cases-api.js';
 
 // Lucide's shapes, drawn in currentColor. Every icon is decoration: the words beside it carry the meaning.
 function Icon({ size, children }: { size: number; children: ReactNode }) {
@@ -30,12 +29,14 @@ export const AlertIcon = () => (
   </Icon>
 );
 
-export function StatusIcon({ status }: { status: CaseStatus }) {
-  return (
-    <Icon size={12}>
-      <circle cx="12" cy="12" r="10" />
-      {status === 'approved' && <path d="m9 12 2 2 4-4" />}
-      {status === 'rejected' && <><path d="m15 9-6 6" /><path d="m9 9 6 6" /></>}
-    </Icon>
-  );
-}
+export const ChevronIcon = ({ open }: { open: boolean }) => (
+  <Icon size={14}>{open ? <path d="m6 9 6 6 6-6" /> : <path d="m9 18 6-6-6-6" />}</Icon>
+);
+
+export const TrashIcon = () => (
+  <Icon size={14}><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></Icon>
+);
+
+export const CheckIcon = () => <Icon size={14}><path d="M20 6 9 17l-5-5" /></Icon>;
+
+export const XIcon = () => <Icon size={14}><path d="M18 6 6 18" /><path d="m6 6 12 12" /></Icon>;

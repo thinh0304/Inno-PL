@@ -1,11 +1,10 @@
 # TeraBox · Hiệu quả đơn hàng (P&L)
 
-`inno/pl` is an AgentFlow app, built with the AgentFlow SDK: Sales enter a sales order, the app computes its P&L (revenue, cost, sales and financial costs, provisions, net profit against the contract type's threshold), routes the 15 approval and fulfilment tasks between departments with SLAs and AI assistance, and tracks KPIs. The design is `docs/superpowers/specs/2026-11-02-pl-agentflow-design.md`; the build plans are in `docs/superpowers/plans/`. Until plan 02 replaces it, the starter's case desk (the `case` entity, "Open a case", the Cases screen) is still in the package. It holds:
+`inno/pl` is an AgentFlow app, built with the AgentFlow SDK: Sales enter a sales order, the app computes its P&L (revenue, cost, sales and financial costs, provisions, net profit against the contract type's threshold), routes the 15 approval and fulfilment tasks between departments with SLAs and AI assistance, and tracks KPIs. The design is `docs/superpowers/specs/2026-11-02-pl-agentflow-design.md`; the build plans are in `docs/superpowers/plans/`. It holds:
 
 - **An app package** that AgentFlow installs, described by `config/`. `agentflow-app build` turns `config/` into `package/`, which is committed, so a reviewer reads what ships.
-  It holds the `case` entity, its create form, a view, its access, a rule and a stage model (`config/entities/case.json`), and the workflow "Open a case" (`config/build/open-case.mjs`).
 - **A UI module** that ships inside the package, and that AgentFlow opens in its own pages, at `/apps/<installation key>/`.
-  It is the Cases screen (`src/module/`): a list of cases with a "New case" dialog, on the AgentFlow UI kit.
+  It is the order screens (`src/module/`), on the AgentFlow UI kit.
 
 ## Commands
 
@@ -23,7 +22,7 @@ These commands run in the project's folder, after `pnpm install`:
 
 `pnpm build` also puts the module into `package/ui/` (git ignores that folder), and `pnpm test` ends with `agentflow-app types --check`, which fails when `src/generated/app.ts` is behind `package/`.
 
-`pnpm demo` serves the Cases screen on in-memory sample data at `http://localhost:5174/module.html`: nothing is sent anywhere, and `?empty` shows no cases, `?fail` a refused create.
+`pnpm demo` serves the order screens on in-memory sample data at `http://localhost:5174/module.html`: nothing is sent anywhere.
 
 `node_modules/@reflexify/agentflow-app-builder/README.md` documents `config/`. [Install the package](#install-the-package) puts it in an organization.
 

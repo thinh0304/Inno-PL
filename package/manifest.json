@@ -196,46 +196,6 @@
       "kind": "entity_view"
     },
     {
-      "key": "entity:case",
-      "kind": "entity"
-    },
-    {
-      "key": "entity_field:case/title",
-      "kind": "entity_field"
-    },
-    {
-      "key": "entity_field:case/urgent",
-      "kind": "entity_field"
-    },
-    {
-      "key": "entity_field:case/opened_on",
-      "kind": "entity_field"
-    },
-    {
-      "key": "entity_field:case/summary",
-      "kind": "entity_field"
-    },
-    {
-      "key": "entity_field:case/amount",
-      "kind": "entity_field"
-    },
-    {
-      "key": "entity_field:case/status",
-      "kind": "entity_field"
-    },
-    {
-      "key": "entity_field:case/opened_by",
-      "kind": "entity_field"
-    },
-    {
-      "key": "entity_view:case/all",
-      "kind": "entity_view"
-    },
-    {
-      "key": "form:case",
-      "kind": "form"
-    },
-    {
       "key": "entity:contract_type_rate",
       "kind": "entity"
     },
@@ -1324,10 +1284,6 @@
       "kind": "entity_view"
     },
     {
-      "key": "workflow:open_case",
-      "kind": "workflow"
-    },
-    {
       "key": "workflow:pl_selftest",
       "kind": "workflow"
     },
@@ -1370,24 +1326,6 @@
         "read": "organization",
         "list": "organization",
         "update": "organization"
-      }
-    },
-    {
-      "key": "case_app_users",
-      "to": "@param:app_users",
-      "entity": "@obj:entity:case",
-      "operations": {
-        "read": "organization",
-        "list": "organization",
-        "create": "organization"
-      },
-      "record_scopes": {
-        "update": [
-          {
-            "kind": "field",
-            "field": "opened_by"
-          }
-        ]
       }
     },
     {
@@ -2681,11 +2619,6 @@
         "list": "organization",
         "update": "organization"
       }
-    },
-    {
-      "key": "start_open_case",
-      "to": "@param:app_users",
-      "workflow": "@obj:workflow:open_case"
     },
     {
       "key": "start_pl_selftest",

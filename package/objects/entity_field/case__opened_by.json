@@ -1,8 +1,0 @@
-{
-  "label": "Opened by",
-  "type": "reference",
-  "target_entity_id": "@req:entity:user",
-  "default": {
-    "kind": "creator"
-  }
-}

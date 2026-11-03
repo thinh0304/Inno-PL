@@ -1,19 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pl: the module on its demo data</title>
+    <title>P&amp;L: màn hình trên dữ liệu mẫu</title>
     <style>
       /* The page around the module, not the module: its own stylesheet lives in its shadow root. */
       html, body { height: 100%; margin: 0; }
       body { background: oklch(0.984 0.003 248); }
       @media (prefers-color-scheme: dark) { body { background: oklch(0.18 0.022 255); } }
-      #cases { display: block; min-height: 100%; }
+      #app { display: block; min-height: 100%; }
     </style>
   </head>
   <body>
-    <div id="cases"></div>
+    <div id="app"></div>
     <script type="module" src="/src/module/demo.tsx"></script>
   </body>
 </html>
