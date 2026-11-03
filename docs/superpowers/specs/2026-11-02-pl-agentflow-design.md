@@ -144,7 +144,7 @@ Theo người dùng (03/11/2026): chi phí dự phòng được trích từ các
 
 | Entity | Nội dung | Đọc được bởi |
 |---|---|---|
-| `provision_entry` | người (AM / SA chủ quỹ), ref `order`, loại (góp / sử dụng / điều chỉnh của Admin), số tiền, trạng thái (dự kiến / ghi nhận / hủy), thời điểm. **Chỉ tạo**, không sửa / xóa | chủ quỹ, SD, ACC, Admin |
+| `provision_entry` | người (AM / SA chủ quỹ), ref `order`, loại (góp / sử dụng / điều chỉnh của Admin), số tiền, trạng thái (dự kiến / giữ chỗ / ghi nhận / hủy), thời điểm. Người dùng không sửa / xóa; chỉ workflow (automation group) đổi trạng thái | chủ quỹ, SD, ACC, Admin |
 
 - Số dư quỹ = Σ góp đã ghi nhận − Σ sử dụng đã ghi nhận (tính trong module / dashboard theo người).
 - **Góp:** mỗi đơn trích `giá vốn × tỷ lệ dự phòng theo loại HĐ` (Define dòng 33; như Excel PL!K53). Khoản này là chi phí của đơn. Bút toán góp ở trạng thái *dự kiến* từ khi đơn được phê duyệt, chuyển *ghi nhận* khi đơn **hoàn tất**; đơn Close-lost thì bút toán góp bị *hủy*.
