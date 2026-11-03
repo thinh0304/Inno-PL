@@ -1,32 +1,10 @@
 // Plan 03b against a real AgentFlow: the module's own OrdersApi (the one the screens use) reading and acting on the flow
 // as each person. The host is the sandbox client of that person; /app/objects only answers the app's own caller, so the
 // object ids come from the sandbox ids instead.
-import { as } from '@reflexify/agentflow-sdk/testing';
-import type { AppHost } from '@reflexify/agentflow-sdk';
 import { beforeAll, describe, expect, it } from 'vitest';
-import { createHttpOrdersApi } from '../src/module/http-orders-api';
 import type { OrdersApi } from '../src/module/orders-api';
-import { ADMIN, ids, newOrder, patch, TAG, userId, waitFor } from './flow-helpers';
-
-const objects = Object.entries(ids).filter(([key]) => key.startsWith('entity:')).map(([logical_key, id]) => ({
-  id, key: logical_key.slice('entity:'.length), kind: 'entity', logical_key, state: 'live', source: 'own', parent: null, feature: null,
-  contract: null, contract_version: null, customized: false }));
-
-function moduleApi(handle: string): OrdersApi {
-  const client = as(handle);
-  const api = new Proxy(client, {
-    get(target, property, receiver) {
-      if (property === 'GET') {
-        return (path: string, init?: unknown) => (path === '/app/objects'
-          ? Promise.resolve({ data: { revision: 1, objects }, response: new Response(null, { status: 200 }) })
-          : (target.GET as (p: string, i?: unknown) => unknown)(path, init));
-      }
-      return Reflect.get(target, property, receiver);
-    },
-  });
-  return createHttpOrdersApi({ api, context: { person: { id: userId(handle), name: handle, email: null }, org: { id: 'sandbox', name: 'Sandbox' },
-    locale: 'vi', theme: { mode: 'light', brand: 'agentflow' } } } as unknown as Pick<AppHost, 'api' | 'context'>);
-}
+import { ADMIN, newOrder, patch, TAG, userId, waitFor } from './flow-helpers';
+import { moduleApi } from './module-helpers';
 
 const taskOf = async (api: OrdersApi, orderId: string, code: string) => (await api.tasks(orderId)).find((t) => t.task_code === code);
 const until = (api: OrdersApi, orderId: string, code: string, status: string) =>

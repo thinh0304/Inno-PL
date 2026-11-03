@@ -898,7 +898,7 @@ var PL = (() => {
     }
     if (task === "t41") {
       for (const issue of validateOrder(ctx.draft, ctx.config, "customer_contract").issues) {
-        if (issue.severity === "error") issues.push({ code: "order_fields", slot: null, message: `${issue.path}: ${issue.message}` });
+        if (issue.severity === "error") issues.push({ code: "order_fields", slot: null, path: issue.path, message: `${issue.path}: ${issue.message}` });
       }
     }
     for (const slot of ctx.slots) {

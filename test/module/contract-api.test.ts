@@ -39,6 +39,18 @@ describe('contracts through the HTTP API', () => {
     expect(row.body).not.toHaveProperty('supplier');
   });
 
+  it('empty_numbers_are_left_out_of_the_record', async () => {
+    // The platform's create form refuses null for a number ("null is not of type number", found on the sandbox).
+    const b = seeded();
+    const api = createHttpOrdersApi(b.host);
+    await api.uploadContract('o1', { ...customerDraft, value: null, file: pdf() });
+    expect(b.all('contract').at(-1)!.body).not.toHaveProperty('value');
+    await api.uploadContract('o1', { ...customerDraft, party: 'supplier', supplier: 's1', value: null, advance_percent: null, file: pdf() });
+    const body = b.all('contract').at(-1)!.body;
+    expect(body).not.toHaveProperty('value');
+    expect(body).not.toHaveProperty('advance_percent');
+  });
+
   it('versions_count_per_party_supplier_and_step', async () => {
     const b = seeded();
     const api = createHttpOrdersApi(b.host);

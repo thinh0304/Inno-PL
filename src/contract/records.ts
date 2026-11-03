@@ -26,9 +26,10 @@ export function nextVersion(list: ContractRec[], party: Party, supplier: string 
 /** What the create form of `contract` receives for an upload. */
 export function contractBody(orderId: string, input: { party: Party; supplier: string | null; step: Step; value: number | null;
   advance_percent: number | null }, fileId: string, by: string, at: string, version: number): Rec {
+  // An empty number is left out: the create form refuses null for a number field.
   return { order: orderId, party: input.party, ...(input.party === 'supplier' ? { supplier: input.supplier } : {}), step: input.step,
-    file: [fileId], version, uploaded_by: by, uploaded_at: at, source: 'upload', value: input.value,
-    ...(input.party === 'supplier' ? { advance_percent: input.advance_percent } : {}) };
+    file: [fileId], version, uploaded_by: by, uploaded_at: at, source: 'upload', ...(input.value !== null ? { value: input.value } : {}),
+    ...(input.party === 'supplier' && input.advance_percent !== null ? { advance_percent: input.advance_percent } : {}) };
 }
 
 /** Newest first: by version, then by the time it was uploaded. */
