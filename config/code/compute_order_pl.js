@@ -681,9 +681,15 @@ var PL = (() => {
   return __toCommonJS(code_entry_exports);
 })();
 function main(inputs) {
+  var config = { item_type: inputs.cfg_item_type, contract_type_rate: inputs.cfg_contract_type_rate,
+    fin_cost_tier: inputs.cfg_fin_cost_tier, vat_rate: inputs.cfg_vat_rate, pl_setting: inputs.cfg_pl_setting,
+    task_sla: inputs.cfg_task_sla, deal_stage_weight: inputs.cfg_deal_stage_weight };
+  var keys = Object.keys(config);
+  var none = keys.every(function (k) { return config[k] == null; });
+  keys.forEach(function (k) { if (config[k] == null) config[k] = []; });
   return PL.runComputeOrderPl({
     records: { order: inputs.order, lines: inputs.lines, goods_prices: inputs.goods_prices,
       service_prices: inputs.service_prices, finance: inputs.finance },
-    proposals: inputs.proposals, existing: inputs.existing, config: inputs.config, now: inputs.now,
+    proposals: inputs.proposals, existing: inputs.existing, config: none ? null : config, now: inputs.now,
   });
 }

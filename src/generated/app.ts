@@ -292,13 +292,14 @@ export const OBJECTS = {
   'form:service_line_price': { kind: 'form', contractVersion: '0.1.0' },
   'form:staff': { kind: 'form', contractVersion: '0.1.0' },
   'form:supplier': { kind: 'form', contractVersion: '0.1.0' },
+  'workflow:compute_pl': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:open_case': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:pl_selftest': { kind: 'workflow', contractVersion: '0.1.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
 export type EntityKey = 'business_plan' | 'case' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
-export type WorkflowKey = 'open_case' | 'pl_selftest';
+export type WorkflowKey = 'compute_pl' | 'open_case' | 'pl_selftest';
 
 /** The value of each field of each entity, as a record carries it. */
 export interface EntityFields {
@@ -582,6 +583,7 @@ export interface EntityFields {
 
 /** What starting each workflow takes. */
 export interface WorkflowInputs {
+  compute_pl: Record<string, never>;
   open_case: {
     amount?: number;
     summary: string;

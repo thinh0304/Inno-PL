@@ -163,6 +163,13 @@
       "required": true,
       "label": "Tự động hóa PL",
       "help": "Nhóm chứa service principal chạy các workflow tự động (tính P&L, điều phối task, nhắc SLA) và một tài khoản riêng không bao giờ đăng nhập, không ai khác. Service principal cần role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
+    },
+    {
+      "key": "automation_principal",
+      "type": "service_principal_ref",
+      "required": true,
+      "label": "Tài khoản tự động hóa PL",
+      "help": "Service principal chạy các workflow tự động của ứng dụng (tính P&L, điều phối task, nhắc SLA). Đặt nó trong nhóm \"Tự động hóa PL\" và cho nó một role có entity.read, entity.list và entity.write."
     }
   ],
   "audience": "@param:app_users",
