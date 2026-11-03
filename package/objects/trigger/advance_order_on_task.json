@@ -1,0 +1,18 @@
+{
+  "workflow": "@obj:workflow:advance_order",
+  "kind": "entity_record",
+  "enabled": false,
+  "config": {
+    "entity_id": "@obj:entity:order_task",
+    "change_kind": "updated",
+    "input_mappings": [],
+    "filter": {
+      "in": [
+        "status",
+        {
+          "var": "event.changed"
+        }
+      ]
+    }
+  }
+}

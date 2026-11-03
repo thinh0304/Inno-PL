@@ -1,0 +1,30 @@
+{
+  "workflow": "@obj:workflow:close_lost_order",
+  "kind": "entity_record",
+  "enabled": false,
+  "config": {
+    "entity_id": "@obj:entity:order",
+    "change_kind": "updated",
+    "input_mappings": [],
+    "filter": {
+      "and": [
+        {
+          "in": [
+            "status",
+            {
+              "var": "event.changed"
+            }
+          ]
+        },
+        {
+          "==": [
+            {
+              "var": "status"
+            },
+            "close_lost"
+          ]
+        }
+      ]
+    }
+  }
+}

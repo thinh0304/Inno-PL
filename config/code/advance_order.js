@@ -1123,12 +1123,13 @@ var PL = (() => {
         pl_requested_at: now.pl_requested_at
       },
       order_changed: Object.keys(result.order).length > 0,
-      create_list: result.creates.map((c) => ({ task_code: c.task_code, stage: c.set.stage, role: c.set.role, am_user: draft.order.am, ...values(c.set) })),
+      create_list: result.creates.map((c) => ({ order: order.id, task_code: c.task_code, stage: c.set.stage, role: c.set.role, am_user: draft.order.am, ...values(c.set) })),
       update_list: result.updates.map((u) => {
         const full = { ...tasks.find((t) => t.task_code === u.task_code), ...u.set };
         return { id: u.id, task_code: u.task_code, expect_status: u.expect_status, ...values(full) };
       }),
       event_list: result.events.map((e) => ({
+        order: order.id,
         task_code: e.task_code,
         task_id: idOf(e.task_code),
         role: roleOf(e.task_code),

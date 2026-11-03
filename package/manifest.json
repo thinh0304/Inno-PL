@@ -1440,7 +1440,35 @@
       "kind": "workflow"
     },
     {
+      "key": "workflow:init_order_tasks",
+      "kind": "workflow"
+    },
+    {
+      "key": "workflow:advance_order",
+      "kind": "workflow"
+    },
+    {
+      "key": "workflow:close_lost_order",
+      "kind": "workflow"
+    },
+    {
+      "key": "workflow:sla_sweep",
+      "kind": "workflow"
+    },
+    {
+      "key": "trigger:advance_order_on_task",
+      "kind": "trigger"
+    },
+    {
+      "key": "trigger:close_lost_order_on_status",
+      "kind": "trigger"
+    },
+    {
       "key": "trigger:compute_pl_on_request",
+      "kind": "trigger"
+    },
+    {
+      "key": "trigger:init_order_tasks_on_create",
       "kind": "trigger"
     },
     {
@@ -1449,6 +1477,10 @@
     },
     {
       "key": "trigger:request_pl_on_proposal_update",
+      "kind": "trigger"
+    },
+    {
+      "key": "trigger:sla_sweep_hourly",
       "kind": "trigger"
     }
   ],

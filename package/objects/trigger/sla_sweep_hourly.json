@@ -1,0 +1,10 @@
+{
+  "workflow": "@obj:workflow:sla_sweep",
+  "kind": "schedule",
+  "enabled": false,
+  "config": {
+    "cron": "0 * * * 1-5",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "input_template": {}
+  }
+}

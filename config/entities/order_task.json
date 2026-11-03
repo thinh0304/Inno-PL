@@ -1132,7 +1132,67 @@
         ]
       },
       {
+        "from": "blocked",
+        "to": "skipped",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "blocked",
+        "to": "not_applicable",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "blocked",
+        "to": "cancelled",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
         "from": "open",
+        "to": "blocked",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "open",
+        "to": "skipped",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "open",
+        "to": "cancelled",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "done",
         "to": "blocked",
         "movers": [
           {
@@ -1153,7 +1213,27 @@
       },
       {
         "from": "done",
-        "to": "blocked",
+        "to": "skipped",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "done",
+        "to": "not_applicable",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "done",
+        "to": "cancelled",
         "movers": [
           {
             "kind": "in_group",
@@ -1172,8 +1252,28 @@
         ]
       },
       {
-        "from": "blocked",
+        "from": "skipped",
+        "to": "open",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "skipped",
         "to": "not_applicable",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "skipped",
+        "to": "cancelled",
         "movers": [
           {
             "kind": "in_group",
@@ -1192,7 +1292,17 @@
         ]
       },
       {
-        "from": "open",
+        "from": "not_applicable",
+        "to": "open",
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "${param:automation_group}"
+          }
+        ]
+      },
+      {
+        "from": "not_applicable",
         "to": "skipped",
         "movers": [
           {
@@ -1202,17 +1312,7 @@
         ]
       },
       {
-        "from": "blocked",
-        "to": "cancelled",
-        "movers": [
-          {
-            "kind": "in_group",
-            "group_id": "${param:automation_group}"
-          }
-        ]
-      },
-      {
-        "from": "open",
+        "from": "not_applicable",
         "to": "cancelled",
         "movers": [
           {

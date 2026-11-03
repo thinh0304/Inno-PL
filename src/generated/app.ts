@@ -318,18 +318,26 @@ export const OBJECTS = {
   'form:service_line_price': { kind: 'form', contractVersion: '0.1.0' },
   'form:staff': { kind: 'form', contractVersion: '0.1.0' },
   'form:supplier': { kind: 'form', contractVersion: '0.1.0' },
+  'trigger:advance_order_on_task': { kind: 'trigger', contractVersion: null },
+  'trigger:close_lost_order_on_status': { kind: 'trigger', contractVersion: null },
   'trigger:compute_pl_on_request': { kind: 'trigger', contractVersion: null },
+  'trigger:init_order_tasks_on_create': { kind: 'trigger', contractVersion: null },
   'trigger:request_pl_on_proposal': { kind: 'trigger', contractVersion: null },
   'trigger:request_pl_on_proposal_update': { kind: 'trigger', contractVersion: null },
+  'trigger:sla_sweep_hourly': { kind: 'trigger', contractVersion: null },
+  'workflow:advance_order': { kind: 'workflow', contractVersion: '0.1.0' },
+  'workflow:close_lost_order': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:compute_pl': { kind: 'workflow', contractVersion: '0.1.0' },
+  'workflow:init_order_tasks': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:pl_selftest': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:request_pl_on_proposal': { kind: 'workflow', contractVersion: '0.1.0' },
   'workflow:request_pl_on_proposal_update': { kind: 'workflow', contractVersion: '0.1.0' },
+  'workflow:sla_sweep': { kind: 'workflow', contractVersion: '0.1.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
 export type EntityKey = 'business_plan' | 'contract_type_rate' | 'customer' | 'deal_stage_weight' | 'fin_cost_tier' | 'goods_line_price' | 'item_type' | 'kpi_target' | 'order' | 'order_event' | 'order_finance' | 'order_line' | 'order_pl' | 'order_pl_goods' | 'order_pl_service' | 'order_task' | 'pl_setting' | 'purchase_proposal' | 'service_line_price' | 'staff' | 'supplier' | 'task_sla' | 'vat_rate';
-export type WorkflowKey = 'compute_pl' | 'pl_selftest' | 'request_pl_on_proposal' | 'request_pl_on_proposal_update';
+export type WorkflowKey = 'advance_order' | 'close_lost_order' | 'compute_pl' | 'init_order_tasks' | 'pl_selftest' | 'request_pl_on_proposal' | 'request_pl_on_proposal_update' | 'sla_sweep';
 
 /** The value of each field of each entity, as a record carries it. */
 export interface EntityFields {
@@ -639,8 +647,12 @@ export interface EntityFields {
 
 /** What starting each workflow takes. */
 export interface WorkflowInputs {
+  advance_order: Record<string, never>;
+  close_lost_order: Record<string, never>;
   compute_pl: Record<string, never>;
+  init_order_tasks: Record<string, never>;
   pl_selftest: Record<string, never>;
   request_pl_on_proposal: Record<string, never>;
   request_pl_on_proposal_update: Record<string, never>;
+  sla_sweep: Record<string, never>;
 }

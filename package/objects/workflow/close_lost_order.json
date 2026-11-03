@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0",
+  "name": "Hủy task khi đơn Close-lost",
+  "description": "Đơn chuyển Close-lost: hủy các task đang chờ làm và chưa tới lượt, ghi nhật ký với lý do.",
+  "runAs": "@param:automation_principal",
+  "exposedSteps": [],
+  "start": "start",
+  "end": [
+    "done"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "node_type": "start",
+      "parameters": {
+        "id": "start",
+        "label": "Start",
+        "inputContract": {
+          "subject": {
+            "kind": "entity",
+            "entityId": "@obj:entity:order",
+            "arity": "single"
+          },
+          "params": {
+            "kind": "none"
+          }
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "cancel_open",
+      "name": "Hủy task đang chờ",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "cancel_open",
+        "label": "Hủy task đang chờ",
+        "operation": "update_many",
+        "entityId": "@obj:entity:order_task",
+        "filters": [
+          {
+            "field": "order",
+            "op": "eq",
+            "value": {
+              "kind": "reference",
+              "value": "subject.record_id"
+            }
+          },
+          {
+            "field": "status",
+            "op": "eq",
+            "value": {
+              "kind": "literal",
+              "value": "open"
+            }
+          }
+        ],
+        "body": [
+          {
+            "field": "status",
+            "kind": "literal",
+            "value": "cancelled"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "cancel_blocked",
+      "name": "Hủy task chưa tới lượt",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "cancel_blocked",
+        "label": "Hủy task chưa tới lượt",
+        "operation": "update_many",
+        "entityId": "@obj:entity:order_task",
+        "filters": [
+          {
+            "field": "order",
+            "op": "eq",
+            "value": {
+              "kind": "reference",
+              "value": "subject.record_id"
+            }
+          },
+          {
+            "field": "status",
+            "op": "eq",
+            "value": {
+              "kind": "literal",
+              "value": "blocked"
+            }
+          }
+        ],
+        "body": [
+          {
+            "field": "status",
+            "kind": "literal",
+            "value": "cancelled"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "log",
+      "name": "Ghi nhật ký",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "log",
+        "label": "Ghi nhật ký",
+        "operation": "create",
+        "entityId": "@obj:entity:order_event",
+        "body": [
+          {
+            "field": "order",
+            "kind": "reference",
+            "value": "subject.record_id"
+          },
+          {
+            "field": "action",
+            "kind": "literal",
+            "value": "close_lost"
+          },
+          {
+            "field": "reason",
+            "kind": "reference",
+            "value": "subject.record.close_reason"
+          },
+          {
+            "field": "at",
+            "kind": "template",
+            "value": "{{ now() }}"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "done",
+      "name": "Đã hủy",
+      "node_type": "end",
+      "parameters": {
+        "id": "done",
+        "label": "Đã hủy",
+        "outcomeLabel": "Đã hủy"
+      },
+      "settings": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_start",
+      "from": "start",
+      "to": "cancel_open"
+    },
+    {
+      "id": "e_open",
+      "from": "cancel_open",
+      "to": "cancel_blocked"
+    },
+    {
+      "id": "e_blocked",
+      "from": "cancel_blocked",
+      "to": "log"
+    },
+    {
+      "id": "e_log",
+      "from": "log",
+      "to": "done"
+    }
+  ]
+}
