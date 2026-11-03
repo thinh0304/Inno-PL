@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { TASKS } from '../../src/flow/tasks';
 import { entity, fieldKeys, grantOf, opsOf } from '../order/entities.test';
@@ -119,5 +120,21 @@ describe('locks after submit', () => {
     expect(writeOps(r, 'changed')[0].field).toBe('status');
     expect(leaves(r).filter((l) => l.kind === 'field').map((l) => l.rule)).toEqual([
       { field: 'status', op: 'eq', value: 'close_lost' }, { field: 'contract_signed', op: 'eq', value: true }]);
+  });
+});
+
+describe('enum colours', () => {
+  // The builder does not check them; the install refuses an unknown one (sandbox: "unknown option color: slate").
+  it('option_colours_are_ones_the_platform_knows', () => {
+    const allowed = new Set(['gray', 'sky', 'teal', 'amber', 'emerald', 'violet', 'indigo', 'rose', 'fuchsia']);
+    const files = readdirSync(new URL('../../config/entities', import.meta.url)).filter((f) => f.endsWith('.json'));
+    const bad: string[] = [];
+    for (const file of files) {
+      const entityFile = JSON.parse(readFileSync(new URL(`../../config/entities/${file}`, import.meta.url), 'utf8'));
+      for (const f of entityFile.fields as Any[]) {
+        for (const v of (f.enum_values ?? []) as Any[]) if (v.color && !allowed.has(v.color) && !/^#[0-9a-fA-F]{6}$/.test(v.color)) bad.push(`${file}:${f.key}:${v.color}`);
+      }
+    }
+    expect(bad).toEqual([]);
   });
 });
