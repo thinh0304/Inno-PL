@@ -27,3 +27,11 @@ describe('the P&L is fixed once the order is approved', () => {
     expect(run({ approved: true }, [{ id: 'p', computed_at: '2026-11-03T09:00:05Z' }]).skip).toBe(false);
   });
 });
+
+describe('the platform\'s own time format', () => {
+  it('skips_with_nine_digit_fractions_and_an_offset', () => {
+    const approved = { approved: true, approved_at: '2026-11-03T18:54:40.100000000+07:00' };
+    expect(run(approved, [{ id: 'p', computed_at: '2026-11-03T18:54:44.945958101+07:00' }]).skip).toBe(true);
+    expect(run(approved, [{ id: 'p', computed_at: '2026-11-03T18:54:39.999999999+07:00' }]).skip).toBe(false);
+  });
+});

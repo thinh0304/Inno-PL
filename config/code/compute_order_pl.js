@@ -25,6 +25,22 @@ var PL = (() => {
     runComputeOrderPl: () => runComputeOrderPl
   });
 
+  // src/pl/time.ts
+  var ISO = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:[.,](\d+))?)?)?\s*(Z|[+-]\d{2}(?::?\d{2})?)?$/i;
+  function parseTime(value) {
+    if (typeof value !== "string") return Number.NaN;
+    const m = ISO.exec(value.trim());
+    if (!m) return Number.NaN;
+    const [, y, mo, d, h = "0", mi = "0", s = "0", fraction = "", zone = "Z"] = m;
+    const ms = Number(`${fraction}000`.slice(0, 3));
+    let offset = 0;
+    if (zone.toUpperCase() !== "Z") {
+      const digits = zone.slice(1).replace(":", "");
+      offset = (Number(digits.slice(0, 2)) * 60 + Number(digits.slice(2, 4) || "0")) * (zone[0] === "-" ? -1 : 1);
+    }
+    return Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s), ms) - offset * 6e4;
+  }
+
   // src/pl/kpi.ts
   function chooseWeightSet(applied, isNewOrder) {
     const service = applied === "dv_once" || applied === "dv_recurring";
@@ -685,8 +701,8 @@ var PL = (() => {
     const skipped = { skip: true, order_pl: {}, order_pl_service: {}, order_pl_goods: {}, order: { code: "", has_goods: false, has_service: false } };
     if (existing.some((pl) => pl.locked === true)) return skipped;
     const order = fieldsOf(args.records.order);
-    const approvedAt = Date.parse(String(order.approved_at ?? ""));
-    const computedAt = Math.max(...existing.map((pl) => Date.parse(String(pl.computed_at ?? ""))));
+    const approvedAt = parseTime(String(order.approved_at ?? ""));
+    const computedAt = Math.max(...existing.map((pl) => parseTime(String(pl.computed_at ?? ""))));
     if ((order.approved === true || order.approved === "true") && computedAt >= approvedAt) return skipped;
     const config = args.config ? configFromRecords(args.config) : DEFAULT_CONFIG;
     const draft = draftFromRecords(args.records, config);

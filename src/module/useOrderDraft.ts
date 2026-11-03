@@ -5,6 +5,7 @@ import { fieldsOf, toPlOrderInput } from '../order/records';
 import type { OrderDraft } from '../order/types';
 import { validateOrder, type FieldIssue } from '../order/validate';
 import { computePl, type PlResult } from '../pl/compute';
+import { parseTime } from '../pl/time';
 import { configFromRecords } from '../pl/config-records';
 import { DEFAULT_CONFIG } from '../pl/defaults';
 import type { PlConfig } from '../pl/types';
@@ -153,8 +154,8 @@ export function useOrderDraft(api: OrdersApi, id: string | null): OrderDraftHook
     setComputing(true);
     const done = (loaded: LoadedOrder | null) => {
       const order = loaded ? fieldsOf(loaded.records.order) : {};
-      const requested = Date.parse(String(order.pl_requested_at ?? ''));
-      const computed = Date.parse(String(loaded?.official.order_pl?.computed_at ?? ''));
+      const requested = parseTime(String(order.pl_requested_at ?? ''));
+      const computed = parseTime(String(loaded?.official.order_pl?.computed_at ?? ''));
       return !Number.isNaN(requested) && !Number.isNaN(computed) && computed >= requested;
     };
     const delays = [300, 1000, 2000, 4000, 8000, 15000, 30000];

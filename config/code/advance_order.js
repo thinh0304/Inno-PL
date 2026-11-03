@@ -823,13 +823,29 @@ var PL = (() => {
     return { issues, missingRequired };
   }
 
+  // src/pl/time.ts
+  var ISO = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:[.,](\d+))?)?)?\s*(Z|[+-]\d{2}(?::?\d{2})?)?$/i;
+  function parseTime(value) {
+    if (typeof value !== "string") return Number.NaN;
+    const m = ISO.exec(value.trim());
+    if (!m) return Number.NaN;
+    const [, y, mo, d, h = "0", mi = "0", s = "0", fraction = "", zone = "Z"] = m;
+    const ms = Number(`${fraction}000`.slice(0, 3));
+    let offset = 0;
+    if (zone.toUpperCase() !== "Z") {
+      const digits = zone.slice(1).replace(":", "");
+      offset = (Number(digits.slice(0, 2)) * 60 + Number(digits.slice(2, 4) || "0")) * (zone[0] === "-" ? -1 : 1);
+    }
+    return Date.UTC(Number(y), Number(mo) - 1, Number(d), Number(h), Number(mi), Number(s), ms) - offset * 6e4;
+  }
+
   // src/flow/calendar.ts
   var HOUR = 36e5;
   var VN = 7 * HOUR;
   var isWeekend = (vnMs) => [0, 6].includes(new Date(vnMs).getUTCDay());
   function addWorkingDays(fromIso, days) {
     if (!days) return null;
-    let vn = Date.parse(fromIso) + VN;
+    let vn = parseTime(fromIso) + VN;
     while (isWeekend(vn)) vn = Math.floor(vn / (24 * HOUR) + 1) * 24 * HOUR + 8 * HOUR;
     for (let left = days; left > 0; ) {
       vn += 24 * HOUR;
@@ -840,7 +856,7 @@ var PL = (() => {
   function lateDaysBetween(dueIso, untilIso) {
     let at = dueIso;
     let count = 0;
-    while (Date.parse(at) < Date.parse(untilIso) && count < 1e3) {
+    while (parseTime(at) < parseTime(untilIso) && count < 1e3) {
       at = addWorkingDays(at, 1);
       count += 1;
     }
@@ -848,11 +864,11 @@ var PL = (() => {
   }
   function dueState(dueIso, nowIso, doneIso) {
     if (!dueIso) return { state: null, lateDays: 0 };
-    const due = Date.parse(dueIso);
+    const due = parseTime(dueIso);
     if (doneIso) {
-      return Date.parse(doneIso) > due ? { state: "done_late", lateDays: lateDaysBetween(dueIso, doneIso) } : { state: "done_on_time", lateDays: 0 };
+      return parseTime(doneIso) > due ? { state: "done_late", lateDays: lateDaysBetween(dueIso, doneIso) } : { state: "done_on_time", lateDays: 0 };
     }
-    const now = Date.parse(nowIso);
+    const now = parseTime(nowIso);
     if (now > due) return { state: "overdue", lateDays: lateDaysBetween(dueIso, nowIso) };
     return { state: due - now < 24 * HOUR ? "due_soon" : "on_time", lateDays: 0 };
   }
