@@ -2,7 +2,8 @@
 // Bundle bởi scripts/build-code.mjs thành config/code/dieu-phoi.js; `main(inputs)` gọi `run`.
 import { DEFAULT_CONFIG, type PlConfig, type TaskCode } from '../domain/config';
 import { type FlowTask, type OrderStatus, type Role, type TaskStatus, nextActions } from '../domain/flow';
-import { type ContractKind, type Line, type LineType, isGoods, isService } from '../domain/lines';
+import { CONTRACT_KIND_OF_CODE, LINE_TYPE_OF_CODE } from '../domain/codes';
+import { type Line, isGoods, isService } from '../domain/lines';
 import { type CustomerTier, computePl } from '../domain/pl';
 
 /** Phase 1 chỉ mở t11–t31 (lộ trình Phase 3 mở hết). */
@@ -30,15 +31,6 @@ export interface DieuPhoiOutput {
   don: { trang_thai: string; giai_doan: number; co_dich_vu: boolean; co_hang_hoa: boolean; ky_thuat: string[]; mua_hang: string[] };
   chot: null | { pl_chot: string; cau_hinh_chot: string; ln_thuan_chot: number; dat_chot: boolean };
 }
-
-const LOAI: Record<string, LineType> = {
-  tb: 'TB', lic: 'LIC', lic_dk: 'LIC-DK', lic_ntnn: 'LIC-NTNN', dvtk_i: 'DVTK-I', dvtk_o: 'DVTK-O', dvdk_i: 'DVDK-I', dvdk_o: 'DVDK-O',
-  dvdk_ntnn: 'DVDK-NTNN', cloud_server: 'Cloud Server', colocation: 'Colocation', veeam: 'Veeam', manage_service: 'Manage Service',
-  other_services: 'Other Services',
-};
-const LOAI_HD: Record<string, ContractKind> = {
-  thuong_mai: 'Thương Mại', license_runrate: 'License/Runrate', dv_loai_1: 'Dịch vụ Loại I', dv_loai_2: 'Dịch vụ Loại II', fulfillment: 'Fulfillment',
-};
 
 /** Bản ghi API có thể để trường dưới `body` (AGENTS.md) hoặc phẳng; trả về dạng phẳng có `id`. */
 const flat = (r: unknown): Rec => {
@@ -73,12 +65,12 @@ export function run(inputs: DieuPhoiInputs): DieuPhoiOutput {
 
   const lines: Line[] = list(inputs.dong).map((l) => {
     const p = prices.get(l.id);
-    return { type: LOAI[String(l.loai)] ?? 'TB', qty: n(l.so_luong), sell: n(p?.don_gia_ban), discountPct: n(p?.chiet_khau),
+    return { type: LINE_TYPE_OF_CODE[String(l.loai)] ?? 'TB', qty: n(l.so_luong), sell: n(p?.don_gia_ban), discountPct: n(p?.chiet_khau),
       buy: n(l.gia_mua), months: n(l.so_thang) };
   });
   const pl = computePl({
     lines, tier: (don.hang_kh as CustomerTier) || 'pho_thong', creditDays: n(don.cong_no_ngay), salesCost: n(finance?.cpbh),
-    chosenKind: don.loai_hd_chon ? LOAI_HD[String(don.loai_hd_chon)] : undefined,
+    chosenKind: don.loai_hd_chon ? CONTRACT_KIND_OF_CODE[String(don.loai_hd_chon)] : undefined,
     deployStaff: !!don.nv_trien_khai, consultStaff: !!don.nv_tu_van, proposal: !!don.tv_proposal, poc: !!don.tv_poc,
   }, cfg);
 

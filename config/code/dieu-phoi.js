@@ -131,6 +131,35 @@ var APP = (() => {
     };
   }
 
+  // src/domain/codes.ts
+  var LINE_TYPE_OF_CODE = {
+    tb: "TB",
+    lic: "LIC",
+    lic_dk: "LIC-DK",
+    lic_ntnn: "LIC-NTNN",
+    dvtk_i: "DVTK-I",
+    dvtk_o: "DVTK-O",
+    dvdk_i: "DVDK-I",
+    dvdk_o: "DVDK-O",
+    dvdk_ntnn: "DVDK-NTNN",
+    cloud_server: "Cloud Server",
+    colocation: "Colocation",
+    veeam: "Veeam",
+    manage_service: "Manage Service",
+    other_services: "Other Services"
+  };
+  var LINE_CODES = Object.keys(LINE_TYPE_OF_CODE);
+  var CONTRACT_KIND_OF_CODE = {
+    thuong_mai: "Th\u01B0\u01A1ng M\u1EA1i",
+    license_runrate: "License/Runrate",
+    dv_loai_1: "D\u1ECBch v\u1EE5 Lo\u1EA1i I",
+    dv_loai_2: "D\u1ECBch v\u1EE5 Lo\u1EA1i II",
+    fulfillment: "Fulfillment"
+  };
+  var CODE_OF_CONTRACT_KIND = Object.fromEntries(
+    Object.entries(CONTRACT_KIND_OF_CODE).map(([code, kind]) => [kind, code])
+  );
+
   // src/domain/lines.ts
   var GOODS = ["TB", "LIC", "LIC-DK", "LIC-NTNN"];
   var MONTHLY = ["DVDK-I", "DVDK-O", "DVDK-NTNN", "Cloud Server", "Colocation", "Veeam", "Manage Service", "Other Services"];
@@ -238,29 +267,6 @@ var APP = (() => {
 
   // src/code/dieu-phoi.ts
   var SCOPE = ["t11", "t22", "t23", "t31"];
-  var LOAI = {
-    tb: "TB",
-    lic: "LIC",
-    lic_dk: "LIC-DK",
-    lic_ntnn: "LIC-NTNN",
-    dvtk_i: "DVTK-I",
-    dvtk_o: "DVTK-O",
-    dvdk_i: "DVDK-I",
-    dvdk_o: "DVDK-O",
-    dvdk_ntnn: "DVDK-NTNN",
-    cloud_server: "Cloud Server",
-    colocation: "Colocation",
-    veeam: "Veeam",
-    manage_service: "Manage Service",
-    other_services: "Other Services"
-  };
-  var LOAI_HD = {
-    thuong_mai: "Th\u01B0\u01A1ng M\u1EA1i",
-    license_runrate: "License/Runrate",
-    dv_loai_1: "D\u1ECBch v\u1EE5 Lo\u1EA1i I",
-    dv_loai_2: "D\u1ECBch v\u1EE5 Lo\u1EA1i II",
-    fulfillment: "Fulfillment"
-  };
   var flat = (r) => {
     const o = r ?? {};
     return o.body && typeof o.body === "object" ? { ...o.body, id: o.id } : o;
@@ -298,7 +304,7 @@ var APP = (() => {
     const lines = list(inputs.dong).map((l) => {
       const p = prices.get(l.id);
       return {
-        type: LOAI[String(l.loai)] ?? "TB",
+        type: LINE_TYPE_OF_CODE[String(l.loai)] ?? "TB",
         qty: n(l.so_luong),
         sell: n(p?.don_gia_ban),
         discountPct: n(p?.chiet_khau),
@@ -311,7 +317,7 @@ var APP = (() => {
       tier: don.hang_kh || "pho_thong",
       creditDays: n(don.cong_no_ngay),
       salesCost: n(finance?.cpbh),
-      chosenKind: don.loai_hd_chon ? LOAI_HD[String(don.loai_hd_chon)] : void 0,
+      chosenKind: don.loai_hd_chon ? CONTRACT_KIND_OF_CODE[String(don.loai_hd_chon)] : void 0,
       deployStaff: !!don.nv_trien_khai,
       consultStaff: !!don.nv_tu_van,
       proposal: !!don.tv_proposal,
