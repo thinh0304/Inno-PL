@@ -588,6 +588,12 @@
           {
             "kind": "write",
             "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
               "op": "changed_any",
               "fields": [
                 "trang_thai",

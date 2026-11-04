@@ -35,6 +35,8 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 | F-25 | Chặn | UI module | Ứng dụng đã cài không tải file lên được (`POST /attachments` → `APP_CEILING_DENIED`); host không có cách nào khác để người dùng tải file |
 | F-26 | Nhỏ | Dữ liệu | Trường `file` chỉ trả mảng id: tên file cần thêm một lần đọc `GET /attachments/{id}` mỗi file |
 | F-27 | Chặn | UI module | File do workflow sinh ra (bước `document`) trả `404` qua ứng dụng, kể cả khi đã gắn vào bản ghi ứng dụng đọc được |
+| F-28 | Nhỏ | Builder | `display_field` là trường `reference` qua được `build` và `sandbox check`, bị từ chối lúc cài |
+| F-29 | Nhỏ | Rule | `changed_any` / `changed` coi giá trị mặc định lúc tạo là thay đổi: rule "chỉ hệ thống ghi trường X" chặn luôn việc tạo bản ghi |
 
 ---
 
@@ -258,3 +260,19 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 - **Bằng chứng:** tài liệu trên; cùng với F-25 (ứng dụng không tải file lên), module không có đường nào đưa một file vào hay ra ngoài cách người dùng tải lên trực tiếp.
 - **Làm tạm:** kế hoạch 04 không dựng mẫu văn bản; để cho kế hoạch 05 (AI soạn dự thảo dùng cùng mẫu), khi nền tảng trả lời F-25 / F-27.
 - **Đề xuất:** khi file do lượt chạy sinh ra được gắn vào trường `file` của một bản ghi, coi bản ghi đó là chủ của file (ứng dụng đọc được bản ghi thì tải được file); hoặc cho bước `document` ghi thẳng vào trường `file` với chủ là bản ghi.
+
+## F-28 · `display_field` là trường `reference` qua được build, bị từ chối lúc cài
+
+- **Vướng:** entity `tai_chinh_don` có `"display_field": "don_hang"` (một `reference` tới đơn).
+- **Cách tái hiện** (tái hiện được): đặt `display_field` của một entity bằng khóa một trường `reference`, `pnpm build` (`wrote N package files`), `pnpm af sandbox check` (`sandbox.json is valid`), `pnpm af deploy --sandbox`: `APP_PLAN_CHANGED: … VALIDATION_ERROR: display field 'don_hang' must be a scalar field (a reference or file field cannot serve as the display label)`.
+- **Bằng chứng:** lần deploy sandbox đầu của Phase 1 (04/11/2026), SDK `sdk-v0.9.0`; `reference/entities.md` ("The display field") không nói điều này ở chỗ khai báo trường.
+- **Làm tạm:** dùng một trường vô hướng (`cpbh`) làm `display_field`.
+- **Đề xuất:** `build` từ chối `display_field` trỏ tới trường `reference` / `file` và nêu khóa trường, như đã từ chối các lỗi khác trước lúc cài.
+
+## F-29 · `changed_any` coi giá trị mặc định lúc tạo là thay đổi
+
+- **Vướng:** rule "chỉ hệ thống ghi `trang_thai`, `giai_doan`…" (condition: `changed_any` các trường đó và người ghi không thuộc nhóm tự động) chặn luôn việc người dùng tạo đơn, vì `trang_thai` có giá trị mặc định `nhap`.
+- **Cách tái hiện** (tái hiện được): entity có trường `status` mặc định `draft`, rule `{ changed_any: [status] }` + actor không thuộc nhóm tự động; người dùng tạo bản ghi không đặt `status`: `422 ENTITY_VALIDATION_RULE_FAILED: 1 record rule(s) refused the write`.
+- **Bằng chứng:** `e2e/p01-lat-mong.sandbox.test.ts` lần chạy đầu (2 test hỏng ở bước tạo đơn); `reference/rules-and-stages.md` ghi "On a create it holds for every field the create sets" nhưng không nói giá trị mặc định cũng tính.
+- **Làm tạm:** thêm leaf `is_update` vào các rule loại này.
+- **Đề xuất:** ghi ví dụ này vào `rules-and-stages.md`; hoặc `changed` không tính giá trị mặc định mà người ghi không gửi.

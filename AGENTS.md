@@ -1,8 +1,8 @@
 # Notes for coding agents
 
 This project is an AgentFlow app, built with the AgentFlow SDK: `inno/pl`, "TeraBox · Hiệu quả đơn hàng". It is being
-rebuilt from scratch on a new specification: today `config/` describes an empty package (no entities, no workflows), and
-`src/module/` shows a placeholder screen. The new spec goes in `docs/superpowers/specs/`, its plans in
+rebuilt from scratch on a new specification (`docs/superpowers/specs/2026-11-04-pl-v2-design.md`); the roadmap in
+`docs/superpowers/plans/` says which phase is built. The new spec goes in `docs/superpowers/specs/`, its plans in
 `docs/superpowers/plans/`. `config/` describes an app package, and the builder turns it into `package/`.
 
 ## Skills
@@ -41,7 +41,7 @@ The first version was built on a specification that turned out wrong, and was th
 ## Commands
 
 - `pnpm build`: `node scripts/build-code.mjs && agentflow-app build`: bundles each Code step's TypeScript (the `ENTRIES`
-  of `scripts/build-code.mjs`, none yet) into `config/code/<name>.js`, then writes `package/` from `config/`.
+  of `scripts/build-code.mjs`) into `config/code/<name>.js`, then writes `package/` from `config/`.
   `pnpm build:code` does the first part alone.
 - `pnpm build` also writes the UI module into `package/ui`: built with Vite, or copied as it is when `ui` in
   `agentflow.app.mjs` names a `prebuilt` folder.
@@ -110,18 +110,23 @@ What v1 learnt about AgentFlow, which any app here will meet (details and repros
 
 ## Where things are
 
-- `config/package-manifest.json`: the package's identity and parameters (today only `app_users`); raise `version` for
-  every release. Its `ui` and `launcher` members declare the module and its entry in AgentFlow's sidebar.
-- `config/entities/`, `config/build/`: none yet. `agentflow.app.mjs` merges the workflow modules of `config/build/`, in
-  publish order.
-- `scripts/build-code.mjs`: bundles a Code step's TypeScript into `config/code/<name>.js`; never edit those by hand.
+- `config/package-manifest.json`: the package's identity and parameters (one group per role: `app_users`, `nhom_sales`,
+  `nhom_tm`, `nhom_proc`, `nhom_sd`, `nhom_acc`, `nhom_admin`, plus the automation pair `tu_dong_principal` and
+  `nhom_tu_dong`); raise `version` for every release. Its `ui` and `launcher` members declare the module and its entry.
+- `config/entities/`: `don_hang`, `dong_hang`, `gia_ban_dong`, `tai_chinh_don`, `task` (a `work` entity: one record per
+  task of an order), `cau_hinh`. The money lives apart from what Kỹ thuật and Mua hàng read (spec §11.4).
+  `config/build/dieu-phoi.mjs` is the one workflow (trigger on a task's status; runs as the automation principal);
+  `agentflow.app.mjs` merges it.
+- `src/domain/`: the pure functions the module and the Code step share: `pl.ts` (the P&L formula), `lines.ts`, `config.ts`
+  (defaults), `flow.ts` (which tasks open when), `codes.ts`. `src/code/dieu-phoi.ts` is the Code step's entry; esbuild bundles
+  it into `config/code/dieu-phoi.js` (`scripts/build-code.mjs`): never edit that file by hand.
 - `src/module/`: `module.tsx` (the entry, `mount(root, host)`), `mount.tsx` (the stylesheet in the shadow root, the
-  language and the theme), `App.tsx` (picks the screen), `kit.tsx` (the kit's elements for React), `icons.tsx`,
-  `format.ts` (money, percentages and days the Vietnamese way), `text.ts` (vi and en), `styles.css`, `demo.tsx`
-  (for `module.html`).
-- `test/module/`: `test-host.tsx` (a host for screen tests), `shims.ts` (what jsdom lacks), `styles.test.ts` and
-  `ui-build.test.ts` (the module rules), `app.test.tsx`.
-- `sandbox.json`: the sandbox's people, groups and roles: one user group today; rewrite it with the new spec's roles.
+  language and the theme), `App.tsx` (routes `/`, `/don/new`, `/don/<id>`, `/viec`), `api.ts` (records through `host.api`),
+  `model.ts`, `screens/`, `kit.tsx`, `format.ts`, `text.ts` (vi and en), `styles.css`, `demo.tsx`.
+- `test/domain/`, `test/code/` (`run-code.ts` runs a Code step as AgentFlow does), `test/module/`, and
+  `e2e/p01-lat-mong.sandbox.test.ts` (Phase 1 on the sandbox).
+- `sandbox.json`: one person per role (`am1`, `is1`, `tm1`, `proc1`, `sd1`, `acc1`, `admin`) and the automation principal.
+- `docs/superpowers/specs/2026-11-04-pl-v2-design.md`: the spec; `docs/superpowers/plans/`: the roadmap and each phase's plan.
 - `docs/sdk-feedback.md`: the platform's snags, F-01 onwards. Add an F-xx for each new one, with "Cách tái hiện" and
   "Đề xuất".
 

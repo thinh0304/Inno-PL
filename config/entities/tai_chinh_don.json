@@ -54,7 +54,7 @@
       ]
     }
   ],
-  "display_field": "don_hang",
+  "display_field": "cpbh",
   "views": [
     {
       "key": "all",
@@ -278,6 +278,12 @@
       "condition": {
         "join": "and",
         "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
           {
             "kind": "write",
             "write": {

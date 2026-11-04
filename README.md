@@ -1,7 +1,9 @@
 # TeraBox · Hiệu quả đơn hàng
 
 `inno/pl` is an AgentFlow app, built with the AgentFlow SDK. It is being rebuilt from scratch on a new specification
-(`docs/superpowers/specs/`); today it is an empty package with a placeholder screen. It holds:
+(`docs/superpowers/specs/2026-11-04-pl-v2-design.md`), phase by phase (`docs/superpowers/plans/2026-11-04-pl-v2-roadmap.md`).
+Phase 1, the thin slice, is in: an order is created, its P&L is worked out as it is typed, and it goes through
+t11 → t22 ∥ t23 → t31 with tasks that appear in My Work. It holds:
 
 - **An app package** that AgentFlow installs, described by `config/`. `agentflow-app build` turns `config/` into
   `package/`, which is committed, so a reviewer reads what ships.
@@ -33,5 +35,10 @@ template). `node_modules/@reflexify/agentflow-app-builder/README.md` documents `
 1. `pnpm build && pnpm exec agentflow-app keygen --key-id dev-inno && pnpm seal` (leave `keygen` out once the key exists).
 2. `pnpm lint`, then `pnpm deploy:app`. An admin opens the link it prints, completes the setup and approves it.
 
-Installing asks for one group, `app_users` ("Người dùng ứng dụng"): everyone who uses the app. Give its members a role
-with `entity.read`, `entity.list` and `entity.write`: a role does not come from a group. The package has no trigger yet.
+Installing asks for one group for each role, `app_users` ("Người dùng ứng dụng", everyone who uses the app) and
+`nhom_sales` (AM and Inside Sale), `nhom_tm`, `nhom_proc`, `nhom_sd`, `nhom_acc`, `nhom_admin`, each holding the people
+who do that job (a job with one holder is a group with one member: when the person changes, change the member), and an
+automation pair: `tu_dong_principal` (a service principal) and `nhom_tu_dong` (the group holding it and one account that
+never signs in). Give every person a role with `entity.read`, `entity.list` and `entity.write`: a role does not come from a group.
+The package has one workflow, `dieu_phoi` ("Điều phối quy trình đơn hàng"), started by a trigger on a task's status. **A
+trigger ships off: an admin turns it on after installing**, or no task ever opens after the first.

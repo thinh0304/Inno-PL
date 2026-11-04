@@ -22,7 +22,7 @@
       ]
     }
   ],
-  "display_field": "don_hang",
+  "display_field": "cpbh",
   "create_form": "@obj:form:tai_chinh_don",
   "rules": [
     {
@@ -69,6 +69,12 @@
       "condition": {
         "join": "and",
         "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
           {
             "kind": "write",
             "write": {
