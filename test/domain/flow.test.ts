@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { type FlowOrder, type FlowTask, type TaskCode, nextActions } from '../../src/domain/flow';
+import { type FlowOrder, type FlowTask, type RequestCode, type TaskCode, nextActions } from '../../src/domain/flow';
 
 const P1: TaskCode[] = ['t11', 't22', 't23', 't31'];
 const MIXED: FlowOrder = { hasService: true, hasGoods: true, advanceFirst: false, revenue: 500_000_000, passed: true };
 const SERVICE_ONLY: FlowOrder = { hasService: true, hasGoods: false, advanceFirst: false, revenue: 250_000_000, passed: true };
-const t = (id: string, code: TaskCode, status: FlowTask['status']): FlowTask => ({ id, code, status });
+const t = (id: string, code: FlowTask['code'], status: FlowTask['status']): FlowTask => ({ id, code, status });
 
 describe('nextActions', () => {
   it('t11 xong, đơn hỗn hợp: mở t22 cho TM và t23 cho PROC, chốt P&L', () => {
@@ -84,7 +84,7 @@ describe('nextActions', () => {
 
 const ALL: TaskCode[] = ['t11', 't22', 't23', 't31', 't40', 't44', 't42', 't41', 't45', 't51', 't53', 't61', 't62', 't71', 't72'];
 const codes = (a: { code: TaskCode }[]) => a.map((x) => x.code);
-const upTo = (...pairs: [TaskCode, FlowTask['status']][]): FlowTask[] => pairs.map(([c, s], i) => t(`id${i}`, c, s));
+const upTo = (...pairs: [TaskCode | RequestCode, FlowTask['status']][]): FlowTask[] => pairs.map(([c, s], i) => t(`id${i}`, c, s));
 const D = (c: TaskCode): [TaskCode, FlowTask['status']] => [c, 'xong'];
 
 describe('nextActions: đủ 15 task', () => {
