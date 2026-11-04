@@ -5,11 +5,11 @@ import { type FlowTask, type OrderStatus, type Role, type TaskStatus, nextAction
 import { CONTRACT_KIND_OF_CODE, LINE_TYPE_OF_CODE } from '../domain/codes';
 import { type Line, isGoods, isService } from '../domain/lines';
 import { type CustomerTier, computePl } from '../domain/pl';
+import { flat, idOf, list, n } from '../domain/records';
 
 /** Phase 1 chỉ mở t11–t31 (lộ trình Phase 3 mở hết). */
 export const SCOPE: TaskCode[] = ['t11', 't22', 't23', 't31'];
 
-type Rec = Record<string, unknown> & { id: string };
 
 export interface DieuPhoiInputs {
   don: unknown;
@@ -31,15 +31,6 @@ export interface DieuPhoiOutput {
   don: { trang_thai: string; giai_doan: number; co_dich_vu: boolean; co_hang_hoa: boolean; ky_thuat: string[]; mua_hang: string[] };
   chot: null | { pl_chot: string; cau_hinh_chot: string; ln_thuan_chot: number; dat_chot: boolean };
 }
-
-/** Bản ghi API có thể để trường dưới `body` (AGENTS.md) hoặc phẳng; trả về dạng phẳng có `id`. */
-const flat = (r: unknown): Rec => {
-  const o = (r ?? {}) as Record<string, unknown>;
-  return (o.body && typeof o.body === 'object' ? { ...(o.body as object), id: o.id } : o) as Rec;
-};
-const list = (v: unknown): Rec[] => (Array.isArray(v) ? v.map(flat) : []);
-const n = (v: unknown): number => (typeof v === 'number' ? v : Number(v) || 0);
-const idOf = (v: unknown): string | null => (v && typeof v === 'object' ? String((v as Rec).id) : v ? String(v) : null);
 
 function mergeConfig(base: PlConfig, raw: unknown): PlConfig {
   let over: unknown = {};

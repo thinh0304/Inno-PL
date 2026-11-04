@@ -266,15 +266,17 @@ var APP = (() => {
     };
   }
 
-  // src/code/dieu-phoi.ts
-  var SCOPE = ["t11", "t22", "t23", "t31"];
-  var flat = (r) => {
+  // src/domain/records.ts
+  function flat(r) {
     const o = r ?? {};
     return o.body && typeof o.body === "object" ? { ...o.body, id: o.id } : o;
-  };
+  }
   var list = (v) => Array.isArray(v) ? v.map(flat) : [];
   var n = (v) => typeof v === "number" ? v : Number(v) || 0;
   var idOf = (v) => v && typeof v === "object" ? String(v.id) : v ? String(v) : null;
+
+  // src/code/dieu-phoi.ts
+  var SCOPE = ["t11", "t22", "t23", "t31"];
   function mergeConfig(base, raw) {
     let over = {};
     try {
