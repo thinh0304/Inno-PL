@@ -151,6 +151,11 @@ export function run(inputs: DieuPhoiInputs): DieuPhoiOutput {
     if (!late.onTime) lich_su.push(history('canh_bao', str(trigger.ma), `Hoàn thành quá hạn, trễ ${late.daysLate} ngày`, 'qua_han'));
   }
 
+  // Đi tiếp khi P&L không đạt ngưỡng (t11 gửi, t31 duyệt): lý do người dùng ghi trên task được lưu thành cảnh báo.
+  if (trigger.trang_thai === 'xong' && (trigger.ma === 't11' || trigger.ma === 't31') && !pl.passed && !returning) {
+    lich_su.push(history('canh_bao', str(trigger.ma), str(trigger.ly_do) || 'không có lý do', 'pl_khong_dat'));
+  }
+
   const tom_tat: DieuPhoiOutput['tom_tat'] = [];
   if (locked && !returning) {
     if (hasService) tom_tat.push({ don_hang: don.id, phan: 'dich_vu', du_lieu: JSON.stringify(summaryFor('dich_vu', plInput.lines, pl, cfg)), nhom_xem: [groups.tm] });

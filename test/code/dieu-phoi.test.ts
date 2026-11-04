@@ -154,5 +154,13 @@ describe('Code step dieu_phoi', () => {
       const warn = out.lich_su.find((h: { hanh_dong: string }) => h.hanh_dong === 'canh_bao');
       expect(warn.ghi_chu).toContain('trễ 3 ngày');
     });
+
+    it('t31 duyệt khi P&L không đạt: lý do trên task được ghi vào nhật ký cảnh báo', async () => {
+      const dv = validLine({ loai: 'dvtk_i', sku: '', co_cq: '', so_luong: 1, so_thang: 0, gia_mua: 90_000_000, don_gia_ban: 100_000_000 });
+      const kich_hoat = { id: 'k4', body: { ma: 't31', trang_thai: 'xong', ly_do: 'Khách chiến lược' } };
+      const out = await runCode('dieu-phoi.js', { ...inputs(validOrder(), [dv], ALL_DONE), de_xuat: [], kich_hoat });
+      const warn = out.lich_su.find((h: { hanh_dong: string; sau: string }) => h.hanh_dong === 'canh_bao' && h.sau === 'pl_khong_dat');
+      expect(warn.ghi_chu).toBe('Khách chiến lược');
+    });
   });
 });

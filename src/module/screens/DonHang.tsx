@@ -6,16 +6,18 @@ import { detectContractKinds } from '../../domain/lines.js';
 import { computePl, contractKindFor } from '../../domain/pl.js';
 import { defaultStages, stageSetFor, stagesTotal } from '../../domain/stages.js';
 import { normalize, parseNumber, validateOrder, type FormatKind, type Issue } from '../../domain/validate.js';
-import type { Api, LoadedOrder, SupplierRec } from '../api.js';
+import type { Api, LoadedOrder, SupplierRec, TaskAct } from '../api.js';
+import { TASKS } from '../../domain/flow.js';
 import { fillEmpty, quickFill, suggest, suggestCode, type Conflict, type CustomerRec } from '../customerBook.js';
 import { emptyLine, onlyMine, plInputFromForm } from '../model.js';
 import { TEXT, type Lang, type TextKey } from '../text.js';
 import { LinesTable } from './LinesTable.js';
 import { PlPanel } from './PlPanel.js';
-import { TaskActions } from './ViecCuaBan.js';
+import { SlaChip, TaskActions, taskKind } from './ViecCuaBan.js';
+import { PurchasePanel } from './PurchasePanel.js';
+import { RequestPanel } from './RequestPanel.js';
 
 const STAGES = [1, 2, 3, 4, 5, 6, 7];
-const ACTION_KIND: Record<string, 'submit' | 'approve' | 'do'> = { t11: 'submit', t22: 'approve', t31: 'approve', t23: 'do' };
 
 type StrKey = { [K in keyof Required<OrderForm>]: Required<OrderForm>[K] extends string ? K : never }[keyof Required<OrderForm>];
 type NumKey = { [K in keyof Required<OrderForm>]: Required<OrderForm>[K] extends number ? K : never }[keyof Required<OrderForm>];
@@ -120,8 +122,9 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
     setMessage({ kind: 'ok', text: t.saved });
   });
 
+  const plResult = loaded?.locked && !editable ? loaded.locked.result : live;
   const mine = onlyMine((loaded?.tasks ?? []).filter((x) => x.trang_thai === 'dang_lam'), loaded?.workIds ?? new Set<string>());
-  const act = (taskId: string, status: 'xong' | 'tra_lai', reason: string) => run(async () => {
+  const act = (taskId: string, status: TaskAct, reason: string) => run(async () => {
     const isSubmit = mine.find((x) => x.id === taskId)?.ma === 't11';
     if (isSubmit && status === 'xong') {
       if (issues.length) { setShowRequired(true); return; }
@@ -131,7 +134,6 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
     await load();
   });
 
-  const plResult = loaded?.locked && !editable ? loaded.locked.result : live;
   const pct = (v: number) => String(Math.round(v * 10000) / 100);
   return (
     <main className="screen">
@@ -143,7 +145,11 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
 
       {id && loaded ? (
         <ol className="stages" aria-label={t.stage}>
-          {STAGES.map((s) => <li key={s} className={s < loaded.giai_doan ? 'done' : s === loaded.giai_doan ? 'cur' : undefined}>{s} · {t[`stage.${s}` as TextKey]}</li>)}
+          {STAGES.map((s) => {
+            // Task chạy trước giai đoạn của nó mang nhãn "Song song" (spec §7.1).
+            const parallel = loaded.tasks.some((x) => x.trang_thai === 'dang_lam' && TASKS[x.ma as keyof typeof TASKS]?.stage === s && s > loaded.giai_doan);
+            return <li key={s} className={s < loaded.giai_doan ? 'done' : s === loaded.giai_doan ? 'cur' : undefined}>{s} · {t[`stage.${s}` as TextKey]}{parallel ? ` (${t.parallel})` : ''}</li>;
+          })}
         </ol>
       ) : null}
 
@@ -156,11 +162,23 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
           <h2>{t.myTasks}</h2>
           {mine.map((x) => (
             <div key={x.id} className="task">
-              <b>{t[`task.${x.ma}` as TextKey] ?? x.ma}</b>
-              <TaskActions kind={ACTION_KIND[x.ma] ?? 'do'} lang={lang} busy={busy} onAct={(s, r) => void act(x.id, s, r)} />
+              <b>{t[`task.${x.ma}` as TextKey] ?? x.ma}</b> <SlaChip han={x.han} lang={lang} />
+              <TaskActions kind={taskKind(x.ma)} lang={lang} busy={busy} warning={(x.ma === 't11' || x.ma === 't31') && seesMoney && !plResult.passed ? t.warnPlFail : undefined}
+                onAct={(st, r) => void act(x.id, st, r)} />
             </div>
           ))}
         </section>
+      ) : null}
+
+      {id && loaded ? (
+        <RequestPanel lang={lang} busy={busy} status={loaded.trang_thai} tasks={loaded.tasks}
+          onRequest={(kind, reason) => void run(async () => { await api.requestOrder(id, kind, reason); setMessage({ kind: 'ok', text: t.requestSent }); })} />
+      ) : null}
+
+      {id && loaded?.proposals ? (
+        <PurchasePanel lang={lang} busy={busy} lines={lines} proposals={loaded.proposals} suppliers={suppliers}
+          editable={loaded.tasks.some((x) => x.ma === 't23' && x.trang_thai === 'dang_lam' && loaded.workIds.has(x.id))}
+          onSave={(rows) => void run(async () => { await api.saveProposals(id, rows); await load(); setMessage({ kind: 'ok', text: t.saved }); })} />
       ) : null}
 
       <section className="panel">

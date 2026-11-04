@@ -811,6 +811,9 @@ var APP = (() => {
       const late = lateness(str(trigger.han) || null, done);
       if (!late.onTime) lich_su.push(history("canh_bao", str(trigger.ma), `Ho\xE0n th\xE0nh qu\xE1 h\u1EA1n, tr\u1EC5 ${late.daysLate} ng\xE0y`, "qua_han"));
     }
+    if (trigger.trang_thai === "xong" && (trigger.ma === "t11" || trigger.ma === "t31") && !pl.passed && !returning) {
+      lich_su.push(history("canh_bao", str(trigger.ma), str(trigger.ly_do) || "kh\xF4ng c\xF3 l\xFD do", "pl_khong_dat"));
+    }
     const tom_tat = [];
     if (locked && !returning) {
       if (hasService) tom_tat.push({ don_hang: don.id, phan: "dich_vu", du_lieu: JSON.stringify(summaryFor("dich_vu", plInput.lines, pl, cfg)), nhom_xem: [groups.tm] });
