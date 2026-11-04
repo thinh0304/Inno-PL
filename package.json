@@ -22,13 +22,13 @@
     "test:sandbox": "vitest run --config vitest.sandbox.config.ts"
   },
   "dependencies": {
-    "@reflexify/agentflow-elements": "github:reflexify/agentflow-sdk#sdk-v0.7.0&path:packages/agentflow-elements",
-    "@reflexify/agentflow-sdk": "github:reflexify/agentflow-sdk#sdk-v0.7.0&path:packages/agentflow-sdk",
+    "@reflexify/agentflow-elements": "github:reflexify/agentflow-sdk#sdk-v0.9.0&path:packages/agentflow-elements",
+    "@reflexify/agentflow-sdk": "github:reflexify/agentflow-sdk#sdk-v0.9.0&path:packages/agentflow-sdk",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
   "devDependencies": {
-    "@reflexify/agentflow-app-builder": "github:reflexify/agentflow-sdk#sdk-v0.7.0&path:packages/agentflow-app-builder",
+    "@reflexify/agentflow-app-builder": "github:reflexify/agentflow-sdk#sdk-v0.9.0&path:packages/agentflow-app-builder",
     "@testing-library/react": "^16.3.3",
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",

@@ -167,11 +167,11 @@ importers:
   .:
     dependencies:
       '@reflexify/agentflow-elements':
-        specifier: github:reflexify/agentflow-sdk#sdk-v0.7.0&path:packages/agentflow-elements
-        version: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91#path:packages/agentflow-elements(@floating-ui/dom@1.8.0)(svelte@5.57.3)
+        specifier: github:reflexify/agentflow-sdk#sdk-v0.9.0&path:packages/agentflow-elements
+        version: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-elements(@floating-ui/dom@1.8.0)(svelte@5.57.3)
       '@reflexify/agentflow-sdk':
-        specifier: github:reflexify/agentflow-sdk#sdk-v0.7.0&path:packages/agentflow-sdk
-        version: git+https://github.com/reflexify/agentflow-sdk.git#a98498c4b49b49ce401675f4834ed6f04603bb91&path:packages/agentflow-sdk
+        specifier: github:reflexify/agentflow-sdk#sdk-v0.9.0&path:packages/agentflow-sdk
+        version: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-sdk
       react:
         specifier: ^19.3.0
         version: 19.3.1
@@ -180,8 +180,8 @@ importers:
         version: 19.3.1(react@19.3.1)
     devDependencies:
       '@reflexify/agentflow-app-builder':
-        specifier: github:reflexify/agentflow-sdk#sdk-v0.7.0&path:packages/agentflow-app-builder
-        version: git+https://github.com/reflexify/agentflow-sdk.git#a98498c4b49b49ce401675f4834ed6f04603bb91&path:packages/agentflow-app-builder
+        specifier: github:reflexify/agentflow-sdk#sdk-v0.9.0&path:packages/agentflow-app-builder
+        version: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-app-builder
       '@testing-library/react':
         specifier: ^16.3.3
         version: 16.3.3(@testing-library/dom@10.4.2)(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -479,23 +479,19 @@ packages:
   '@oxc-project/types@0.156.0':
     resolution: {integrity: sha512-1Duyg48TdJNdyhEB8Xn1L36bT9Pv6GUtlKjHxOys8xkaF/rQq3XJE+bAurSK/AgIz5mGFsb77cn9Pb20+WCScw==}
 
-  '@reflexify/agentflow-app-builder@git+https://github.com/reflexify/agentflow-sdk.git#a98498c4b49b49ce401675f4834ed6f04603bb91&path:packages/agentflow-app-builder':
-    resolution: {commit: a98498c4b49b49ce401675f4834ed6f04603bb91, path: packages/agentflow-app-builder, repo: https://github.com/reflexify/agentflow-sdk.git, type: git}
-    version: 0.7.0
+  '@reflexify/agentflow-app-builder@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-app-builder':
+    resolution: {gitHosted: true, integrity: sha512-ryJwu9m9z3wJ/9pYe3iaPltMG269t2w2FeSOPvx/RsR47iD8wzykQQYH5S+CjtZlz1PuIQo7DSdg1VCx5KT7jg==, path: packages/agentflow-app-builder, tarball: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675}
+    version: 0.9.0
     engines: {node: '>=22.9.0'}
     hasBin: true
 
-  '@reflexify/agentflow-elements@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91#path:packages/agentflow-elements':
-    resolution: {gitHosted: true, integrity: sha512-0u32B7TuusH2rOMZnp5CHELnpEXFTxg2VlKbn7PsDweHFgMQ/yPXAP6tNG04qa9wNcEhwlCh8nIOl8ybQiNPDg==, path: packages/agentflow-elements, tarball: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91}
-    version: 0.7.0
+  '@reflexify/agentflow-elements@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-elements':
+    resolution: {gitHosted: true, integrity: sha512-ryJwu9m9z3wJ/9pYe3iaPltMG269t2w2FeSOPvx/RsR47iD8wzykQQYH5S+CjtZlz1PuIQo7DSdg1VCx5KT7jg==, path: packages/agentflow-elements, tarball: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675}
+    version: 0.9.0
 
-  '@reflexify/agentflow-sdk@git+https://github.com/reflexify/agentflow-sdk.git#a98498c4b49b49ce401675f4834ed6f04603bb91&path:packages/agentflow-sdk':
-    resolution: {commit: a98498c4b49b49ce401675f4834ed6f04603bb91, path: packages/agentflow-sdk, repo: https://github.com/reflexify/agentflow-sdk.git, type: git}
-    version: 0.7.0
-
-  '@reflexify/agentflow-sdk@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91#path:packages/agentflow-sdk':
-    resolution: {gitHosted: true, integrity: sha512-0u32B7TuusH2rOMZnp5CHELnpEXFTxg2VlKbn7PsDweHFgMQ/yPXAP6tNG04qa9wNcEhwlCh8nIOl8ybQiNPDg==, path: packages/agentflow-sdk, tarball: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91}
-    version: 0.7.0
+  '@reflexify/agentflow-sdk@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-sdk':
+    resolution: {gitHosted: true, integrity: sha512-ryJwu9m9z3wJ/9pYe3iaPltMG269t2w2FeSOPvx/RsR47iD8wzykQQYH5S+CjtZlz1PuIQo7DSdg1VCx5KT7jg==, path: packages/agentflow-sdk, tarball: https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675}
+    version: 0.9.0
 
   '@rolldown/binding-android-arm-eabi@1.2.16':
     resolution: {integrity: sha512-ia3DwAs0OsMGS7+IConptSiyk9pEXkOx/AbJ2n/lAGxH3QkWQus1t8d7gnAT38FCU2sQu8lUbeR6AiZFv4JxaA==}
@@ -1970,12 +1966,12 @@ snapshots:
 
   '@oxc-project/types@0.156.0': {}
 
-  '@reflexify/agentflow-app-builder@git+https://github.com/reflexify/agentflow-sdk.git#a98498c4b49b49ce401675f4834ed6f04603bb91&path:packages/agentflow-app-builder': {}
+  '@reflexify/agentflow-app-builder@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-app-builder': {}
 
-  '@reflexify/agentflow-elements@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91#path:packages/agentflow-elements(@floating-ui/dom@1.8.0)(svelte@5.57.3)':
+  '@reflexify/agentflow-elements@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-elements(@floating-ui/dom@1.8.0)(svelte@5.57.3)':
     dependencies:
       '@ark-ui/svelte': 5.25.0(svelte@5.57.3)
-      '@reflexify/agentflow-sdk': https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91#path:packages/agentflow-sdk
+      '@reflexify/agentflow-sdk': https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-sdk
       '@tiptap/core': 3.31.4(@tiptap/pm@3.31.4)
       '@tiptap/extension-list': 3.31.4(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)
       '@tiptap/extension-mention': 3.31.4(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4)(@tiptap/suggestion@3.31.4(@floating-ui/dom@1.8.0)(@tiptap/core@3.31.4(@tiptap/pm@3.31.4))(@tiptap/pm@3.31.4))
@@ -1988,13 +1984,7 @@ snapshots:
       - '@floating-ui/dom'
       - svelte
 
-  '@reflexify/agentflow-sdk@git+https://github.com/reflexify/agentflow-sdk.git#a98498c4b49b49ce401675f4834ed6f04603bb91&path:packages/agentflow-sdk':
-    dependencies:
-      jose: 6.2.14
-      openapi-fetch: 0.17.0
-      openid-client: 6.8.8
-
-  '@reflexify/agentflow-sdk@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/a98498c4b49b49ce401675f4834ed6f04603bb91#path:packages/agentflow-sdk':
+  '@reflexify/agentflow-sdk@https://codeload.github.com/reflexify/agentflow-sdk/tar.gz/0a4db408680986a2d4a68f171d15ab945c6d4675#path:packages/agentflow-sdk':
     dependencies:
       jose: 6.2.14
       openapi-fetch: 0.17.0
