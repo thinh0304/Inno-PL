@@ -8,7 +8,9 @@ import { build } from 'esbuild';
 const root = fileURLToPath(new URL('..', import.meta.url));
 
 /** name -> { entry: 'src/…/code-entry.ts', main: 'function main(inputs) { return APP.run…(inputs); }\n' } */
-const ENTRIES = {};
+const ENTRIES = {
+  'dieu-phoi': { entry: 'src/code/dieu-phoi.ts', main: 'function main(inputs) { return APP.run(inputs); }\n' },
+};
 
 export async function bundle(name) {
   const { entry, main } = ENTRIES[name];

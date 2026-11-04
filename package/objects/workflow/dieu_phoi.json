@@ -1,0 +1,697 @@
+{
+  "schemaVersion": "1.0",
+  "name": "Điều phối quy trình đơn hàng",
+  "description": "Khi một task xong, bị trả lại hoặc không áp dụng: mở các task đủ tiền đề, hủy task khi trả lại, ghi trạng thái đơn và chốt P&L.",
+  "runAs": "@param:tu_dong_principal",
+  "exposedSteps": [],
+  "start": "start",
+  "end": [
+    "xong_chot",
+    "xong"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "node_type": "start",
+      "parameters": {
+        "id": "start",
+        "label": "Start",
+        "inputContract": {
+          "subject": {
+            "kind": "entity",
+            "entityId": "@obj:entity:task",
+            "arity": "single"
+          },
+          "params": {
+            "kind": "none"
+          }
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "params",
+      "name": "Read the app's parameters",
+      "node_type": "set_variable",
+      "parameters": {
+        "id": "params",
+        "label": "Read the app's parameters",
+        "assignments": [
+          {
+            "target": "nhom_tm",
+            "kind": "literal",
+            "valueJson": "@param:nhom_tm"
+          },
+          {
+            "target": "nhom_proc",
+            "kind": "literal",
+            "valueJson": "@param:nhom_proc"
+          },
+          {
+            "target": "nhom_sd",
+            "kind": "literal",
+            "valueJson": "@param:nhom_sd"
+          },
+          {
+            "target": "nhom_acc",
+            "kind": "literal",
+            "valueJson": "@param:nhom_acc"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "don",
+      "name": "Đọc đơn",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "don",
+        "label": "Đọc đơn",
+        "operation": "get",
+        "entityId": "@obj:entity:don_hang",
+        "recordIdExpr": {
+          "kind": "reference",
+          "value": "subject.record.don_hang"
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "tasks",
+      "name": "Task của đơn",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "tasks",
+        "label": "Task của đơn",
+        "operation": "search",
+        "entityId": "@obj:entity:task",
+        "filters": [
+          {
+            "field": "don_hang",
+            "op": "eq",
+            "value": {
+              "kind": "reference",
+              "value": "subject.record.don_hang"
+            }
+          }
+        ],
+        "limit": 500
+      },
+      "settings": {}
+    },
+    {
+      "id": "dong",
+      "name": "Dòng hàng",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "dong",
+        "label": "Dòng hàng",
+        "operation": "search",
+        "entityId": "@obj:entity:dong_hang",
+        "filters": [
+          {
+            "field": "don_hang",
+            "op": "eq",
+            "value": {
+              "kind": "reference",
+              "value": "subject.record.don_hang"
+            }
+          }
+        ],
+        "limit": 1000
+      },
+      "settings": {}
+    },
+    {
+      "id": "gia",
+      "name": "Giá bán",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "gia",
+        "label": "Giá bán",
+        "operation": "search",
+        "entityId": "@obj:entity:gia_ban_dong",
+        "filters": [
+          {
+            "field": "don_hang",
+            "op": "eq",
+            "value": {
+              "kind": "reference",
+              "value": "subject.record.don_hang"
+            }
+          }
+        ],
+        "limit": 1000
+      },
+      "settings": {}
+    },
+    {
+      "id": "tc",
+      "name": "Tài chính đơn",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "tc",
+        "label": "Tài chính đơn",
+        "operation": "search",
+        "entityId": "@obj:entity:tai_chinh_don",
+        "filters": [
+          {
+            "field": "don_hang",
+            "op": "eq",
+            "value": {
+              "kind": "reference",
+              "value": "subject.record.don_hang"
+            }
+          }
+        ],
+        "limit": 1
+      },
+      "settings": {}
+    },
+    {
+      "id": "ch",
+      "name": "Cấu hình",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "ch",
+        "label": "Cấu hình",
+        "operation": "search",
+        "entityId": "@obj:entity:cau_hinh",
+        "filters": [
+          {
+            "field": "ten",
+            "op": "eq",
+            "value": {
+              "kind": "literal",
+              "value": "mac_dinh"
+            }
+          }
+        ],
+        "limit": 1
+      },
+      "settings": {}
+    },
+    {
+      "id": "tinh",
+      "name": "Tính việc cần làm",
+      "node_type": "code",
+      "parameters": {
+        "id": "tinh",
+        "label": "Tính việc cần làm",
+        "language": "javascript",
+        "source": "// GENERATED by scripts/build-code.mjs — do not edit\n\"use strict\";\nvar APP = (() => {\n  var __defProp = Object.defineProperty;\n  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;\n  var __getOwnPropNames = Object.getOwnPropertyNames;\n  var __hasOwnProp = Object.prototype.hasOwnProperty;\n  var __export = (target, all) => {\n    for (var name in all)\n      __defProp(target, name, { get: all[name], enumerable: true });\n  };\n  var __copyProps = (to, from, except, desc) => {\n    if (from && typeof from === \"object\" || typeof from === \"function\") {\n      for (let key of __getOwnPropNames(from))\n        if (!__hasOwnProp.call(to, key) && key !== except)\n          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });\n    }\n    return to;\n  };\n  var __toCommonJS = (mod) => __copyProps(__defProp({}, \"__esModule\", { value: true }), mod);\n\n  // src/code/dieu-phoi.ts\n  var dieu_phoi_exports = {};\n  __export(dieu_phoi_exports, {\n    SCOPE: () => SCOPE,\n    run: () => run\n  });\n\n  // src/domain/config.ts\n  var TASK_CODES = [\"t11\", \"t22\", \"t23\", \"t31\", \"t40\", \"t44\", \"t42\", \"t41\", \"t45\", \"t51\", \"t53\", \"t61\", \"t62\", \"t71\", \"t72\"];\n  var steps = (below) => ({\n    below,\n    steps: [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7].map((from, i) => ({ from, rate: Math.round((below + 0.05 * (i + 1)) * 100) / 100 }))\n  });\n  var contract = (threshold, consultBonus, provision, salesBonus) => ({\n    threshold,\n    deployBonus: 0.05,\n    consultBonus,\n    provision,\n    techSupportBonus: 0.03,\n    salesBonus\n  });\n  var DEFAULT_CONFIG = {\n    contracts: {\n      \"Th\\u01B0\\u01A1ng M\\u1EA1i\": contract(0.08, 0.03, 0.01, 0.1),\n      \"License/Runrate\": contract(0.05, 0.01, 5e-3, 0.08),\n      \"D\\u1ECBch v\\u1EE5 Lo\\u1EA1i I\": contract(0.4, 0.03, 0.05, 0.1),\n      \"D\\u1ECBch v\\u1EE5 Lo\\u1EA1i II\": contract(0.1, 0.03, 0.05, 0.1),\n      Fulfillment: contract(0.03, 0.01, 0, 0)\n    },\n    finance: { vip: steps(0.15), tiem_nang: steps(0.2), pho_thong: steps(0.25) },\n    foreignFactor: 0.12,\n    licenseSupport: 5e-3,\n    techSupportInternal: 0.05,\n    techSupportOutsourced: 0.02,\n    warrantyPerYear: 2e-3,\n    proposalBonus: 0.02,\n    pocBonus: 0.02,\n    creditBaseDays: 30,\n    creditStepDays: 15,\n    creditStepRate: 5e-3,\n    baseExchangeRate: 26e3,\n    annualInterest: 0.146,\n    defaultVat: 0.08,\n    autoApproveMaxRevenue: 3e8,\n    contractFileMinValue: 2e7,\n    slaDays: { t11: 1, t22: 1, t23: 1, t31: 1, t40: 2, t44: 1, t42: 1, t41: 3, t45: 2, t51: 3, t53: 2, t61: 7, t62: 7, t71: 2, t72: 1 }\n  };\n\n  // src/domain/flow.ts\n  var def = (code, role, stage, requires, when, kind, optional = false) => ({ code, role, stage, requires, when, optional, kind });\n  var TASKS = {\n    t11: def(\"t11\", \"am\", 1, [], \"always\", \"submit\"),\n    t22: def(\"t22\", \"tm\", 2, [\"t11\"], \"service\", \"approve\"),\n    t23: def(\"t23\", \"proc\", 2, [\"t11\"], \"goods\", \"do\"),\n    t31: def(\"t31\", \"sd\", 3, [\"t22\", \"t23\"], \"always\", \"approve\"),\n    t40: def(\"t40\", \"is\", 4, [\"t31\"], \"always\", \"do\"),\n    t44: def(\"t44\", \"proc\", 4, [\"t31\"], \"goods\", \"do\"),\n    t42: def(\"t42\", \"sd\", 4, [\"t40\", \"t44\"], \"always\", \"draft_review\"),\n    t41: def(\"t41\", \"is\", 4, [\"t42\"], \"always\", \"do\"),\n    t45: def(\"t45\", \"proc\", 4, [\"t42\"], \"goods\", \"do\"),\n    t51: def(\"t51\", \"acc\", 5, [\"t41\"], \"always\", \"do\", true),\n    t53: def(\"t53\", \"acc\", 5, [\"t45\"], \"goods\", \"do\", true),\n    t61: def(\"t61\", \"proc\", 6, [\"t45\", \"t53\"], \"goods\", \"do\"),\n    t62: def(\"t62\", \"tm\", 6, [\"t41\"], \"service\", \"do\"),\n    t71: def(\"t71\", \"acc\", 7, [\"t61\", \"t62\"], \"always\", \"do\"),\n    t72: def(\"t72\", \"acc\", 7, [\"t71\"], \"always\", \"do\")\n  };\n  var DONE = [\"xong\", \"khong_ap_dung\", \"bo_qua\"];\n  var AUTO_APPROVE_MAX = 3e8;\n  var applies = (d, o) => d.when === \"always\" || (d.when === \"service\" ? o.hasService : o.hasGoods);\n  var requiresOf = (d, o) => o.advanceFirst && (d.code === \"t61\" || d.code === \"t62\") ? [...d.requires, \"t51\"] : d.requires;\n  function nextActions(order, tasks, scope) {\n    const live = tasks.filter((x) => x.status !== \"huy\");\n    if (live.some((x) => x.status === \"tra_lai\")) {\n      return {\n        create: [{ code: \"t11\", role: \"am\", status: \"dang_lam\" }],\n        update: live.map((x) => ({ id: x.id, status: \"huy\" })),\n        order: { status: \"tra_lai\", stage: 1 }\n      };\n    }\n    const status = new Map(live.map((x) => [x.code, x.status]));\n    const isDone = (c) => DONE.includes(status.get(c));\n    const create = [];\n    for (let changed = true; changed; ) {\n      changed = false;\n      for (const code of TASK_CODES) {\n        const d = TASKS[code];\n        if (!scope.includes(code) || d.kind === \"submit\" || status.has(code)) continue;\n        if (!requiresOf(d, order).every(isDone)) continue;\n        let s = applies(d, order) ? \"dang_lam\" : \"bo_qua\";\n        if (code === \"t31\" && order.revenue <= AUTO_APPROVE_MAX && !order.hasGoods && order.passed) s = \"xong\";\n        create.push({ code, role: d.role, status: s });\n        status.set(code, s);\n        changed = true;\n      }\n    }\n    const approved = isDone(\"t31\");\n    const pending = scope.filter((c) => !isDone(c) && (status.has(c) || TASKS[c].kind !== \"submit\"));\n    const stage = pending.length ? Math.min(...pending.map((c) => TASKS[c].stage)) : Math.max(...scope.map((c) => TASKS[c].stage)) + 1;\n    const firstWave = create.some((c) => TASKS[c.code].requires.includes(\"t11\"));\n    const justApproved = approved && order.status !== \"da_phe_duyet\";\n    return {\n      create,\n      update: [],\n      order: {\n        status: approved ? \"da_phe_duyet\" : \"dang_xu_ly\",\n        stage,\n        ...firstWave || justApproved ? { lockPl: true } : {}\n      }\n    };\n  }\n\n  // src/domain/lines.ts\n  var GOODS = [\"TB\", \"LIC\", \"LIC-DK\", \"LIC-NTNN\"];\n  var MONTHLY = [\"DVDK-I\", \"DVDK-O\", \"DVDK-NTNN\", \"Cloud Server\", \"Colocation\", \"Veeam\", \"Manage Service\", \"Other Services\"];\n  var PERIODIC = [\"LIC-DK\", \"LIC-NTNN\"];\n  var FOREIGN = [\"LIC-NTNN\", \"DVDK-NTNN\"];\n  var isGoods = (t) => GOODS.includes(t);\n  var isService = (t) => !isGoods(t);\n  var isMonthly = (t) => MONTHLY.includes(t);\n  var isPeriodic = (t) => PERIODIC.includes(t);\n  var isForeign = (t) => FOREIGN.includes(t);\n  var monthFactor = (l) => isMonthly(l.type) ? l.months || 1 : 1;\n  function lineSell(l) {\n    return l.qty * l.sell * (1 - (l.discountPct || 0) / 100) * monthFactor(l);\n  }\n  function lineBuy(l, cfg) {\n    return l.qty * l.buy * monthFactor(l) * (isForeign(l.type) ? 1 + cfg.foreignFactor : 1);\n  }\n  function contractKindOf(t) {\n    if (isMonthly(t)) return \"D\\u1ECBch v\\u1EE5 Lo\\u1EA1i II\";\n    if (isPeriodic(t)) return \"License/Runrate\";\n    if (isService(t)) return \"D\\u1ECBch v\\u1EE5 Lo\\u1EA1i I\";\n    return \"Th\\u01B0\\u01A1ng M\\u1EA1i\";\n  }\n  function detectContractKinds(lines) {\n    const out = [];\n    for (const l of lines) {\n      const kind = contractKindOf(l.type);\n      const hit = out.find((x) => x.kind === kind);\n      if (hit) hit.revenue += lineSell(l);\n      else out.push({ kind, revenue: lineSell(l) });\n    }\n    return out;\n  }\n\n  // src/domain/pl.ts\n  var sum = (xs) => xs.reduce((a, b) => a + b, 0);\n  function contractKindFor(lines, chosen) {\n    if (chosen === \"Fulfillment\") return chosen;\n    const found = detectContractKinds(lines);\n    if (chosen && (found.length === 0 || found.some((x) => x.kind === chosen))) return chosen;\n    if (found.length === 0) return \"Th\\u01B0\\u01A1ng M\\u1EA1i\";\n    return found.reduce((best, x) => x.revenue > best.revenue ? x : best).kind;\n  }\n  function financeRate(salesCost, cost, tier, cfg) {\n    if (salesCost <= 0) return 0;\n    const ratio = cost ? salesCost / cost : 0;\n    const table = cfg.finance[tier];\n    let rate = table.below;\n    for (const s of [...table.steps].sort((a, b) => a.from - b.from)) if (ratio >= s.from) rate = s.rate;\n    return rate;\n  }\n  function computePl(input, cfg) {\n    const { lines } = input;\n    const kind = contractKindFor(lines, input.chosenKind);\n    const params = cfg.contracts[kind];\n    const revenue = sum(lines.map(lineSell));\n    const cost = sum(lines.map((l) => lineBuy(l, cfg)));\n    const grossProfit = revenue - cost;\n    const salesCost = input.salesCost || 0;\n    const rate = financeRate(salesCost, cost, input.tier, cfg);\n    const financeCost = salesCost > 0 ? Math.round(salesCost * rate / (1 - rate)) : 0;\n    const afterSales = grossProfit - salesCost - financeCost;\n    const buyOf = (pick) => sum(lines.filter(pick).map((l) => lineBuy(l, cfg)));\n    const warrantyBase = sum(\n      lines.filter((l) => l.type === \"TB\" && l.months > 0).map((l) => lineBuy(l, cfg) * Math.ceil(l.months / 12))\n    );\n    const warranty = Math.round(warrantyBase * cfg.warrantyPerYear);\n    const licenseBase = buyOf((l) => [\"LIC\", \"LIC-DK\", \"LIC-NTNN\"].includes(l.type) || isForeign(l.type));\n    const licenseSupport = Math.round(licenseBase * cfg.licenseSupport);\n    const techSupport = Math.round(\n      buyOf((l) => l.type === \"DVDK-I\") * cfg.techSupportInternal + buyOf((l) => l.type === \"DVTK-O\") * cfg.techSupportOutsourced\n    );\n    const deployBonus = input.deployStaff ? Math.round(sum(lines.filter((l) => l.type === \"DVTK-I\").map(lineSell)) * params.deployBonus) : 0;\n    const provision = Math.round(cost * params.provision);\n    const running = afterSales - warranty - licenseSupport - techSupport - deployBonus - provision;\n    const consultRate = input.consultStaff ? params.consultBonus + (input.proposal ? cfg.proposalBonus : 0) + (input.poc ? cfg.pocBonus : 0) : 0;\n    const consultBonus = input.consultStaff ? Math.round(Math.max(0, running) * consultRate) : 0;\n    const fundTopUp = input.fundTopUp || 0;\n    const netProfit = running - consultBonus + fundTopUp;\n    const extraSteps = Math.max(0, Math.floor((input.creditDays - cfg.creditBaseDays) / cfg.creditStepDays));\n    const threshold = params.threshold + extraSteps * cfg.creditStepRate;\n    const margin = cost ? netProfit / cost : 0;\n    return {\n      kind,\n      revenue,\n      cost,\n      grossProfit,\n      salesCost,\n      financeRate: rate,\n      financeCost,\n      warranty,\n      licenseSupport,\n      techSupport,\n      deployBonus,\n      provision,\n      consultRate,\n      consultBonus,\n      fundTopUp,\n      netProfit,\n      threshold,\n      margin,\n      passed: cost > 0 && margin >= threshold\n    };\n  }\n\n  // src/code/dieu-phoi.ts\n  var SCOPE = [\"t11\", \"t22\", \"t23\", \"t31\"];\n  var LOAI = {\n    tb: \"TB\",\n    lic: \"LIC\",\n    lic_dk: \"LIC-DK\",\n    lic_ntnn: \"LIC-NTNN\",\n    dvtk_i: \"DVTK-I\",\n    dvtk_o: \"DVTK-O\",\n    dvdk_i: \"DVDK-I\",\n    dvdk_o: \"DVDK-O\",\n    dvdk_ntnn: \"DVDK-NTNN\",\n    cloud_server: \"Cloud Server\",\n    colocation: \"Colocation\",\n    veeam: \"Veeam\",\n    manage_service: \"Manage Service\",\n    other_services: \"Other Services\"\n  };\n  var LOAI_HD = {\n    thuong_mai: \"Th\\u01B0\\u01A1ng M\\u1EA1i\",\n    license_runrate: \"License/Runrate\",\n    dv_loai_1: \"D\\u1ECBch v\\u1EE5 Lo\\u1EA1i I\",\n    dv_loai_2: \"D\\u1ECBch v\\u1EE5 Lo\\u1EA1i II\",\n    fulfillment: \"Fulfillment\"\n  };\n  var flat = (r) => {\n    const o = r ?? {};\n    return o.body && typeof o.body === \"object\" ? { ...o.body, id: o.id } : o;\n  };\n  var list = (v) => Array.isArray(v) ? v.map(flat) : [];\n  var n = (v) => typeof v === \"number\" ? v : Number(v) || 0;\n  var idOf = (v) => v && typeof v === \"object\" ? String(v.id) : v ? String(v) : null;\n  function mergeConfig(base, raw) {\n    let over = {};\n    try {\n      over = JSON.parse(String(raw || \"{}\"));\n    } catch {\n      over = {};\n    }\n    const merge = (a, b) => {\n      if (!b || typeof b !== \"object\" || Array.isArray(b) || !a || typeof a !== \"object\" || Array.isArray(a)) return b ?? a;\n      const out = { ...a };\n      for (const [k, v] of Object.entries(b)) out[k] = merge(a[k], v);\n      return out;\n    };\n    return merge(base, over);\n  }\n  function run(inputs) {\n    const don = flat(inputs.don);\n    const tasks = list(inputs.tasks);\n    const prices = new Map(list(inputs.gia_ban).map((p) => [idOf(p.dong_hang), p]));\n    const finance = list(inputs.tai_chinh)[0];\n    const cfg = mergeConfig(DEFAULT_CONFIG, list(inputs.cau_hinh)[0]?.gia_tri);\n    const groups = {\n      tm: inputs.nhom_tm,\n      proc: inputs.nhom_proc,\n      sd: inputs.nhom_sd,\n      acc: inputs.nhom_acc\n    };\n    const lines = list(inputs.dong).map((l) => {\n      const p = prices.get(l.id);\n      return {\n        type: LOAI[String(l.loai)] ?? \"TB\",\n        qty: n(l.so_luong),\n        sell: n(p?.don_gia_ban),\n        discountPct: n(p?.chiet_khau),\n        buy: n(l.gia_mua),\n        months: n(l.so_thang)\n      };\n    });\n    const pl = computePl({\n      lines,\n      tier: don.hang_kh || \"pho_thong\",\n      creditDays: n(don.cong_no_ngay),\n      salesCost: n(finance?.cpbh),\n      chosenKind: don.loai_hd_chon ? LOAI_HD[String(don.loai_hd_chon)] : void 0,\n      deployStaff: !!don.nv_trien_khai,\n      consultStaff: !!don.nv_tu_van,\n      proposal: !!don.tv_proposal,\n      poc: !!don.tv_poc\n    }, cfg);\n    const hasService = lines.some((l) => isService(l.type));\n    const hasGoods = lines.some((l) => isGoods(l.type));\n    const flowTasks = tasks.map((t) => ({ id: t.id, code: t.ma, status: t.trang_thai }));\n    const actions = nextActions(\n      { hasService, hasGoods, advanceFirst: !!don.tu_truoc, revenue: pl.revenue, passed: pl.passed, status: don.trang_thai },\n      flowTasks,\n      SCOPE\n    );\n    const groupOf = (role) => role === \"am\" || role === \"is\" ? [] : [groups[role]];\n    return {\n      tao: actions.create.map((c) => ({\n        don_hang: don.id,\n        ma: c.code,\n        vai_tro: c.role,\n        trang_thai: c.status,\n        sla_ngay: cfg.slaDays[c.code] ?? 0,\n        am: idOf(don.am),\n        is: idOf(don.is),\n        nhom: groupOf(c.role)\n      })),\n      cap_nhat: actions.update.map((u) => ({ id: u.id, trang_thai: u.status })),\n      don: {\n        trang_thai: actions.order.status ?? String(don.trang_thai),\n        giai_doan: actions.order.stage ?? n(don.giai_doan),\n        co_dich_vu: hasService,\n        co_hang_hoa: hasGoods,\n        ky_thuat: hasService ? [groups.tm] : [],\n        mua_hang: hasGoods ? [groups.proc] : []\n      },\n      chot: actions.order.lockPl ? { pl_chot: JSON.stringify(pl), cau_hinh_chot: JSON.stringify(cfg), ln_thuan_chot: pl.netProfit, dat_chot: pl.passed } : null\n    };\n  }\n  return __toCommonJS(dieu_phoi_exports);\n})();\nfunction main(inputs) { return APP.run(inputs); }\n",
+        "inputs": [
+          {
+            "name": "don",
+            "kind": "reference",
+            "value": "nodes.don.output.record"
+          },
+          {
+            "name": "tasks",
+            "kind": "reference",
+            "value": "nodes.tasks.output.records"
+          },
+          {
+            "name": "dong",
+            "kind": "reference",
+            "value": "nodes.dong.output.records"
+          },
+          {
+            "name": "gia_ban",
+            "kind": "reference",
+            "value": "nodes.gia.output.records"
+          },
+          {
+            "name": "tai_chinh",
+            "kind": "reference",
+            "value": "nodes.tc.output.records"
+          },
+          {
+            "name": "cau_hinh",
+            "kind": "reference",
+            "value": "nodes.ch.output.records"
+          },
+          {
+            "name": "nhom_tm",
+            "kind": "reference",
+            "value": "vars.nhom_tm"
+          },
+          {
+            "name": "nhom_proc",
+            "kind": "reference",
+            "value": "vars.nhom_proc"
+          },
+          {
+            "name": "nhom_sd",
+            "kind": "reference",
+            "value": "vars.nhom_sd"
+          },
+          {
+            "name": "nhom_acc",
+            "kind": "reference",
+            "value": "vars.nhom_acc"
+          }
+        ],
+        "outputSchema": {
+          "type": "object",
+          "properties": {
+            "tao": {
+              "type": "array"
+            },
+            "cap_nhat": {
+              "type": "array"
+            },
+            "don": {
+              "type": "object"
+            },
+            "chot": {
+              "type": [
+                "object",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "tao",
+            "cap_nhat",
+            "don",
+            "chot"
+          ]
+        },
+        "timeoutSecs": 10
+      },
+      "settings": {}
+    },
+    {
+      "id": "cap_nhat",
+      "name": "Cập nhật task",
+      "node_type": "for_each",
+      "parameters": {
+        "id": "cap_nhat",
+        "label": "Cập nhật task",
+        "listSource": "nodes.tinh.output.cap_nhat",
+        "itemAlias": "u",
+        "mode": "sequential",
+        "continueOnItemFailure": false,
+        "failOnItemFailure": true,
+        "body": {
+          "schemaVersion": "1.0",
+          "start": "us",
+          "end": [
+            "ue"
+          ],
+          "nodes": [
+            {
+              "id": "us",
+              "name": "Task",
+              "node_type": "start",
+              "parameters": {
+                "id": "us",
+                "label": "Task"
+              },
+              "settings": {}
+            },
+            {
+              "id": "doi",
+              "name": "Đổi trạng thái task",
+              "node_type": "entity_record",
+              "parameters": {
+                "id": "doi",
+                "label": "Đổi trạng thái task",
+                "operation": "update",
+                "entityId": "@obj:entity:task",
+                "recordIdExpr": {
+                  "kind": "reference",
+                  "value": "input.u.id"
+                },
+                "body": [
+                  {
+                    "field": "trang_thai",
+                    "kind": "reference",
+                    "value": "input.u.trang_thai"
+                  }
+                ]
+              },
+              "settings": {}
+            },
+            {
+              "id": "ue",
+              "name": "Xong",
+              "node_type": "end",
+              "parameters": {
+                "id": "ue",
+                "label": "Xong"
+              },
+              "settings": {}
+            }
+          ],
+          "edges": [
+            {
+              "id": "ue0",
+              "from": "us",
+              "to": "doi"
+            },
+            {
+              "id": "ue1",
+              "from": "doi",
+              "to": "ue"
+            }
+          ]
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "mo_task",
+      "name": "Mở các task mới",
+      "node_type": "for_each",
+      "parameters": {
+        "id": "mo_task",
+        "label": "Mở các task mới",
+        "listSource": "nodes.tinh.output.tao",
+        "itemAlias": "t",
+        "mode": "sequential",
+        "continueOnItemFailure": false,
+        "failOnItemFailure": true,
+        "body": {
+          "schemaVersion": "1.0",
+          "start": "ms",
+          "end": [
+            "me"
+          ],
+          "nodes": [
+            {
+              "id": "ms",
+              "name": "Task",
+              "node_type": "start",
+              "parameters": {
+                "id": "ms",
+                "label": "Task"
+              },
+              "settings": {}
+            },
+            {
+              "id": "tao",
+              "name": "Tạo task",
+              "node_type": "entity_record",
+              "parameters": {
+                "id": "tao",
+                "label": "Tạo task",
+                "operation": "create",
+                "entityId": "@obj:entity:task",
+                "body": [
+                  {
+                    "field": "don_hang",
+                    "kind": "reference",
+                    "value": "input.t.don_hang"
+                  },
+                  {
+                    "field": "ma",
+                    "kind": "reference",
+                    "value": "input.t.ma"
+                  },
+                  {
+                    "field": "vai_tro",
+                    "kind": "reference",
+                    "value": "input.t.vai_tro"
+                  },
+                  {
+                    "field": "trang_thai",
+                    "kind": "reference",
+                    "value": "input.t.trang_thai"
+                  },
+                  {
+                    "field": "am",
+                    "kind": "reference",
+                    "value": "input.t.am"
+                  },
+                  {
+                    "field": "is",
+                    "kind": "reference",
+                    "value": "input.t.is"
+                  },
+                  {
+                    "field": "nhom",
+                    "kind": "reference",
+                    "value": "input.t.nhom"
+                  },
+                  {
+                    "field": "han",
+                    "kind": "template",
+                    "value": "{{ add_business_days(now(), input.t.sla_ngay) }}"
+                  }
+                ]
+              },
+              "settings": {}
+            },
+            {
+              "id": "me",
+              "name": "Xong",
+              "node_type": "end",
+              "parameters": {
+                "id": "me",
+                "label": "Xong"
+              },
+              "settings": {}
+            }
+          ],
+          "edges": [
+            {
+              "id": "me0",
+              "from": "ms",
+              "to": "tao"
+            },
+            {
+              "id": "me1",
+              "from": "tao",
+              "to": "me"
+            }
+          ]
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "ghi_don",
+      "name": "Ghi trạng thái đơn",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "ghi_don",
+        "label": "Ghi trạng thái đơn",
+        "operation": "update",
+        "entityId": "@obj:entity:don_hang",
+        "recordIdExpr": {
+          "kind": "reference",
+          "value": "subject.record.don_hang"
+        },
+        "body": [
+          {
+            "field": "trang_thai",
+            "kind": "reference",
+            "value": "nodes.tinh.output.don.trang_thai"
+          },
+          {
+            "field": "giai_doan",
+            "kind": "reference",
+            "value": "nodes.tinh.output.don.giai_doan"
+          },
+          {
+            "field": "co_dich_vu",
+            "kind": "reference",
+            "value": "nodes.tinh.output.don.co_dich_vu"
+          },
+          {
+            "field": "co_hang_hoa",
+            "kind": "reference",
+            "value": "nodes.tinh.output.don.co_hang_hoa"
+          },
+          {
+            "field": "ky_thuat",
+            "kind": "reference",
+            "value": "nodes.tinh.output.don.ky_thuat"
+          },
+          {
+            "field": "mua_hang",
+            "kind": "reference",
+            "value": "nodes.tinh.output.don.mua_hang"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "can_chot",
+      "name": "Có chốt P&L?",
+      "node_type": "decision",
+      "parameters": {
+        "id": "can_chot",
+        "label": "Có chốt P&L?",
+        "branches": [
+          {
+            "edgeIds": [
+              "e_chot"
+            ],
+            "when": {
+              "!!": [
+                {
+                  "var": "nodes.tinh.output.chot"
+                }
+              ]
+            }
+          },
+          {
+            "edgeIds": [
+              "e_khong_chot"
+            ],
+            "default": true
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "chot",
+      "name": "Chốt P&L",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "chot",
+        "label": "Chốt P&L",
+        "operation": "update",
+        "entityId": "@obj:entity:tai_chinh_don",
+        "recordIdExpr": {
+          "kind": "reference",
+          "value": "nodes.tc.output.records[0].id"
+        },
+        "body": [
+          {
+            "field": "pl_chot",
+            "kind": "reference",
+            "value": "nodes.tinh.output.chot.pl_chot"
+          },
+          {
+            "field": "cau_hinh_chot",
+            "kind": "reference",
+            "value": "nodes.tinh.output.chot.cau_hinh_chot"
+          },
+          {
+            "field": "ln_thuan_chot",
+            "kind": "reference",
+            "value": "nodes.tinh.output.chot.ln_thuan_chot"
+          },
+          {
+            "field": "dat_chot",
+            "kind": "reference",
+            "value": "nodes.tinh.output.chot.dat_chot"
+          },
+          {
+            "field": "chot_luc",
+            "kind": "template",
+            "value": "{{ now() }}"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "xong_chot",
+      "name": "Đã chốt",
+      "node_type": "end",
+      "parameters": {
+        "id": "xong_chot",
+        "label": "Đã chốt",
+        "outcomeLabel": "chot"
+      },
+      "settings": {}
+    },
+    {
+      "id": "xong",
+      "name": "Xong",
+      "node_type": "end",
+      "parameters": {
+        "id": "xong",
+        "label": "Xong",
+        "outcomeLabel": "xong"
+      },
+      "settings": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_start",
+      "from": "start",
+      "to": "params"
+    },
+    {
+      "id": "e_params",
+      "from": "params",
+      "to": "don"
+    },
+    {
+      "id": "e_don",
+      "from": "don",
+      "to": "tasks"
+    },
+    {
+      "id": "e_tasks",
+      "from": "tasks",
+      "to": "dong"
+    },
+    {
+      "id": "e_dong",
+      "from": "dong",
+      "to": "gia"
+    },
+    {
+      "id": "e_gia",
+      "from": "gia",
+      "to": "tc"
+    },
+    {
+      "id": "e_tc",
+      "from": "tc",
+      "to": "ch"
+    },
+    {
+      "id": "e_ch",
+      "from": "ch",
+      "to": "tinh"
+    },
+    {
+      "id": "e_tinh",
+      "from": "tinh",
+      "to": "cap_nhat"
+    },
+    {
+      "id": "e_cap_nhat",
+      "from": "cap_nhat",
+      "to": "mo_task"
+    },
+    {
+      "id": "e_mo_task",
+      "from": "mo_task",
+      "to": "ghi_don"
+    },
+    {
+      "id": "e_ghi_don",
+      "from": "ghi_don",
+      "to": "can_chot"
+    },
+    {
+      "id": "e_chot",
+      "from": "can_chot",
+      "to": "chot"
+    },
+    {
+      "id": "e_khong_chot",
+      "from": "can_chot",
+      "to": "xong"
+    },
+    {
+      "id": "e_da_chot",
+      "from": "chot",
+      "to": "xong_chot"
+    }
+  ]
+}

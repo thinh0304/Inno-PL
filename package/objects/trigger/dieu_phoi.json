@@ -1,0 +1,40 @@
+{
+  "workflow": "@obj:workflow:dieu_phoi",
+  "kind": "entity_record",
+  "enabled": false,
+  "config": {
+    "entity_id": "@obj:entity:task",
+    "change_kind": "updated",
+    "input_mappings": [],
+    "filter": {
+      "and": [
+        {
+          "in": [
+            "trang_thai",
+            {
+              "var": "event.changed"
+            }
+          ]
+        },
+        {
+          "in": [
+            {
+              "var": "trang_thai"
+            },
+            [
+              "xong",
+              "tra_lai",
+              "khong_ap_dung"
+            ]
+          ]
+        }
+      ]
+    },
+    "group": {
+      "by": {
+        "kind": "field",
+        "field": "don_hang"
+      }
+    }
+  }
+}

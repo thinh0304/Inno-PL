@@ -466,6 +466,14 @@
     {
       "key": "form:task",
       "kind": "form"
+    },
+    {
+      "key": "workflow:dieu_phoi",
+      "kind": "workflow"
+    },
+    {
+      "key": "trigger:dieu_phoi",
+      "kind": "trigger"
     }
   ],
   "grants": [
