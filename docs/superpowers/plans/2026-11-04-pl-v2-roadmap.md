@@ -18,7 +18,8 @@ bản ghi `work` + workflow điều phối, P&L do server chốt bằng cùng b�
   và file (phụ thuộc nền tảng 2026.11, F-27); AI; quỹ, KPI, thưởng; dashboard và xuất; phát hành.
 - **Kiểm tra** theo `AGENTS.md`, mục "Testing": mỗi phase chỉ chạy test của phase (liệt kê trong kế hoạch phase), cộng `pnpm typecheck`,
   `pnpm build`, `pnpm check`; trên sandbox **deploy một lần mỗi phase** (`pnpm af deploy --sandbox`) và chỉ chạy file e2e của phase.
-  `pnpm test` và toàn bộ `pnpm test:sandbox` chỉ chạy ở Phase 8.
+  `pnpm test` và toàn bộ `pnpm test:sandbox` chỉ chạy ở Phase 8. **Unit test mỗi phase chỉ gồm những test cần thiết** để chứng minh
+  phần của phase; bộ unit test toàn diện viết ở Phase 8, khi đã xong mọi phase **[Quyết định 2026-11-04]**.
 - Mỗi vướng mắc SDK mới: một mục F-xx trong `docs/sdk-feedback.md` (có "Cách tái hiện", "Đề xuất").
 - Không push, không merge `main` khi người dùng chưa bảo. Không đọc `docs/archive/` (nội dung cần đã chép vào §12 của spec).
 
@@ -179,7 +180,7 @@ Excel.
 
 | Rủi ro | Ảnh hưởng | Cách xử lý |
 |---|---|---|
-| Nền tảng chưa lên 2026.11 | Phase 4 không upload được | đẩy Phase 4 sau Phase 5–7 (AI phần không cần file, KPI, dashboard vẫn làm được) |
+| Nền tảng chưa lên 2026.11 | Phase 4 không upload được | người dùng xác nhận với dev AgentFlow (nền tảng 2026.11 và F-27) **trước Phase 4**: ổn thì giữ thứ tự 4 → 5 → 6 → 7; chưa ổn thì làm 5 (phần không cần file), 6, 7 trước rồi mới 4 **[Quyết định 2026-11-04]** |
 | F-27 còn | không tải được HĐ do workflow sinh | dựng .docx trong module (§11.5) |
 | Điều phối task bị đua (hai thao tác cùng lúc) | task mở trùng / thiếu | Code step idempotent: luôn tính lại toàn bộ trạng thái từ dữ liệu, không dựa vào sự kiện; test ở Phase 1 và 3 |
 | Workflow sandbox chậm (7 s – 2 phút / lượt) | e2e lâu | e2e chờ theo điều kiện, mỗi phase ít ca, chạy từng file |
