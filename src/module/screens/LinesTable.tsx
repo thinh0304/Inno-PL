@@ -1,7 +1,7 @@
 import { LINE_CODES, LINE_TYPE_OF_CODE } from '../../domain/codes.js';
 import { emptyLine, type LineForm, type VatCode } from '../../domain/form.js';
 import { isMonthly } from '../../domain/lines.js';
-import { normalize, type FormatKind } from '../../domain/validate.js';
+import { normalize, parseNumber, type FormatKind } from '../../domain/validate.js';
 import type { SupplierRec } from '../api.js';
 import { TEXT, type Lang, type TextKey } from '../text.js';
 
@@ -31,7 +31,7 @@ function monthsLabel(code: string, lang: Lang): string {
 export function LinesTable({ lines, editable, lang, onChange, showPrices = true, suppliers = [], errors = {} }: LinesTableProps) {
   const t = TEXT[lang];
   const set = (i: number, patch: Partial<LineForm>) => onChange(lines.map((l, j) => (j === i ? { ...l, ...patch } : l)));
-  const num = (v: string) => (v === '' ? 0 : Number(v.replace(/[^\d.-]/g, '')) || 0);
+  const num = (v: string) => parseNumber(v);
   return (
     <div className="tbl-wrap">
       <table>

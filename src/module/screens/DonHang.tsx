@@ -5,7 +5,7 @@ import type { LineForm, OrderForm } from '../../domain/form.js';
 import { detectContractKinds } from '../../domain/lines.js';
 import { computePl, contractKindFor } from '../../domain/pl.js';
 import { defaultStages, stageSetFor, stagesTotal } from '../../domain/stages.js';
-import { normalize, validateOrder, type FormatKind, type Issue } from '../../domain/validate.js';
+import { normalize, parseNumber, validateOrder, type FormatKind, type Issue } from '../../domain/validate.js';
 import type { Api, LoadedOrder, SupplierRec } from '../api.js';
 import { fillEmpty, quickFill, suggest, suggestCode, type Conflict, type CustomerRec } from '../customerBook.js';
 import { emptyLine, onlyMine, plInputFromForm } from '../model.js';
@@ -95,11 +95,11 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
     <Field label={label} value={order[k] ?? ""} kind={kind} error={errors[k]} readOnly={!editable} onChange={(v) => { set(k, v as never); if (k === 'ten_kh' || k === 'ma_kh' || k === 'mst') setQuery(v); }} />
   );
   const number = (k: NumKey, label: string) => (
-    <Field label={label} type="number" value={order[k]} error={errors[k]} readOnly={!editable} onChange={(v) => set(k, (Number(v.replace(/[^\d.-]/g, '')) || 0) as never)} />
+    <Field label={label} type="number" value={order[k]} error={errors[k]} readOnly={!editable} onChange={(v) => set(k, parseNumber(v) as never)} />
   );
   const nullable = (k: 'cpbh_truoc' | 'doanh_thu_truoc' | 'ln_truoc', label: string) => (
     <Field label={label} type="number" value={order[k] ?? ''} error={errors[k]} readOnly={!editable}
-      onChange={(v) => set(k, v.trim() === '' ? null : Number(v.replace(/[^\d.-]/g, '')) || 0)} />
+      onChange={(v) => set(k, v.trim() === '' ? null : parseNumber(v))} />
   );
   const flag = (k: 'tv_proposal' | 'tv_poc' | 'tu_truoc' | 'don_moi' | 'kh_moi', label: string) => (
     <label className="check"><input type="checkbox" checked={order[k]} disabled={!editable} onChange={(e) => set(k, e.target.checked)} />{label}</label>
