@@ -2,7 +2,7 @@
 // bằng Code step `dieu_phoi` (src/code/dieu-phoi.ts), rồi mở task mới, hủy task, ghi trạng thái đơn và chốt P&L.
 import {
   NOBODY, NOW, bind, code, create, decision, edges, end, flt, getById, graph, lit, node, otherwise, readParameters, ref, search,
-  servicePrincipal, setvar, start, tpl, update, upsert, when, workflow,
+  servicePrincipal, setvar, start, tpl, update, updateMany, upsert, when, workflow,
 } from "@reflexify/agentflow-app-builder/workflow";
 
 const TASK = "${entity:task}";
@@ -139,6 +139,21 @@ export const workflows = {
   ),
 };
 
+// Nhắc hạn (spec §7.6): mỗi sáng đưa các task đang làm đã quá hạn lên ưu tiên cao, để hiện đầu My Work và thông báo của nền tảng.
+// Email nhắc cần một kết nối gửi thư của tổ chức (tham số connection_ref): chưa làm, ghi ở kế hoạch Phase 3.
+workflows.nhac_han = workflow(
+  "nhac_han", "Nhắc task quá hạn",
+  "Mỗi sáng: task đang làm có hạn đã qua thì đặt ưu tiên cao.",
+  servicePrincipal("tu_dong_principal"), NOBODY,
+  graph("Nhắc task quá hạn", [
+    start({}),
+    updateMany("qua_han", "Task quá hạn", TASK,
+      [flt("trang_thai", "eq", lit("dang_lam")), flt("han", "lt", tpl("{{ now() }}")), flt("uu_tien", "eq", lit("binh_thuong"))],
+      [bind("uu_tien", lit("cao"))]),
+    end("xong", "Xong", "xong"),
+  ], edges(["e_start", "start", "qua_han"], ["e_xong", "qua_han", "xong"])),
+);
+
 // Chỉ người làm task tạo ra các trạng thái này; workflow chỉ ghi dang_lam / bo_qua / xong (tạo mới) và huy, nên không tự gọi lại.
 export const triggers = {
   dieu_phoi: {
@@ -164,6 +179,11 @@ triggers.dieu_phoi_yeu_cau = {
     filter: { in: [{ var: "ma" }, ["yc_close_lost", "yc_xin_duyet_lai"]] },
     group: { by: { kind: "field", field: "don_hang" } },
   },
+};
+
+triggers.nhac_han = {
+  workflow: "nhac_han", kind: "schedule",
+  config: { cron: "0 8 * * 1-5", timezone: "Asia/Ho_Chi_Minh", input_template: {} },
 };
 
 export const actions = {};

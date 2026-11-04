@@ -836,11 +836,19 @@
       "kind": "workflow"
     },
     {
+      "key": "workflow:nhac_han",
+      "kind": "workflow"
+    },
+    {
       "key": "trigger:dieu_phoi",
       "kind": "trigger"
     },
     {
       "key": "trigger:dieu_phoi_yeu_cau",
+      "kind": "trigger"
+    },
+    {
+      "key": "trigger:nhac_han",
       "kind": "trigger"
     }
   ],

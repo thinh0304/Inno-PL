@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "1.0",
+  "name": "Nhắc task quá hạn",
+  "description": "Mỗi sáng: task đang làm có hạn đã qua thì đặt ưu tiên cao.",
+  "runAs": "@param:tu_dong_principal",
+  "exposedSteps": [],
+  "start": "start",
+  "end": [
+    "xong"
+  ],
+  "nodes": [
+    {
+      "id": "start",
+      "name": "Start",
+      "node_type": "start",
+      "parameters": {
+        "id": "start",
+        "label": "Start",
+        "inputContract": {
+          "subject": {
+            "kind": "none"
+          },
+          "params": {
+            "kind": "none"
+          }
+        }
+      },
+      "settings": {}
+    },
+    {
+      "id": "qua_han",
+      "name": "Task quá hạn",
+      "node_type": "entity_record",
+      "parameters": {
+        "id": "qua_han",
+        "label": "Task quá hạn",
+        "operation": "update_many",
+        "entityId": "@obj:entity:task",
+        "filters": [
+          {
+            "field": "trang_thai",
+            "op": "eq",
+            "value": {
+              "kind": "literal",
+              "value": "dang_lam"
+            }
+          },
+          {
+            "field": "han",
+            "op": "lt",
+            "value": {
+              "kind": "template",
+              "value": "{{ now() }}"
+            }
+          },
+          {
+            "field": "uu_tien",
+            "op": "eq",
+            "value": {
+              "kind": "literal",
+              "value": "binh_thuong"
+            }
+          }
+        ],
+        "body": [
+          {
+            "field": "uu_tien",
+            "kind": "literal",
+            "value": "cao"
+          }
+        ]
+      },
+      "settings": {}
+    },
+    {
+      "id": "xong",
+      "name": "Xong",
+      "node_type": "end",
+      "parameters": {
+        "id": "xong",
+        "label": "Xong",
+        "outcomeLabel": "xong"
+      },
+      "settings": {}
+    }
+  ],
+  "edges": [
+    {
+      "id": "e_start",
+      "from": "start",
+      "to": "qua_han"
+    },
+    {
+      "id": "e_xong",
+      "from": "qua_han",
+      "to": "xong"
+    }
+  ]
+}
