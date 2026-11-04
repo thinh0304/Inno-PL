@@ -12,6 +12,7 @@ const GIA = "${entity:gia_ban_dong}";
 const TC = "${entity:tai_chinh_don}";
 const CH = "${entity:cau_hinh}";
 const TOMTAT = "${entity:tom_tat_don}";
+const DEXUAT = "${entity:de_xuat_mua_hang}";
 const LICHSU = "${entity:lich_su}";
 const CUA_DON = (field = "don_hang") => [flt(field, "eq", ref("subject.record.don_hang"))];
 const OUT = "nodes.tinh.output";
@@ -92,11 +93,13 @@ export const workflows = {
       search("dong", "Dòng hàng", DONG, CUA_DON(), { limit: 1000 }),
       search("gia", "Giá bán", GIA, CUA_DON(), { limit: 1000 }),
       search("tc", "Tài chính đơn", TC, CUA_DON(), { limit: 1 }),
+      search("dx", "Đề xuất mua hàng", DEXUAT, CUA_DON(), { limit: 1000 }),
       search("ch", "Cấu hình", CH, [flt("ten", "eq", lit("mac_dinh"))], { limit: 1 }),
       code("tinh", "Tính việc cần làm", "code/dieu-phoi.js", [
         ["don", ref("nodes.don.output.record")], ["tasks", ref("nodes.tasks.output.records")],
         ["dong", ref("nodes.dong.output.records")], ["gia_ban", ref("nodes.gia.output.records")],
         ["tai_chinh", ref("nodes.tc.output.records")], ["cau_hinh", ref("nodes.ch.output.records")],
+        ["de_xuat", ref("nodes.dx.output.records")], ["kich_hoat", ref("subject.record")],
         ["nhom_tm", ref("vars.nhom_tm")], ["nhom_proc", ref("vars.nhom_proc")],
         ["nhom_sd", ref("vars.nhom_sd")], ["nhom_acc", ref("vars.nhom_acc")],
       ], {
@@ -114,6 +117,8 @@ export const workflows = {
         bind("co_dich_vu", ref(`${OUT}.don.co_dich_vu`)), bind("co_hang_hoa", ref(`${OUT}.don.co_hang_hoa`)),
         bind("ky_thuat", ref(`${OUT}.don.ky_thuat`)), bind("mua_hang", ref(`${OUT}.don.mua_hang`)),
         bind("nguoi_duoc_chia", ref(`${OUT}.don.nguoi_duoc_chia`)), bind("ly_do_gui", ref(`${OUT}.don.ly_do_gui`)),
+        bind("cho_duyet_lai", ref(`${OUT}.don.cho_duyet_lai`)), bind("ngay_het_han", ref(`${OUT}.don.ngay_het_han`)),
+        bind("theo_doi_tai_ky", ref(`${OUT}.don.theo_doi_tai_ky`)),
       ]),
       ghiTomTat,
       ghiLichSu,
@@ -126,7 +131,7 @@ export const workflows = {
       end("xong", "Xong", "xong"),
     ], edges(
       ["e_start", "start", "params"], ["e_params", "params", "nguoi"], ["e_nguoi", "nguoi", "don"], ["e_don", "don", "tasks"], ["e_tasks", "tasks", "dong"],
-      ["e_dong", "dong", "gia"], ["e_gia", "gia", "tc"], ["e_tc", "tc", "ch"], ["e_ch", "ch", "tinh"],
+      ["e_dong", "dong", "gia"], ["e_gia", "gia", "tc"], ["e_tc", "tc", "dx"], ["e_dx", "dx", "ch"], ["e_ch", "ch", "tinh"],
       ["e_tinh", "tinh", "cap_nhat"], ["e_cap_nhat", "cap_nhat", "ghi_don"], ["e_ghi_don_mo", "ghi_don", "mo_task"],
       ["e_mo_task", "mo_task", "ghi_tom_tat"], ["e_tom_tat", "ghi_tom_tat", "ghi_lich_su"], ["e_lich_su", "ghi_lich_su", "can_chot"], ["e_chot", "can_chot", "chot"], ["e_khong_chot", "can_chot", "xong"],
       ["e_da_chot", "chot", "xong_chot"],
@@ -143,10 +148,21 @@ export const triggers = {
       entity_id: TASK, change_kind: "updated", input_mappings: [],
       filter: { and: [
         { in: ["trang_thai", { var: "event.changed" }] },
-        { in: [{ var: "trang_thai" }, ["xong", "tra_lai", "khong_ap_dung"]] },
+        { in: [{ var: "trang_thai" }, ["xong", "tra_lai", "khong_ap_dung", "yeu_cau_sua"]] },
       ] },
       group: { by: { kind: "field", field: "don_hang" } },
     },
+  },
+};
+
+// Task yêu cầu của IS / AM (Close-lost, Xin duyệt lại): được tạo ở "đang làm", nên cần trigger lúc tạo (tạo bản ghi không kích hoạt trigger "updated").
+triggers.dieu_phoi_yeu_cau = {
+  workflow: "dieu_phoi",
+  kind: "entity_record",
+  config: {
+    entity_id: TASK, change_kind: "created", input_mappings: [],
+    filter: { in: [{ var: "ma" }, ["yc_close_lost", "yc_xin_duyet_lai"]] },
+    group: { by: { kind: "field", field: "don_hang" } },
   },
 };
 

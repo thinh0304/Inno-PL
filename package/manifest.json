@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "id": "inno/pl",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "name": "TeraBox · Hiệu quả đơn hàng",
   "summary": "Hiệu quả đơn hàng (P&L) và quy trình đơn hàng của TeraBox: lập đơn, tính P&L, duyệt, task theo vai trò.",
   "publisher": {
@@ -432,6 +432,18 @@
       "kind": "entity_field"
     },
     {
+      "key": "entity_field:don_hang/cho_duyet_lai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ngay_het_han",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/theo_doi_tai_ky",
+      "kind": "entity_field"
+    },
+    {
       "key": "entity_view:don_hang/all",
       "kind": "entity_view"
     },
@@ -780,6 +792,10 @@
       "kind": "entity_field"
     },
     {
+      "key": "entity_field:task/nguoi_tao",
+      "kind": "entity_field"
+    },
+    {
       "key": "entity_view:task/all",
       "kind": "entity_view"
     },
@@ -821,6 +837,10 @@
     },
     {
       "key": "trigger:dieu_phoi",
+      "kind": "trigger"
+    },
+    {
+      "key": "trigger:dieu_phoi_yeu_cau",
       "kind": "trigger"
     }
   ],

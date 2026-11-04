@@ -551,6 +551,14 @@
             }
           },
           {
+            "kind": "field",
+            "rule": {
+              "field": "don_hang.cho_duyet_lai",
+              "op": "eq",
+              "value": false
+            }
+          },
+          {
             "kind": "write",
             "write": {
               "op": "actor",

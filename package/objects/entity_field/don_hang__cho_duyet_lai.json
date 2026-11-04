@@ -1,0 +1,8 @@
+{
+  "label": "Đang chờ duyệt lại",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}

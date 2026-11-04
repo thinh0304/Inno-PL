@@ -1,0 +1,27 @@
+{
+  "workflow": "@obj:workflow:dieu_phoi",
+  "kind": "entity_record",
+  "enabled": false,
+  "config": {
+    "entity_id": "@obj:entity:task",
+    "change_kind": "created",
+    "input_mappings": [],
+    "filter": {
+      "in": [
+        {
+          "var": "ma"
+        },
+        [
+          "yc_close_lost",
+          "yc_xin_duyet_lai"
+        ]
+      ]
+    },
+    "group": {
+      "by": {
+        "kind": "field",
+        "field": "don_hang"
+      }
+    }
+  }
+}

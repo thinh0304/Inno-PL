@@ -39,6 +39,11 @@
       "color": "rose"
     },
     {
+      "value": "yeu_cau_sua",
+      "label": "Yêu cầu sửa",
+      "color": "amber"
+    },
+    {
       "value": "huy",
       "label": "Hủy",
       "color": "fuchsia"

@@ -63,6 +63,14 @@
     {
       "value": "t72",
       "label": "t72"
+    },
+    {
+      "value": "yc_close_lost",
+      "label": "Yêu cầu Close-lost"
+    },
+    {
+      "value": "yc_xin_duyet_lai",
+      "label": "Yêu cầu xin duyệt lại"
     }
   ]
 }
