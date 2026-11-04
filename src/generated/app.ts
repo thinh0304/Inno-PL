@@ -174,12 +174,15 @@ export const OBJECTS = {
   'form:tom_tat_don': { kind: 'form', contractVersion: '0.3.0' },
   'trigger:dieu_phoi': { kind: 'trigger', contractVersion: null },
   'trigger:dieu_phoi_yeu_cau': { kind: 'trigger', contractVersion: null },
+  'trigger:nhac_han': { kind: 'trigger', contractVersion: null },
   'workflow:dieu_phoi': { kind: 'workflow', contractVersion: '0.3.0' },
+  'workflow:dieu_phoi_yeu_cau': { kind: 'workflow', contractVersion: '0.3.0' },
+  'workflow:nhac_han': { kind: 'workflow', contractVersion: '0.3.0' },
 } as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
 export type EntityKey = 'cau_hinh' | 'de_xuat_mua_hang' | 'don_hang' | 'dong_hang' | 'gia_ban_dong' | 'khach_hang' | 'lich_su' | 'nha_cung_cap' | 'tai_chinh_don' | 'task' | 'tom_tat_don';
-export type WorkflowKey = 'dieu_phoi';
+export type WorkflowKey = 'dieu_phoi' | 'dieu_phoi_yeu_cau' | 'nhac_han';
 
 /** The value of each field of each entity, as a record carries it. */
 export interface EntityFields {
@@ -343,4 +346,6 @@ export interface EntityFields {
 /** What starting each workflow takes. */
 export interface WorkflowInputs {
   dieu_phoi: Record<string, never>;
+  dieu_phoi_yeu_cau: Record<string, never>;
+  nhac_han: Record<string, never>;
 }
