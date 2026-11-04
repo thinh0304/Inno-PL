@@ -15,38 +15,32 @@
     {
       "key": "ten_kh",
       "label": "Tên khách hàng",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "ma_kh",
       "label": "Mã KH",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "mst",
       "label": "MST",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "nguoi_lien_he",
       "label": "Người liên hệ",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "noi_dung",
       "label": "Nội dung đơn hàng",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "so_hd_noi_bo",
       "label": "Số HĐ nội bộ",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "am",
@@ -59,14 +53,12 @@
       "key": "is",
       "label": "Inside Sale",
       "type": "reference",
-      "target_entity_id": "ffffffff-0000-0000-0000-000000000001",
-      "required": true
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
     },
     {
       "key": "hang_kh",
       "label": "Hạng KH",
       "type": "enum",
-      "required": true,
       "facetable": true,
       "enum_values": [
         {
@@ -89,8 +81,7 @@
     {
       "key": "cong_no_ngay",
       "label": "Số ngày công nợ",
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     {
       "key": "nv_trien_khai",

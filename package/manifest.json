@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "id": "inno/pl",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "name": "TeraBox · Hiệu quả đơn hàng",
   "summary": "Hiệu quả đơn hàng (P&L) và quy trình đơn hàng của TeraBox: lập đơn, tính P&L, duyệt, task theo vai trò.",
   "publisher": {
@@ -888,7 +888,8 @@
       "entity": "@obj:entity:de_xuat_mua_hang",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {
@@ -1167,7 +1168,8 @@
       "entity": "@obj:entity:dong_hang",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {
@@ -1280,7 +1282,8 @@
       "entity": "@obj:entity:gia_ban_dong",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {
@@ -1404,7 +1407,8 @@
       "entity": "@obj:entity:lich_su",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {
@@ -1573,7 +1577,8 @@
       "entity": "@obj:entity:tai_chinh_don",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {
@@ -1777,7 +1782,8 @@
       "entity": "@obj:entity:task",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {
@@ -1834,7 +1840,8 @@
       "entity": "@obj:entity:tom_tat_don",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {

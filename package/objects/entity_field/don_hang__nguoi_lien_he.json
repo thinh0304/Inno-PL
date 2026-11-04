@@ -1,5 +1,4 @@
 {
   "label": "Người liên hệ",
-  "type": "text",
-  "required": true
+  "type": "text"
 }

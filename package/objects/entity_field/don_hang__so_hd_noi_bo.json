@@ -1,5 +1,4 @@
 {
   "label": "Số HĐ nội bộ",
-  "type": "text",
-  "required": true
+  "type": "text"
 }

@@ -99,3 +99,8 @@ export function formFromRecords(src: { don: unknown; finance?: unknown; dong: un
     });
   return { order, lines };
 }
+
+/** Form tạo bản ghi từ chối `null` (số, ngày, enum, người dùng): khi tạo phải bỏ hẳn các trường rỗng. Khi sửa, `null` xóa trường nên giữ nguyên. */
+export function forCreate(payload: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(payload).filter(([, v]) => v !== null && v !== undefined));
+}

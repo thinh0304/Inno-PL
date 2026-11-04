@@ -37,6 +37,8 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 | F-27 | Chặn | UI module | File do workflow sinh ra (bước `document`) trả `404` qua ứng dụng, kể cả khi đã gắn vào bản ghi ứng dụng đọc được |
 | F-28 | Nhỏ | Builder | `display_field` là trường `reference` qua được `build` và `sandbox check`, bị từ chối lúc cài |
 | F-29 | Nhỏ | Rule | `changed_any` / `changed` coi giá trị mặc định lúc tạo là thay đổi: rule "chỉ hệ thống ghi trường X" chặn luôn việc tạo bản ghi |
+| F-30 | Nhỏ | Form tạo | Danh sách Nhóm (`reference_list` tới Groups) trong create form qua được `build`, bị từ chối lúc cài; form tạo cũng từ chối `null` cho ngày, enum, người dùng |
+| F-31 | Nhỏ | Quyền | Xóa một bản ghi kéo theo bản ghi con (`on_target_delete: cascade`) đòi người xóa có quyền `delete` trên từng entity con |
 
 ---
 
@@ -276,3 +278,19 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 - **Bằng chứng:** `e2e/p01-lat-mong.sandbox.test.ts` lần chạy đầu (2 test hỏng ở bước tạo đơn); `reference/rules-and-stages.md` ghi "On a create it holds for every field the create sets" nhưng không nói giá trị mặc định cũng tính.
 - **Làm tạm:** thêm leaf `is_update` vào các rule loại này.
 - **Đề xuất:** ghi ví dụ này vào `rules-and-stages.md`; hoặc `changed` không tính giá trị mặc định mà người ghi không gửi.
+
+## F-30 · Create form: `reference_list` tới Groups bị từ chối lúc cài; `null` bị từ chối ở mọi kiểu
+
+- **Vướng:** (a) entity `tom_tat_don` có trường `nhom_xem` (`reference_list` tới Groups) và create form có thuộc tính cho nó; (b) module/workflow gửi `null` cho trường ngày, enum, người dùng còn trống khi tạo đơn.
+- **Cách tái hiện** (tái hiện được): (a) `config/entities/x.json` có `create_form` bind một `reference_list` tới `ffffffff-0000-0000-0000-000000000002` kiểu `{ type: 'array', 'x-entityField': 'k' }`: `pnpm build` ổn, `deploy --sandbox` báo `APP_PLAN_CHANGED … form:x at VALIDATION_ERROR: reference binding 'k' must use the entity-reference format`. (b) `POST /entities/{id}/records` với `form_payload: { hieu_luc_den: null }` (trường `date`) trả `VALIDATION_ERROR … /hieu_luc_den: null is not of type "string"`; tương tự enum và người dùng (AGENTS.md mới ghi số).
+- **Bằng chứng:** lần deploy sandbox đầu của Phase 2 (05/11/2026) và `e2e/p02-quyen.sandbox.test.ts` lần chạy đầu (10 lỗi trường).
+- **Làm tạm:** bỏ thuộc tính khỏi create form (workflow ghi trực tiếp, không qua form); `forCreate()` trong `src/domain/records.ts` bỏ trường rỗng khi tạo (khi sửa vẫn gửi `null` để xóa).
+- **Đề xuất:** `build` từ chối thuộc tính Groups sai dạng và nêu dạng đúng; tài liệu `entities.md` ("The create form") ghi rõ form tạo không nhận `null` cho kiểu nào, hoặc cho phép `null` như "không có giá trị".
+
+## F-31 · Xóa bản ghi cha đòi quyền xóa trên mọi bản ghi con
+
+- **Vướng:** Admin xóa một đơn (`don_hang`) có dòng hàng, giá bán, task, lịch sử… trỏ tới nó bằng `on_target_delete: cascade`.
+- **Cách tái hiện** (tái hiện được): người có `delete` trên cha nhưng chỉ `read`/`list` trên entity con xóa cha: `ENTITY_RECORD_CASCADE_FORBIDDEN: deleting this record would change records you cannot edit`.
+- **Bằng chứng:** `e2e/p02-quyen.sandbox.test.ts` ca "xóa đơn chỉ Admin" lần chạy đầu; `access.md` không nhắc.
+- **Làm tạm:** cấp `delete` `organization` cho nhóm Admin trên các entity con (kể cả `lich_su`, nên Admin xóa được cả lịch sử).
+- **Đề xuất:** ghi vào `access.md`; hoặc cho phép cascade qua quyền xóa của cha khi người xóa đã có `delete` trên cha.

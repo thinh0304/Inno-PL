@@ -1,5 +1,4 @@
 {
   "label": "Tên khách hàng",
-  "type": "text",
-  "required": true
+  "type": "text"
 }

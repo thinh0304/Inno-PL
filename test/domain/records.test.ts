@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { STAGE_CODES } from '../../src/domain/form';
-import { financePayload, flat, formFromRecords, linePayload, orderPayload } from '../../src/domain/records';
+import { financePayload, flat, forCreate, formFromRecords, linePayload, orderPayload } from '../../src/domain/records';
 import { validLine, validOrder } from './fixtures/order-form';
 
 describe('flat', () => {
@@ -53,5 +53,12 @@ describe('formFromRecords', () => {
   it('dòng không có giá bán (người xem không đọc được) vẫn dựng được với giá 0', () => {
     const r = records();
     expect(formFromRecords({ ...r, gia_ban: [] }).lines[0]).toMatchObject({ don_gia_ban: 0, chiet_khau: 0, priceId: undefined });
+  });
+  it('forCreate: form tạo từ chối null (kể cả ngày, enum, người dùng), nên bỏ hẳn các trường rỗng khi tạo', () => {
+    const created = forCreate(orderPayload({ ...order, nv_trien_khai: '', hieu_luc_den: '', hinh_thuc: '' }));
+    for (const k of ['nv_trien_khai', 'hieu_luc_den', 'hinh_thuc', 'ngay_bao_gia']) expect(k in created).toBe(false);
+    expect(created.ten_kh).toBe(order.ten_kh);
+    expect('cpbh_truoc' in forCreate(financePayload(order))).toBe(false);
+    expect(forCreate(financePayload({ ...order, cpbh_truoc: 0 })).cpbh_truoc).toBe(0);
   });
 });

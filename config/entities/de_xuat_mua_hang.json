@@ -137,6 +137,10 @@
           {
             "operation": "list",
             "scope": "organization"
+          },
+          {
+            "operation": "delete",
+            "scope": "organization"
           }
         ]
       },

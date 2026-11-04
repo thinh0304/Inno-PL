@@ -6,7 +6,7 @@ import { emptyOrder, type LineForm, type OrderForm } from '../domain/form.js';
 import type { FlowTask } from '../domain/flow.js';
 import { isGoods } from '../domain/lines.js';
 import type { PlResult } from '../domain/pl.js';
-import { financePayload, formFromRecords, linePayload, orderPayload, str } from '../domain/records.js';
+import { financePayload, forCreate, formFromRecords, linePayload, orderPayload, str } from '../domain/records.js';
 import type { CustomerRec } from './customerBook.js';
 import { onlyMine } from './model.js';
 import type { MyTask } from './screens/ViecCuaBan.js';
@@ -179,10 +179,10 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
     async createOrder(o: OrderForm, lines: LineForm[]): Promise<string> {
       const khach = await ensureCustomer(o);
       const ma_loai = lines.some((l) => { const t = LINE_TYPE_OF_CODE[l.loai]; return !!t && isGoods(t); }) ? 'tm' : 'dv';
-      const don = await create('don_hang', { ...orderPayload({ ...o, khach_hang_id: khach }), ma_loai });
-      await create('tai_chinh_don', { don_hang: don.id, ...financePayload(o) });
+      const don = await create('don_hang', { ...forCreate(orderPayload({ ...o, khach_hang_id: khach })), ma_loai });
+      await create('tai_chinh_don', { don_hang: don.id, ...forCreate(financePayload(o)) });
       for (const [i, l] of lines.entries()) {
-        const dong = await create('dong_hang', linePayload(don.id, l, i + 1));
+        const dong = await create('dong_hang', forCreate(linePayload(don.id, l, i + 1)));
         await create('gia_ban_dong', { dong_hang: dong.id, don_hang: don.id, don_gia_ban: l.don_gia_ban, chiet_khau: l.chiet_khau });
       }
       await create('task', { don_hang: don.id, ma: 't11', vai_tro: 'am', trang_thai: 'dang_lam', am: o.am, is: o.is });
@@ -202,7 +202,7 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
           await patch('dong_hang', l.id, linePayload(id, l, i + 1));
           if (l.priceId) await patch('gia_ban_dong', l.priceId, { don_gia_ban: l.don_gia_ban, chiet_khau: l.chiet_khau });
         } else {
-          const dong = await create('dong_hang', linePayload(id, l, i + 1));
+          const dong = await create('dong_hang', forCreate(linePayload(id, l, i + 1)));
           await create('gia_ban_dong', { dong_hang: dong.id, don_hang: id, don_gia_ban: l.don_gia_ban, chiet_khau: l.chiet_khau });
         }
       }

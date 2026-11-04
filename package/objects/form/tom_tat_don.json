@@ -20,10 +20,6 @@
       "du_lieu": {
         "type": "string",
         "x-entityField": "du_lieu"
-      },
-      "nhom_xem": {
-        "type": "string",
-        "x-entityField": "nhom_xem"
       }
     }
   },
