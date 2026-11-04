@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "id": "inno/pl",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "name": "TeraBox · Hiệu quả đơn hàng",
   "summary": "Hiệu quả đơn hàng (P&L) và quy trình đơn hàng của TeraBox: lập đơn, tính P&L, duyệt, task theo vai trò.",
   "publisher": {

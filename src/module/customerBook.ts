@@ -1,5 +1,6 @@
 // Danh bạ khách hàng dùng lại giữa các đơn (spec §12.3): gợi ý khi gõ, chỉ điền ô trống, mã KH không trùng, điền nhanh giao nhận.
 import type { OrderForm } from '../domain/form.js';
+import { checkFormat } from '../domain/validate.js';
 
 export interface CustomerRec {
   id: string; ma_kh: string; ten: string; mst: string; dia_chi: string; nguoi_dai_dien: string; chuc_vu: string; so_tk: string; ngan_hang: string;
@@ -54,4 +55,9 @@ export function quickFill(order: OrderForm, how: 'contact' | 'address'): OrderFo
   return how === 'contact'
     ? { ...order, nguoi_nhan: order.nguoi_lien_he, sdt_nhan: order.dien_thoai }
     : { ...order, dia_chi_nhan: order.dia_chi };
+}
+
+/** Lưu nháp chỉ tạo hồ sơ khách khi mã KH đúng dạng và đã có tên: không để lại hồ sơ rác. */
+export function shouldCreateCustomer(o: OrderForm): boolean {
+  return o.ten_kh.trim() !== '' && o.ma_kh.trim() !== '' && checkFormat('customerCode', o.ma_kh) === null;
 }

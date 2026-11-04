@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { emptyOrder } from '../../src/domain/form';
-import { fillEmpty, quickFill, suggest, suggestCode, type CustomerRec } from '../../src/module/customerBook';
+import { fillEmpty, quickFill, shouldCreateCustomer, suggest, suggestCode, type CustomerRec } from '../../src/module/customerBook';
 
 const rec = (patch: Partial<CustomerRec>): CustomerRec => ({
   id: 'k1', ma_kh: 'SOGTVTLD', ten: 'Sở Giao thông Vận tải Lâm Đồng', mst: '0312345678', dia_chi: 'Số 4 Trần Hưng Đạo, Đà Lạt', nguoi_dai_dien: 'Ông Bình',
@@ -47,5 +47,14 @@ describe('quickFill', () => {
     const o = { ...emptyOrder('a'), nguoi_lien_he: 'Anh Bình', dien_thoai: '0909 111 222', dia_chi: 'Đà Lạt' };
     expect(quickFill(o, 'contact')).toMatchObject({ nguoi_nhan: 'Anh Bình', sdt_nhan: '0909 111 222' });
     expect(quickFill(o, 'address').dia_chi_nhan).toBe('Đà Lạt');
+  });
+});
+
+describe('shouldCreateCustomer: lưu nháp không tạo hồ sơ rác', () => {
+  it('chỉ tạo khi mã KH đúng dạng và có tên', () => {
+    expect(shouldCreateCustomer({ ...emptyOrder('a'), ma_kh: '', ten_kh: 'ABC' })).toBe(false);
+    expect(shouldCreateCustomer({ ...emptyOrder('a'), ma_kh: 'a', ten_kh: 'ABC' })).toBe(false);
+    expect(shouldCreateCustomer({ ...emptyOrder('a'), ma_kh: 'ABC', ten_kh: '' })).toBe(false);
+    expect(shouldCreateCustomer({ ...emptyOrder('a'), ma_kh: 'ABC', ten_kh: 'Công ty ABC' })).toBe(true);
   });
 });

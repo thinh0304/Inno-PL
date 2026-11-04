@@ -70,6 +70,8 @@ describe('Phase 2: dữ liệu và quyền', () => {
     await denied(patch(am, 'dong_hang', dong[0]!.id, { so_luong: 99 }));
     await denied(patch(am, 'gia_ban_dong', gia[0]!.id, { don_gia_ban: 1 }));
     await denied(patch(am, 'tai_chinh_don', tai_chinh.id, { cpbh: 1 }));
+    await denied(patch(am, 'tai_chinh_don', tai_chinh.id, { ln_truoc: 1, doanh_thu_truoc: 5 }));
+    await denied(patch(am, 'tai_chinh_don', tai_chinh.id, { so_hd_truoc: 'HD-SUA-SAU-GUI' }));
     await denied(patch(am, 'don_hang', don.id, { ten_kh: 'Đổi tên sau khi gửi' }));
     await denied(patch(tm, 'dong_hang', dong[0]!.id, { so_luong: 99 }));
     await denied(patch(am, 'don_hang', don.id, { nguoi_duoc_chia: [uid('am3')] }));

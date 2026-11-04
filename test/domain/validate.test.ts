@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { emptyOrder, type LineForm, type OrderForm } from '../../src/domain/form';
-import { checkFormat, normalize, validateOrder } from '../../src/domain/validate';
+import { checkFormat, normalize, parseNumber, validateOrder } from '../../src/domain/validate';
 import { validLine, validOrder } from './fixtures/order-form';
 
 const fields = (o: OrderForm, l: LineForm[]) => validateOrder(o, l).map((i) => i.field);
@@ -99,5 +99,38 @@ describe('validateOrder', () => {
   it('lỗi định dạng của trường đã nhập: MST sai, SĐT sai', () => {
     const f = fields({ ...validOrder(), mst: '123', dien_thoai: '12345' }, [validLine()]);
     expect(f).toEqual(expect.arrayContaining(['mst', 'dien_thoai']));
+  });
+});
+
+describe('validateOrder: số âm, chiết khấu, mã người dùng, hệ số âm (review cuối)', () => {
+  const o = validOrder();
+  it('chiết khấu ngoài 0–100 và giá mua / CPBH âm bị báo', () => {
+    expect(fields(o, [validLine({ chiet_khau: 150 })])).toEqual(['dong_1.chiet_khau']);
+    expect(fields(o, [validLine({ chiet_khau: -5 })])).toEqual(['dong_1.chiet_khau']);
+    expect(fields(o, [validLine({ gia_mua: -1 })])).toEqual(['dong_1.gia_mua']);
+    expect(fields({ ...o, cpbh: -5 }, [validLine()])).toEqual(['cpbh']);
+    expect(fields({ ...o, don_moi: false, so_hd_truoc: 'HD-1', cpbh_truoc: -1, doanh_thu_truoc: 100, ln_truoc: 10, giai_doan: o.giai_doan.map((s, i) => ({ ...s, pct: [0, 0, 0.1, 0.1, 0.2, 0.1][i]! })) }, [validLine()])).toEqual(['cpbh_truoc']);
+  });
+  it('hệ số giai đoạn âm bị báo dù tổng vẫn đúng', () => {
+    const stages = o.giai_doan.map((s, i) => ({ ...s, pct: [0.5, -0.1, 0.1, 0.1, 0.2, 0.2][i]! }));
+    expect(fields({ ...o, giai_doan: stages }, [validLine()])).toEqual(['giai_doan.1.pct']);
+  });
+  it('mã người dùng gõ thành tên có dấu cách hoặc dấu thì bị báo, ở AM, IS, NV và giai đoạn', () => {
+    expect(fields({ ...o, am: 'Nguyễn Văn A' }, [validLine()])).toEqual(['am']);
+    expect(fields({ ...o, nv_trien_khai: 'anh Hùng' }, [validLine()])).toEqual(['nv_trien_khai']);
+    expect(fields({ ...o, giai_doan: o.giai_doan.map((s, i) => (i === 0 ? { ...s, nv: 'chị Lan' } : s)) }, [validLine()])).toEqual(['giai_doan.0.nv']);
+    expect(fields({ ...o, nguon_kh: 'nguoi', nguon_kh_nguoi: 'a b' }, [validLine()])).toEqual(['nguon_kh_nguoi']);
+  });
+});
+
+describe('parseNumber', () => {
+  it('đọc số kiểu Việt: dấu chấm ngăn nghìn, dấu phẩy thập phân; không nhận được thì 0', () => {
+    expect(parseNumber('1.500.000')).toBe(1_500_000);
+    expect(parseNumber('1,5')).toBe(1.5);
+    expect(parseNumber('2.500.000,5')).toBe(2_500_000.5);
+    expect(parseNumber('42')).toBe(42);
+    expect(parseNumber('3.5')).toBe(3.5);
+    expect(parseNumber('abc')).toBe(0);
+    expect(parseNumber('')).toBe(0);
   });
 });

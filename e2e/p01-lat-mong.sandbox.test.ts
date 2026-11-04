@@ -52,7 +52,7 @@ describe('Phase 1: lát mỏng', () => {
     await expect.poll(async () => live(await tasksOf(am, don.id), 't23')[0]?.body.trang_thai, POLL).toBe('bo_qua');
     await finish(tm, live(await tasksOf(tm, don.id), 't22')[0]!, 'xong');
     await expect.poll(async () => (await get(am, 'don_hang', don.id)).body.trang_thai, POLL).toBe('da_phe_duyet');
-    expect(live(await tasksOf(am, don.id), 't31')[0]?.body.trang_thai).toBe('xong');
+    await expect.poll(async () => live(await tasksOf(am, don.id), 't31')[0]?.body.trang_thai, POLL).toBe('xong');
   });
   it('nền tảng: task có hạn theo ngày làm việc và hiện trong My Work của đúng người', async () => {
     const am = as('am1'); const tm = as('tm1'); const proc = as('proc1');

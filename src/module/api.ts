@@ -7,7 +7,7 @@ import type { FlowTask } from '../domain/flow.js';
 import { isGoods } from '../domain/lines.js';
 import type { PlResult } from '../domain/pl.js';
 import { financePayload, forCreate, formFromRecords, linePayload, orderPayload, str } from '../domain/records.js';
-import type { CustomerRec } from './customerBook.js';
+import { shouldCreateCustomer, type CustomerRec } from './customerBook.js';
 import { onlyMine } from './model.js';
 import type { MyTask } from './screens/ViecCuaBan.js';
 
@@ -65,6 +65,9 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
     return items;
   }
 
+  /** `updated_at` của từng bản ghi lúc người dùng mở đơn: lưu mà có người sửa xen vào thì báo 409, không ghi đè lặng lẽ. */
+  const seen = new Map<string, string>();
+
   async function create(key: EntityKey, form_payload: Body): Promise<Wire> {
     const entity_id = await entityId(key);
     return ok(host.api.POST('/entities/{entity_id}/records', { params: { path: { entity_id } }, body: { form_payload } as never })) as Promise<Wire>;
@@ -78,18 +81,20 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
   /** Đọc bản ghi để lấy `updated_at` hiện tại rồi sửa các trường (409 STALE_VERSION nếu có người sửa xen vào). */
   async function patch(key: EntityKey, id: string, changes: Body): Promise<void> {
     const entity_id = await entityId(key);
-    const current = await read(key, id);
-    await ok(host.api.PATCH('/entities/{entity_id}/records/{record_id}', {
-      params: { path: { entity_id, record_id: id } }, body: { changes, expected_updated_at: current.updated_at } as never,
-    }));
+    const expected = seen.get(id) ?? (await read(key, id)).updated_at;
+    const saved = (await ok(host.api.PATCH('/entities/{entity_id}/records/{record_id}', {
+      params: { path: { entity_id, record_id: id } }, body: { changes, expected_updated_at: expected } as never,
+    }))) as unknown as Wire | undefined;
+    if (saved?.updated_at) seen.set(id, saved.updated_at); else seen.delete(id);
   }
 
   async function remove(key: EntityKey, id: string): Promise<void> {
     const entity_id = await entityId(key);
-    const current = await read(key, id);
+    const expected = seen.get(id) ?? (await read(key, id)).updated_at;
     await ok(host.api.DELETE('/entities/{entity_id}/records/{record_id}', {
-      params: { path: { entity_id, record_id: id }, query: { expected_updated_at: current.updated_at } as never },
+      params: { path: { entity_id, record_id: id }, query: { expected_updated_at: expected } as never },
     }));
+    seen.delete(id);
   }
 
   /** Id các task trong My Work của người xem (việc họ giữ hoặc được giao). */
@@ -119,9 +124,12 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
   /** Mã KH không trùng (Review Focus): dùng hồ sơ có sẵn nếu đã có mã này, chỉ tạo khi chưa có. */
   async function ensureCustomer(o: OrderForm): Promise<string> {
     if (o.khach_hang_id) return o.khach_hang_id;
-    const found = await queryAll('khach_hang', [{ field: 'ma_kh', op: 'eq', value: o.ma_kh }]);
-    if (found[0]) return found[0].id;
-    return (await create('khach_hang', customerPayload(o))).id;
+    if (!shouldCreateCustomer(o)) return '';
+    const find = async () => (await queryAll('khach_hang', [{ field: 'ma_kh', op: 'eq', value: o.ma_kh }]))[0]?.id;
+    const found = await find();
+    if (found) return found;
+    try { return (await create('khach_hang', forCreate(customerPayload(o)))).id; }
+    catch (e) { const again = await find(); if (again) return again; throw e; }
   }
 
   return {
@@ -144,6 +152,7 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
     },
 
     async loadOrder(id: string): Promise<LoadedOrder> {
+      seen.clear();
       const rec = await read('don_hang', id);
       const b = bodyOf(rec);
       const [dong, prices, finance, tasks, mine, tomTat] = await Promise.all([
@@ -154,6 +163,7 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
         workIds().catch(() => new Set<string>()),
         queryAll('tom_tat_don', [{ field: 'don_hang', op: 'eq', value: id }]).catch(() => [] as Wire[]),
       ]);
+      for (const r of [rec, ...dong, ...(prices ?? []), ...(finance ?? [])]) seen.set(r.id, r.updated_at);
       const fin = finance?.[0];
       const fb = fin ? bodyOf(fin) : {};
       const { order, lines } = formFromRecords({ don: rec, finance: fin, dong, gia_ban: prices ?? [] });

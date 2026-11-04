@@ -335,7 +335,14 @@ var APP = (() => {
         return s;
     }
   }
-  var num = (s) => Number(s.replace(/\./g, "").replace(",", "."));
+  function parseNumber(raw) {
+    const s = raw.trim();
+    if (!s) return 0;
+    const t = /^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s) ? s.replace(/\./g, "").replace(",", ".") : s.replace(",", ".");
+    const v = Number(t);
+    return Number.isFinite(v) ? v : 0;
+  }
+  var num = parseNumber;
   var int = (s) => /^\d+$/.test(s);
   function checkFormat(kind, value) {
     const v = normalize(kind, value);
@@ -368,6 +375,8 @@ var APP = (() => {
           return v.length >= 1 && v.length <= 20 && hasLetter(v);
         case "money":
           return /^\d+(\.\d{3})*(,\d+)?$/.test(v) || /^\d+(,\d+)?$/.test(v);
+        case "userId":
+          return /^[A-Za-z0-9_-]{1,64}$/.test(v);
         case "quantity":
           return int(v) && +v > 0;
         case "months":
@@ -410,8 +419,10 @@ var APP = (() => {
     need("nguoi_lien_he", order.nguoi_lien_he, "personName");
     need("noi_dung", order.noi_dung, "text");
     need("so_hd_noi_bo", order.so_hd_noi_bo, "contractNo");
-    need("am", order.am);
-    need("is", order.is);
+    need("am", order.am, "userId");
+    need("is", order.is, "userId");
+    maybe("nv_trien_khai", order.nv_trien_khai, "userId");
+    maybe("nv_tu_van", order.nv_tu_van, "userId");
     maybe("dien_thoai", order.dien_thoai, "phone");
     maybe("email", order.email, "email");
     maybe("sdt_nhan", order.sdt_nhan, "phone");
@@ -426,17 +437,20 @@ var APP = (() => {
     if (quoted && valid && valid <= quoted) add("hieu_luc_den", "range.after");
     if (checkFormat("creditDays", String(order.cong_no_ngay))) add("cong_no_ngay", "format.creditDays");
     if (order.so_lan_tt && checkFormat("payments", String(order.so_lan_tt))) add("so_lan_tt", "format.payments");
-    if (order.nguon_kh === "nguoi" && !order.nguon_kh_nguoi.trim()) add("nguon_kh_nguoi", "required");
+    if (order.nguon_kh === "nguoi") need("nguon_kh_nguoi", order.nguon_kh_nguoi, "userId");
+    if (order.cpbh < 0) add("cpbh", "range.min");
     if (!order.don_moi) {
       if (order.nguon_kh !== "khong") add("nguon_kh", "renew.source");
       need("so_hd_truoc", order.so_hd_truoc, "contractNo");
       if (order.cpbh_truoc === null) add("cpbh_truoc", "required");
+      else if (order.cpbh_truoc < 0) add("cpbh_truoc", "range.min");
       if (order.doanh_thu_truoc === null || order.doanh_thu_truoc <= 0) add("doanh_thu_truoc", "required");
       if (order.ln_truoc === null) add("ln_truoc", "required");
       else if (order.doanh_thu_truoc !== null && order.ln_truoc > order.doanh_thu_truoc) add("ln_truoc", "range.max");
     }
     order.giai_doan.forEach((s, i) => {
-      if (!s.nv.trim()) add(`giai_doan.${i}.nv`, "required");
+      need(`giai_doan.${i}.nv`, s.nv, "userId");
+      if (s.pct < 0) add(`giai_doan.${i}.pct`, "range.min");
     });
     const total = order.giai_doan.reduce((t, s) => t + s.pct, 0);
     if (Math.abs(total - (order.don_moi ? 1 : 0.5)) > SUM_TOLERANCE) add("giai_doan.tong", "stages.total");
@@ -449,6 +463,8 @@ var APP = (() => {
       need(f("dvt"), l.dvt, "unit");
       if (!(l.so_luong > 0) || !Number.isInteger(l.so_luong)) add(f("so_luong"), "format.quantity");
       if (!(l.don_gia_ban > 0)) add(f("don_gia_ban"), "required");
+      if (l.chiet_khau < 0 || l.chiet_khau > 100) add(f("chiet_khau"), "range.percent");
+      if (l.gia_mua < 0) add(f("gia_mua"), "range.min");
       if (goods) need(f("sku"), l.sku, "sku");
       else maybe(f("sku"), l.sku, "sku");
       if (l.loai === "tb" && !l.co_cq) add(f("co_cq"), "required");

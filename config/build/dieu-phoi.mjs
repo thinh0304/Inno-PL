@@ -127,8 +127,8 @@ export const workflows = {
     ], edges(
       ["e_start", "start", "params"], ["e_params", "params", "nguoi"], ["e_nguoi", "nguoi", "don"], ["e_don", "don", "tasks"], ["e_tasks", "tasks", "dong"],
       ["e_dong", "dong", "gia"], ["e_gia", "gia", "tc"], ["e_tc", "tc", "ch"], ["e_ch", "ch", "tinh"],
-      ["e_tinh", "tinh", "cap_nhat"], ["e_cap_nhat", "cap_nhat", "mo_task"], ["e_mo_task", "mo_task", "ghi_don"],
-      ["e_ghi_don", "ghi_don", "ghi_tom_tat"], ["e_tom_tat", "ghi_tom_tat", "ghi_lich_su"], ["e_lich_su", "ghi_lich_su", "can_chot"], ["e_chot", "can_chot", "chot"], ["e_khong_chot", "can_chot", "xong"],
+      ["e_tinh", "tinh", "cap_nhat"], ["e_cap_nhat", "cap_nhat", "ghi_don"], ["e_ghi_don_mo", "ghi_don", "mo_task"],
+      ["e_mo_task", "mo_task", "ghi_tom_tat"], ["e_tom_tat", "ghi_tom_tat", "ghi_lich_su"], ["e_lich_su", "ghi_lich_su", "can_chot"], ["e_chot", "can_chot", "chot"], ["e_khong_chot", "can_chot", "xong"],
       ["e_da_chot", "chot", "xong_chot"],
     )),
   ),
