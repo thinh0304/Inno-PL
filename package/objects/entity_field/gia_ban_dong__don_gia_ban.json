@@ -1,0 +1,5 @@
+{
+  "label": "Đơn giá bán",
+  "type": "number",
+  "required": true
+}

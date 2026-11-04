@@ -1,0 +1,20 @@
+{
+  "label": "Ưu tiên",
+  "type": "enum",
+  "default": {
+    "kind": "literal",
+    "value": "binh_thuong"
+  },
+  "enum_values": [
+    {
+      "value": "binh_thuong",
+      "label": "Bình thường",
+      "color": "gray"
+    },
+    {
+      "value": "cao",
+      "label": "Cao",
+      "color": "amber"
+    }
+  ]
+}

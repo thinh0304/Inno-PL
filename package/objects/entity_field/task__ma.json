@@ -1,0 +1,68 @@
+{
+  "label": "Task",
+  "type": "enum",
+  "required": true,
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "t11",
+      "label": "t11"
+    },
+    {
+      "value": "t22",
+      "label": "t22"
+    },
+    {
+      "value": "t23",
+      "label": "t23"
+    },
+    {
+      "value": "t31",
+      "label": "t31"
+    },
+    {
+      "value": "t40",
+      "label": "t40"
+    },
+    {
+      "value": "t44",
+      "label": "t44"
+    },
+    {
+      "value": "t42",
+      "label": "t42"
+    },
+    {
+      "value": "t41",
+      "label": "t41"
+    },
+    {
+      "value": "t45",
+      "label": "t45"
+    },
+    {
+      "value": "t51",
+      "label": "t51"
+    },
+    {
+      "value": "t53",
+      "label": "t53"
+    },
+    {
+      "value": "t61",
+      "label": "t61"
+    },
+    {
+      "value": "t62",
+      "label": "t62"
+    },
+    {
+      "value": "t71",
+      "label": "t71"
+    },
+    {
+      "value": "t72",
+      "label": "t72"
+    }
+  ]
+}

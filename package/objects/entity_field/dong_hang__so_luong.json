@@ -1,0 +1,5 @@
+{
+  "label": "Số lượng",
+  "type": "number",
+  "required": true
+}

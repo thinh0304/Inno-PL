@@ -1,0 +1,457 @@
+{
+  "key": "dong_hang",
+  "name": "Dòng hàng",
+  "description": "Một dòng thiết bị, license hoặc dịch vụ của đơn (không có giá bán).",
+  "icon": "package",
+  "accent": "sky",
+  "fields": [
+    {
+      "key": "don_hang",
+      "label": "Đơn hàng",
+      "type": "reference",
+      "target_entity_id": "${entity:don_hang}",
+      "required": true,
+      "inverse_key": "dong_hang",
+      "inverse_label": "Dòng hàng",
+      "on_target_delete": "cascade"
+    },
+    {
+      "key": "stt",
+      "label": "STT",
+      "type": "number"
+    },
+    {
+      "key": "sku",
+      "label": "SKU (P/N)",
+      "type": "text"
+    },
+    {
+      "key": "mo_ta",
+      "label": "Hàng hóa / dịch vụ",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "dvt",
+      "label": "ĐVT",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "so_luong",
+      "label": "Số lượng",
+      "type": "number",
+      "required": true
+    },
+    {
+      "key": "loai",
+      "label": "Loại",
+      "type": "enum",
+      "required": true,
+      "facetable": true,
+      "enum_values": [
+        {
+          "value": "tb",
+          "label": "TB"
+        },
+        {
+          "value": "lic",
+          "label": "LIC"
+        },
+        {
+          "value": "lic_dk",
+          "label": "LIC-DK"
+        },
+        {
+          "value": "lic_ntnn",
+          "label": "LIC-NTNN"
+        },
+        {
+          "value": "dvtk_i",
+          "label": "DVTK-I"
+        },
+        {
+          "value": "dvtk_o",
+          "label": "DVTK-O"
+        },
+        {
+          "value": "dvdk_i",
+          "label": "DVDK-I"
+        },
+        {
+          "value": "dvdk_o",
+          "label": "DVDK-O"
+        },
+        {
+          "value": "dvdk_ntnn",
+          "label": "DVDK-NTNN"
+        },
+        {
+          "value": "cloud_server",
+          "label": "Cloud Server"
+        },
+        {
+          "value": "colocation",
+          "label": "Colocation"
+        },
+        {
+          "value": "veeam",
+          "label": "Veeam"
+        },
+        {
+          "value": "manage_service",
+          "label": "Manage Service"
+        },
+        {
+          "value": "other_services",
+          "label": "Other Services"
+        }
+      ]
+    },
+    {
+      "key": "so_thang",
+      "label": "Số tháng",
+      "type": "number"
+    },
+    {
+      "key": "gia_mua",
+      "label": "Đơn giá mua dự kiến",
+      "type": "number"
+    },
+    {
+      "key": "ncc",
+      "label": "Nhà cung cấp",
+      "type": "text"
+    }
+  ],
+  "natural_key": [],
+  "display_field": "mo_ta",
+  "views": [
+    {
+      "key": "all",
+      "name": "Dòng hàng",
+      "columns": [
+        "don_hang",
+        "stt",
+        "mo_ta",
+        "loai",
+        "so_luong"
+      ]
+    }
+  ],
+  "create_form": {
+    "name": "Dòng hàng",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "don_hang": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "don_hang",
+          "x-entityField": "don_hang"
+        },
+        "stt": {
+          "type": "number",
+          "x-entityField": "stt"
+        },
+        "sku": {
+          "type": "string",
+          "x-entityField": "sku"
+        },
+        "mo_ta": {
+          "type": "string",
+          "x-entityField": "mo_ta"
+        },
+        "dvt": {
+          "type": "string",
+          "x-entityField": "dvt"
+        },
+        "so_luong": {
+          "type": "number",
+          "x-entityField": "so_luong"
+        },
+        "loai": {
+          "type": "string",
+          "enum": [
+            "tb",
+            "lic",
+            "lic_dk",
+            "lic_ntnn",
+            "dvtk_i",
+            "dvtk_o",
+            "dvdk_i",
+            "dvdk_o",
+            "dvdk_ntnn",
+            "cloud_server",
+            "colocation",
+            "veeam",
+            "manage_service",
+            "other_services"
+          ],
+          "x-entityField": "loai"
+        },
+        "so_thang": {
+          "type": "number",
+          "x-entityField": "so_thang"
+        },
+        "gia_mua": {
+          "type": "number",
+          "x-entityField": "gia_mua"
+        },
+        "ncc": {
+          "type": "string",
+          "x-entityField": "ncc"
+        }
+      }
+    }
+  },
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sales}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "am"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "is"
+              }
+            ]
+          },
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "am"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "is"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "am"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "is"
+              }
+            ]
+          },
+          {
+            "operation": "update",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "am"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "is"
+              }
+            ]
+          },
+          {
+            "operation": "delete",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "am"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "is"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tm}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "ky_thuat"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "ky_thuat"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_proc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "mua_hang"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "mua_hang"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "rules": [
+    {
+      "key": "khoa_khi_da_gui",
+      "message": "Đơn đã gửi duyệt: chỉ sửa được khi đơn đang nháp hoặc bị trả lại",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "field",
+            "rule": {
+              "field": "don_hang.trang_thai",
+              "op": "not_in",
+              "value": [
+                "nhap",
+                "tra_lai"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "${param:nhom_tu_dong}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

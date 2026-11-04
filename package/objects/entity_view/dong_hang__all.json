@@ -1,0 +1,15 @@
+{
+  "name": "Dòng hàng",
+  "type": "grid",
+  "columns": [
+    "don_hang",
+    "stt",
+    "mo_ta",
+    "loai",
+    "so_luong"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

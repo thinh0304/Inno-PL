@@ -1,0 +1,38 @@
+{
+  "label": "Vai trò",
+  "type": "enum",
+  "required": true,
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "am",
+      "label": "AM",
+      "color": "sky"
+    },
+    {
+      "value": "is",
+      "label": "Inside Sale",
+      "color": "teal"
+    },
+    {
+      "value": "tm",
+      "label": "Technical Manager",
+      "color": "violet"
+    },
+    {
+      "value": "proc",
+      "label": "Procurement",
+      "color": "amber"
+    },
+    {
+      "value": "sd",
+      "label": "Sales Director",
+      "color": "rose"
+    },
+    {
+      "value": "acc",
+      "label": "Sales Accountant",
+      "color": "indigo"
+    }
+  ]
+}

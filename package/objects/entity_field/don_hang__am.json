@@ -1,0 +1,6 @@
+{
+  "label": "AM phụ trách",
+  "type": "reference",
+  "target_entity_id": "@req:entity:user",
+  "required": true
+}

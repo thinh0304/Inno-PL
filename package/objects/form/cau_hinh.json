@@ -1,0 +1,20 @@
+{
+  "name": "Cấu hình",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "ten": {
+        "type": "string",
+        "x-entityField": "ten"
+      },
+      "gia_tri": {
+        "type": "string",
+        "x-entityField": "gia_tri"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:cau_hinh"
+}

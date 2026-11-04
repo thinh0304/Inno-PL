@@ -1,0 +1,47 @@
+{
+  "label": "Trạng thái",
+  "type": "enum",
+  "required": true,
+  "facetable": true,
+  "default": {
+    "kind": "literal",
+    "value": "dang_lam"
+  },
+  "enum_values": [
+    {
+      "value": "cho",
+      "label": "Chờ",
+      "color": "gray"
+    },
+    {
+      "value": "dang_lam",
+      "label": "Đang làm",
+      "color": "sky"
+    },
+    {
+      "value": "xong",
+      "label": "Xong",
+      "color": "emerald"
+    },
+    {
+      "value": "khong_ap_dung",
+      "label": "Không áp dụng",
+      "color": "gray"
+    },
+    {
+      "value": "bo_qua",
+      "label": "Bỏ qua",
+      "color": "gray"
+    },
+    {
+      "value": "tra_lai",
+      "label": "Trả lại",
+      "color": "rose"
+    },
+    {
+      "value": "huy",
+      "label": "Hủy",
+      "color": "fuchsia"
+    }
+  ]
+}

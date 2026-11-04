@@ -4,7 +4,7 @@
   "id": "inno/pl",
   "version": "0.1.0",
   "name": "TeraBox · Hiệu quả đơn hàng",
-  "summary": "Đang xây dựng lại theo đặc tả mới.",
+  "summary": "Hiệu quả đơn hàng (P&L) và quy trình đơn hàng của TeraBox: lập đơn, tính P&L, duyệt, task theo vai trò.",
   "publisher": {
     "name": "Innomation",
     "contact": "thinh.nguyentruong@innomation.vn",
@@ -12,13 +12,13 @@
   },
   "license": "Proprietary",
   "dataHandling": {
-    "purpose": "Đang xây dựng lại: chưa lưu dữ liệu nghiệp vụ.",
+    "purpose": "Đơn hàng, dòng hàng, giá bán, kết quả P&L và task quy trình của từng đơn.",
     "storage": "In the organization's AgentFlow",
     "retention": "Tối thiểu 5 năm kể từ khi đơn hoàn tất hoặc đóng, theo yêu cầu lưu trữ chứng từ kế toán; tổ chức có thể giữ lâu hơn.",
     "privacy": "https://innomation.vn",
     "recipients": []
   },
-  "changelog": "Khung rỗng: xây lại từ đầu theo đặc tả mới.",
+  "changelog": "Phase 1: đơn hàng, P&L, task t11–t31 với điều phối tự động.",
   "contentLocale": "vi",
   "minPlatformVersion": "2026.10",
   "requires": {
@@ -31,11 +31,66 @@
           "name": "text",
           "email": "text"
         }
+      },
+      {
+        "key": "group",
+        "access": "read",
+        "fields": {
+          "name": "text"
+        }
       }
     ],
     "permissions": [
       {
         "group": "@param:app_users",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_sales",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_tm",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_proc",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_sd",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_acc",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_admin",
         "permissions": [
           "entity.read",
           "entity.list",
@@ -50,7 +105,63 @@
       "type": "group_ref",
       "required": true,
       "label": "Người dùng ứng dụng",
-      "help": "Nhóm chứa mọi người dùng ứng dụng. Ai không ở nhóm này sẽ không thấy ứng dụng. Thành viên cần một role có entity.read, entity.list và entity.write: role không đến từ nhóm."
+      "help": "Nhóm chứa mọi người dùng ứng dụng. Ai không ở nhóm này sẽ không thấy ứng dụng. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_sales",
+      "type": "group_ref",
+      "required": true,
+      "label": "Sales (AM, Inside Sale)",
+      "help": "AM và Inside Sale: lập đơn, xem đơn mình phụ trách. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_tm",
+      "type": "group_ref",
+      "required": true,
+      "label": "Technical Manager",
+      "help": "Một người: duyệt giải pháp kỹ thuật, triển khai dịch vụ. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_proc",
+      "type": "group_ref",
+      "required": true,
+      "label": "Procurement",
+      "help": "Một người: đề xuất giá mua và nhà cung cấp. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_sd",
+      "type": "group_ref",
+      "required": true,
+      "label": "Sales Director",
+      "help": "Một người: phê duyệt đơn và hợp đồng. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_acc",
+      "type": "group_ref",
+      "required": true,
+      "label": "Sales Accountant",
+      "help": "Kế toán bán hàng: tạm ứng, hóa đơn, lưu hồ sơ. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_admin",
+      "type": "group_ref",
+      "required": true,
+      "label": "Quản trị ứng dụng",
+      "help": "Cấu hình tham số P&L, SLA, KPI. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "tu_dong_principal",
+      "type": "service_principal_ref",
+      "required": true,
+      "label": "Tài khoản tự động",
+      "help": "Service principal mà workflow điều phối chạy dưới tên. Cho nó role có entity.read, entity.list và entity.write, thêm vào nhóm Tự động, không cấp khóa."
+    },
+    {
+      "key": "nhom_tu_dong",
+      "type": "group_ref",
+      "required": true,
+      "label": "Nhóm tự động",
+      "help": "Chứa tài khoản tự động và một tài khoản không bao giờ đăng nhập (setup cần một người trong nhóm), không ai khác."
     }
   ],
   "audience": "@param:app_users",

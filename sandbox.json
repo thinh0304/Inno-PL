@@ -3,50 +3,48 @@
   "roles": [
     {
       "name": "PL User",
-      "permissions": [
-        "entity.read",
-        "entity.list",
-        "entity.write"
-      ]
+      "permissions": ["entity.read", "entity.list", "entity.write"]
     }
   ],
   "groups": [
-    {
-      "key": "pl_users",
-      "name": "Người dùng PL"
-    }
+    { "key": "pl_users", "name": "Người dùng PL" },
+    { "key": "sales", "name": "Sales (AM, Inside Sale)" },
+    { "key": "tm", "name": "Technical Manager" },
+    { "key": "proc", "name": "Procurement" },
+    { "key": "sd", "name": "Sales Director" },
+    { "key": "acc", "name": "Sales Accountant" },
+    { "key": "pl_admin", "name": "Quản trị PL" },
+    { "key": "tu_dong", "name": "Tự động PL" }
   ],
-  "principals": [],
+  "principals": [
+    { "key": "pl_bot", "name": "PL tự động", "roles": ["PL User"], "groups": ["tu_dong"] }
+  ],
   "settings": {
     "timezone": "Asia/Ho_Chi_Minh",
     "locale": "vi"
   },
   "people": [
-    {
-      "handle": "admin",
-      "name": "Sandbox Admin",
-      "roles": [
-        "admin"
-      ]
-    },
-    {
-      "handle": "user",
-      "name": "Người dùng thử",
-      "roles": [
-        "PL User"
-      ],
-      "groups": [
-        "pl_users"
-      ]
-    },
-    {
-      "handle": "outsider",
-      "name": "Người ngoài ứng dụng"
-    }
+    { "handle": "admin", "name": "Sandbox Admin", "roles": ["admin"], "groups": ["pl_users", "pl_admin"] },
+    { "handle": "am1", "name": "AM Một", "roles": ["PL User"], "groups": ["pl_users", "sales"] },
+    { "handle": "is1", "name": "Inside Sale Một", "roles": ["PL User"], "groups": ["pl_users", "sales"] },
+    { "handle": "tm1", "name": "Kỹ thuật Một", "roles": ["PL User"], "groups": ["pl_users", "tm"] },
+    { "handle": "proc1", "name": "Mua hàng Một", "roles": ["PL User"], "groups": ["pl_users", "proc"] },
+    { "handle": "sd1", "name": "Giám đốc KD Một", "roles": ["PL User"], "groups": ["pl_users", "sd"] },
+    { "handle": "acc1", "name": "Kế toán Một", "roles": ["PL User"], "groups": ["pl_users", "acc"] },
+    { "handle": "bot", "name": "Tài khoản tự động", "groups": ["tu_dong"] },
+    { "handle": "outsider", "name": "Người ngoài ứng dụng" }
   ],
   "install": {
     "parameters": {
-      "app_users": "@group:pl_users"
+      "app_users": "@group:pl_users",
+      "nhom_sales": "@group:sales",
+      "nhom_tm": "@group:tm",
+      "nhom_proc": "@group:proc",
+      "nhom_sd": "@group:sd",
+      "nhom_acc": "@group:acc",
+      "nhom_admin": "@group:pl_admin",
+      "tu_dong_principal": "@principal:pl_bot",
+      "nhom_tu_dong": "@group:tu_dong"
     },
     "decisions": {}
   }

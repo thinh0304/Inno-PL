@@ -1,0 +1,817 @@
+{
+  "key": "task",
+  "name": "Task",
+  "description": "Một việc của quy trình đơn hàng, giao cho một vai trò.",
+  "icon": "list-checks",
+  "accent": "violet",
+  "fields": [
+    {
+      "key": "don_hang",
+      "label": "Đơn hàng",
+      "type": "reference",
+      "target_entity_id": "${entity:don_hang}",
+      "required": true,
+      "inverse_key": "task",
+      "inverse_label": "Task",
+      "on_target_delete": "cascade"
+    },
+    {
+      "key": "ma",
+      "label": "Task",
+      "type": "enum",
+      "required": true,
+      "facetable": true,
+      "enum_values": [
+        {
+          "value": "t11",
+          "label": "t11"
+        },
+        {
+          "value": "t22",
+          "label": "t22"
+        },
+        {
+          "value": "t23",
+          "label": "t23"
+        },
+        {
+          "value": "t31",
+          "label": "t31"
+        },
+        {
+          "value": "t40",
+          "label": "t40"
+        },
+        {
+          "value": "t44",
+          "label": "t44"
+        },
+        {
+          "value": "t42",
+          "label": "t42"
+        },
+        {
+          "value": "t41",
+          "label": "t41"
+        },
+        {
+          "value": "t45",
+          "label": "t45"
+        },
+        {
+          "value": "t51",
+          "label": "t51"
+        },
+        {
+          "value": "t53",
+          "label": "t53"
+        },
+        {
+          "value": "t61",
+          "label": "t61"
+        },
+        {
+          "value": "t62",
+          "label": "t62"
+        },
+        {
+          "value": "t71",
+          "label": "t71"
+        },
+        {
+          "value": "t72",
+          "label": "t72"
+        }
+      ]
+    },
+    {
+      "key": "vai_tro",
+      "label": "Vai trò",
+      "type": "enum",
+      "required": true,
+      "facetable": true,
+      "enum_values": [
+        {
+          "value": "am",
+          "label": "AM",
+          "color": "sky"
+        },
+        {
+          "value": "is",
+          "label": "Inside Sale",
+          "color": "teal"
+        },
+        {
+          "value": "tm",
+          "label": "Technical Manager",
+          "color": "violet"
+        },
+        {
+          "value": "proc",
+          "label": "Procurement",
+          "color": "amber"
+        },
+        {
+          "value": "sd",
+          "label": "Sales Director",
+          "color": "rose"
+        },
+        {
+          "value": "acc",
+          "label": "Sales Accountant",
+          "color": "indigo"
+        }
+      ]
+    },
+    {
+      "key": "trang_thai",
+      "label": "Trạng thái",
+      "type": "enum",
+      "required": true,
+      "facetable": true,
+      "default": {
+        "kind": "literal",
+        "value": "dang_lam"
+      },
+      "enum_values": [
+        {
+          "value": "cho",
+          "label": "Chờ",
+          "color": "gray"
+        },
+        {
+          "value": "dang_lam",
+          "label": "Đang làm",
+          "color": "sky"
+        },
+        {
+          "value": "xong",
+          "label": "Xong",
+          "color": "emerald"
+        },
+        {
+          "value": "khong_ap_dung",
+          "label": "Không áp dụng",
+          "color": "gray"
+        },
+        {
+          "value": "bo_qua",
+          "label": "Bỏ qua",
+          "color": "gray"
+        },
+        {
+          "value": "tra_lai",
+          "label": "Trả lại",
+          "color": "rose"
+        },
+        {
+          "value": "huy",
+          "label": "Hủy",
+          "color": "fuchsia"
+        }
+      ]
+    },
+    {
+      "key": "uu_tien",
+      "label": "Ưu tiên",
+      "type": "enum",
+      "default": {
+        "kind": "literal",
+        "value": "binh_thuong"
+      },
+      "enum_values": [
+        {
+          "value": "binh_thuong",
+          "label": "Bình thường",
+          "color": "gray"
+        },
+        {
+          "value": "cao",
+          "label": "Cao",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "key": "am",
+      "label": "AM",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "is",
+      "label": "Inside Sale",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "nhom",
+      "label": "Nhóm được giao",
+      "type": "reference_list",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000002",
+      "sortable": false
+    },
+    {
+      "key": "han",
+      "label": "Hạn",
+      "type": "datetime"
+    },
+    {
+      "key": "ly_do",
+      "label": "Lý do / ghi chú",
+      "type": "text"
+    }
+  ],
+  "natural_key": [],
+  "display_field": "ma",
+  "views": [
+    {
+      "key": "all",
+      "name": "Task",
+      "columns": [
+        "don_hang",
+        "ma",
+        "vai_tro",
+        "trang_thai",
+        "han"
+      ]
+    }
+  ],
+  "create_form": {
+    "name": "Task",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "don_hang": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "don_hang",
+          "x-entityField": "don_hang"
+        },
+        "ma": {
+          "type": "string",
+          "enum": [
+            "t11",
+            "t22",
+            "t23",
+            "t31",
+            "t40",
+            "t44",
+            "t42",
+            "t41",
+            "t45",
+            "t51",
+            "t53",
+            "t61",
+            "t62",
+            "t71",
+            "t72"
+          ],
+          "x-entityField": "ma"
+        },
+        "vai_tro": {
+          "type": "string",
+          "enum": [
+            "am",
+            "is",
+            "tm",
+            "proc",
+            "sd",
+            "acc"
+          ],
+          "x-entityField": "vai_tro"
+        },
+        "trang_thai": {
+          "type": "string",
+          "enum": [
+            "cho",
+            "dang_lam",
+            "xong",
+            "khong_ap_dung",
+            "bo_qua",
+            "tra_lai",
+            "huy"
+          ],
+          "x-entityField": "trang_thai"
+        },
+        "am": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "am"
+        },
+        "is": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "is"
+        }
+      }
+    }
+  },
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sales}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "am"
+              },
+              {
+                "kind": "field",
+                "field": "is"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "am"
+              },
+              {
+                "kind": "field",
+                "field": "is"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "update",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "am"
+              },
+              {
+                "kind": "field",
+                "field": "is"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tm}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "update",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_proc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "update",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "update",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          },
+          {
+            "operation": "update",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom"
+              },
+              {
+                "kind": "work"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "rules": [
+    {
+      "key": "nguoi_chi_tao_t11",
+      "message": "Chỉ tạo được task Lập đơn (t11); các task khác do hệ thống mở",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_new"
+            }
+          },
+          {
+            "kind": "field",
+            "rule": {
+              "field": "ma",
+              "op": "ne",
+              "value": "t11"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "${param:nhom_tu_dong}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "chi_nguoi_giu_doi_trang_thai",
+      "message": "Chỉ người đang giữ task mới đổi được trạng thái",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed",
+              "field": "trang_thai"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "is_holder"
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "${param:nhom_tu_dong}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "work": {
+    "lifecycle": {
+      "status_field": "trang_thai",
+      "categories": {
+        "cho": "waiting",
+        "dang_lam": "active",
+        "xong": "done",
+        "khong_ap_dung": "done",
+        "bo_qua": "done",
+        "tra_lai": "done",
+        "huy": "cancelled"
+      }
+    },
+    "assignable": {
+      "claim": "candidates",
+      "rules": [
+        {
+          "on": "start",
+          "when": {
+            "==": [
+              {
+                "var": "vai_tro"
+              },
+              "am"
+            ]
+          },
+          "assign": [
+            {
+              "kind": "dynamic",
+              "source": {
+                "type": "field",
+                "key": "am"
+              }
+            }
+          ]
+        },
+        {
+          "on": "start",
+          "when": {
+            "==": [
+              {
+                "var": "vai_tro"
+              },
+              "is"
+            ]
+          },
+          "assign": [
+            {
+              "kind": "dynamic",
+              "source": {
+                "type": "field",
+                "key": "is"
+              }
+            }
+          ]
+        },
+        {
+          "on": "start",
+          "when": {
+            "==": [
+              {
+                "var": "vai_tro"
+              },
+              "tm"
+            ]
+          },
+          "assign": [
+            {
+              "kind": "group",
+              "id": "${param:nhom_tm}"
+            }
+          ]
+        },
+        {
+          "on": "start",
+          "when": {
+            "==": [
+              {
+                "var": "vai_tro"
+              },
+              "proc"
+            ]
+          },
+          "assign": [
+            {
+              "kind": "group",
+              "id": "${param:nhom_proc}"
+            }
+          ]
+        },
+        {
+          "on": "start",
+          "when": {
+            "==": [
+              {
+                "var": "vai_tro"
+              },
+              "sd"
+            ]
+          },
+          "assign": [
+            {
+              "kind": "group",
+              "id": "${param:nhom_sd}"
+            }
+          ]
+        },
+        {
+          "on": "start",
+          "when": {
+            "==": [
+              {
+                "var": "vai_tro"
+              },
+              "acc"
+            ]
+          },
+          "assign": [
+            {
+              "kind": "group",
+              "id": "${param:nhom_acc}"
+            }
+          ]
+        }
+      ]
+    },
+    "work_surface": {
+      "priority": {
+        "field": "uu_tien",
+        "values": {
+          "binh_thuong": "normal",
+          "cao": "high"
+        }
+      }
+    },
+    "module_page": "/don/{{ record_id }}"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "label": "Hạng KH",
+  "type": "enum",
+  "required": true,
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "vip",
+      "label": "VIP",
+      "color": "amber"
+    },
+    {
+      "value": "tiem_nang",
+      "label": "Tiềm năng",
+      "color": "sky"
+    },
+    {
+      "value": "pho_thong",
+      "label": "Phổ thông",
+      "color": "gray"
+    }
+  ]
+}

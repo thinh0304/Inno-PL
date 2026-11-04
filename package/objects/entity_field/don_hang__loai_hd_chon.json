@@ -1,0 +1,26 @@
+{
+  "label": "Loại HĐ áp ngưỡng",
+  "type": "enum",
+  "enum_values": [
+    {
+      "value": "thuong_mai",
+      "label": "Thương mại 1 lần"
+    },
+    {
+      "value": "license_runrate",
+      "label": "Thương mại định kỳ"
+    },
+    {
+      "value": "dv_loai_1",
+      "label": "Dịch vụ 1 lần"
+    },
+    {
+      "value": "dv_loai_2",
+      "label": "Dịch vụ định kỳ"
+    },
+    {
+      "value": "fulfillment",
+      "label": "Fulfillment"
+    }
+  ]
+}

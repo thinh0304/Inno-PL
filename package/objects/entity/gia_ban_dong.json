@@ -1,0 +1,57 @@
+{
+  "name": "Giá bán dòng",
+  "description": "Giá bán và chiết khấu của một dòng hàng; Kỹ thuật và Mua hàng không đọc được.",
+  "icon": "tags",
+  "accent": "amber",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:gia_ban_dong/dong_hang",
+    "@obj:entity_field:gia_ban_dong/don_hang",
+    "@obj:entity_field:gia_ban_dong/don_gia_ban",
+    "@obj:entity_field:gia_ban_dong/chiet_khau"
+  ],
+  "natural_key": [
+    {
+      "id": "theo_dong",
+      "name": "Một giá cho một dòng",
+      "fields": [
+        "dong_hang"
+      ]
+    }
+  ],
+  "display_field": "don_gia_ban",
+  "create_form": "@obj:form:gia_ban_dong",
+  "rules": [
+    {
+      "key": "khoa_khi_da_gui",
+      "message": "Đơn đã gửi duyệt: chỉ sửa được khi đơn đang nháp hoặc bị trả lại",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "field",
+            "rule": {
+              "field": "don_hang.trang_thai",
+              "op": "not_in",
+              "value": [
+                "nhap",
+                "tra_lai"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

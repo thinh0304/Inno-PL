@@ -1,0 +1,6 @@
+{
+  "label": "Mã đơn",
+  "type": "auto_number",
+  "auto_number_scope": "don_hang",
+  "auto_number_format": "DH-{{ value | pad(4) }}"
+}

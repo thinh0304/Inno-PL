@@ -3,7 +3,7 @@
   "id": "inno/pl",
   "version": "0.1.0",
   "name": "TeraBox · Hiệu quả đơn hàng",
-  "summary": "Đang xây dựng lại theo đặc tả mới.",
+  "summary": "Hiệu quả đơn hàng (P&L) và quy trình đơn hàng của TeraBox: lập đơn, tính P&L, duyệt, task theo vai trò.",
   "publisher": {
     "name": "Innomation",
     "contact": "thinh.nguyentruong@innomation.vn",
@@ -11,13 +11,13 @@
   },
   "license": "Proprietary",
   "dataHandling": {
-    "purpose": "Đang xây dựng lại: chưa lưu dữ liệu nghiệp vụ.",
+    "purpose": "Đơn hàng, dòng hàng, giá bán, kết quả P&L và task quy trình của từng đơn.",
     "storage": "In the organization's AgentFlow",
     "retention": "Tối thiểu 5 năm kể từ khi đơn hoàn tất hoặc đóng, theo yêu cầu lưu trữ chứng từ kế toán; tổ chức có thể giữ lâu hơn.",
     "privacy": "https://innomation.vn",
     "recipients": []
   },
-  "changelog": "Khung rỗng: xây lại từ đầu theo đặc tả mới.",
+  "changelog": "Phase 1: đơn hàng, P&L, task t11–t31 với điều phối tự động.",
   "contentLocale": "vi",
   "minPlatformVersion": "2026.10",
   "requires": {
@@ -30,11 +30,66 @@
           "name": "text",
           "email": "text"
         }
+      },
+      {
+        "key": "group",
+        "access": "read",
+        "fields": {
+          "name": "text"
+        }
       }
     ],
     "permissions": [
       {
         "group": "@param:app_users",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_sales",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_tm",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_proc",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_sd",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_acc",
+        "permissions": [
+          "entity.read",
+          "entity.list",
+          "entity.write"
+        ]
+      },
+      {
+        "group": "@param:nhom_admin",
         "permissions": [
           "entity.read",
           "entity.list",
@@ -50,13 +105,1059 @@
       "type": "group_ref",
       "required": true,
       "label": "Người dùng ứng dụng",
-      "help": "Nhóm chứa mọi người dùng ứng dụng. Ai không ở nhóm này sẽ không thấy ứng dụng. Thành viên cần một role có entity.read, entity.list và entity.write: role không đến từ nhóm."
+      "help": "Nhóm chứa mọi người dùng ứng dụng. Ai không ở nhóm này sẽ không thấy ứng dụng. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_sales",
+      "type": "group_ref",
+      "required": true,
+      "label": "Sales (AM, Inside Sale)",
+      "help": "AM và Inside Sale: lập đơn, xem đơn mình phụ trách. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_tm",
+      "type": "group_ref",
+      "required": true,
+      "label": "Technical Manager",
+      "help": "Một người: duyệt giải pháp kỹ thuật, triển khai dịch vụ. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_proc",
+      "type": "group_ref",
+      "required": true,
+      "label": "Procurement",
+      "help": "Một người: đề xuất giá mua và nhà cung cấp. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_sd",
+      "type": "group_ref",
+      "required": true,
+      "label": "Sales Director",
+      "help": "Một người: phê duyệt đơn và hợp đồng. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_acc",
+      "type": "group_ref",
+      "required": true,
+      "label": "Sales Accountant",
+      "help": "Kế toán bán hàng: tạm ứng, hóa đơn, lưu hồ sơ. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "nhom_admin",
+      "type": "group_ref",
+      "required": true,
+      "label": "Quản trị ứng dụng",
+      "help": "Cấu hình tham số P&L, SLA, KPI. Thành viên cần một role có entity.read, entity.list và entity.write."
+    },
+    {
+      "key": "tu_dong_principal",
+      "type": "service_principal_ref",
+      "required": true,
+      "label": "Tài khoản tự động",
+      "help": "Service principal mà workflow điều phối chạy dưới tên. Cho nó role có entity.read, entity.list và entity.write, thêm vào nhóm Tự động, không cấp khóa."
+    },
+    {
+      "key": "nhom_tu_dong",
+      "type": "group_ref",
+      "required": true,
+      "label": "Nhóm tự động",
+      "help": "Chứa tài khoản tự động và một tài khoản không bao giờ đăng nhập (setup cần một người trong nhóm), không ai khác."
     }
   ],
   "audience": "@param:app_users",
   "features": {},
-  "objects": [],
-  "grants": [],
+  "objects": [
+    {
+      "key": "entity:cau_hinh",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:cau_hinh/ten",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:cau_hinh/gia_tri",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:cau_hinh/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:cau_hinh",
+      "kind": "form"
+    },
+    {
+      "key": "entity:don_hang",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:don_hang/ma_don",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ten_kh",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ma_kh",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/mst",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nguoi_lien_he",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/noi_dung",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/so_hd_noi_bo",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/am",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/is",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/hang_kh",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/cong_no_ngay",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nv_trien_khai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nv_tu_van",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/tv_proposal",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/tv_poc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/loai_hd_chon",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/tu_truoc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/trang_thai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/giai_doan",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/co_dich_vu",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/co_hang_hoa",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ky_thuat",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/mua_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ly_do",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:don_hang/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:don_hang",
+      "kind": "form"
+    },
+    {
+      "key": "entity:dong_hang",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:dong_hang/don_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/stt",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/sku",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/mo_ta",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/dvt",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/so_luong",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/loai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/so_thang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/gia_mua",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/ncc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:dong_hang/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:dong_hang",
+      "kind": "form"
+    },
+    {
+      "key": "entity:gia_ban_dong",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:gia_ban_dong/dong_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:gia_ban_dong/don_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:gia_ban_dong/don_gia_ban",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:gia_ban_dong/chiet_khau",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:gia_ban_dong/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:gia_ban_dong",
+      "kind": "form"
+    },
+    {
+      "key": "entity:tai_chinh_don",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/don_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/cpbh",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/pl_chot",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/cau_hinh_chot",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/ln_thuan_chot",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/dat_chot",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/chot_luc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:tai_chinh_don/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:tai_chinh_don",
+      "kind": "form"
+    },
+    {
+      "key": "entity:task",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:task/don_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/ma",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/vai_tro",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/trang_thai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/uu_tien",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/am",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/is",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/nhom",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/han",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:task/ly_do",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:task/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:task",
+      "kind": "form"
+    }
+  ],
+  "grants": [
+    {
+      "key": "cau_hinh_app_users",
+      "to": "@param:app_users",
+      "entity": "@obj:entity:cau_hinh",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "cau_hinh_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:cau_hinh",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "cau_hinh_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:cau_hinh",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "don_hang_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:don_hang",
+      "operations": {
+        "create": "organization"
+      },
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "am"
+          },
+          {
+            "kind": "field",
+            "field": "is"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "am"
+          },
+          {
+            "kind": "field",
+            "field": "is"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "am"
+          },
+          {
+            "kind": "field",
+            "field": "is"
+          }
+        ]
+      }
+    },
+    {
+      "key": "don_hang_nhom_tm",
+      "to": "@param:nhom_tm",
+      "entity": "@obj:entity:don_hang",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "ky_thuat"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "ky_thuat"
+          }
+        ]
+      }
+    },
+    {
+      "key": "don_hang_nhom_proc",
+      "to": "@param:nhom_proc",
+      "entity": "@obj:entity:don_hang",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "mua_hang"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "mua_hang"
+          }
+        ]
+      }
+    },
+    {
+      "key": "don_hang_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:don_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "don_hang_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:don_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "don_hang_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:don_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "don_hang_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:don_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "dong_hang_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:dong_hang",
+      "record_scopes": {
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ]
+      }
+    },
+    {
+      "key": "dong_hang_nhom_tm",
+      "to": "@param:nhom_tm",
+      "entity": "@obj:entity:dong_hang",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "ky_thuat"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "ky_thuat"
+          }
+        ]
+      }
+    },
+    {
+      "key": "dong_hang_nhom_proc",
+      "to": "@param:nhom_proc",
+      "entity": "@obj:entity:dong_hang",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "mua_hang"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "mua_hang"
+          }
+        ]
+      }
+    },
+    {
+      "key": "dong_hang_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:dong_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "dong_hang_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:dong_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "dong_hang_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:dong_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "dong_hang_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:dong_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "gia_ban_dong_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:gia_ban_dong",
+      "record_scopes": {
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "delete": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ]
+      }
+    },
+    {
+      "key": "gia_ban_dong_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:gia_ban_dong",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "gia_ban_dong_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:gia_ban_dong",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "gia_ban_dong_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:gia_ban_dong",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "gia_ban_dong_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:gia_ban_dong",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "tai_chinh_don_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:tai_chinh_don",
+      "record_scopes": {
+        "create": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ],
+        "update": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          }
+        ]
+      }
+    },
+    {
+      "key": "tai_chinh_don_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:tai_chinh_don",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "tai_chinh_don_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:tai_chinh_don",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "tai_chinh_don_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:tai_chinh_don",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "tai_chinh_don_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:tai_chinh_don",
+      "operations": {
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "task_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:task",
+      "operations": {
+        "create": "organization"
+      },
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "am"
+          },
+          {
+            "kind": "field",
+            "field": "is"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "am"
+          },
+          {
+            "kind": "field",
+            "field": "is"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "am"
+          },
+          {
+            "kind": "field",
+            "field": "is"
+          },
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "task_nhom_tm",
+      "to": "@param:nhom_tm",
+      "entity": "@obj:entity:task",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "task_nhom_proc",
+      "to": "@param:nhom_proc",
+      "entity": "@obj:entity:task",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "task_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:task",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "task_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:task",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ],
+        "update": [
+          {
+            "kind": "field",
+            "field": "nhom"
+          },
+          {
+            "kind": "work"
+          }
+        ]
+      }
+    },
+    {
+      "key": "task_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:task",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "task_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:task",
+      "operations": {
+        "create": "organization",
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    }
+  ],
   "ceiling": {
     "narrow": {}
   },

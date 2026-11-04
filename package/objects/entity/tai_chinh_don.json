@@ -1,0 +1,100 @@
+{
+  "name": "Tài chính đơn",
+  "description": "Chi phí bán hàng và P&L đã chốt của đơn; Kỹ thuật và Mua hàng không đọc được.",
+  "icon": "wallet",
+  "accent": "amber",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:tai_chinh_don/don_hang",
+    "@obj:entity_field:tai_chinh_don/cpbh",
+    "@obj:entity_field:tai_chinh_don/pl_chot",
+    "@obj:entity_field:tai_chinh_don/cau_hinh_chot",
+    "@obj:entity_field:tai_chinh_don/ln_thuan_chot",
+    "@obj:entity_field:tai_chinh_don/dat_chot",
+    "@obj:entity_field:tai_chinh_don/chot_luc"
+  ],
+  "natural_key": [
+    {
+      "id": "theo_don",
+      "name": "Một bản cho một đơn",
+      "fields": [
+        "don_hang"
+      ]
+    }
+  ],
+  "display_field": "don_hang",
+  "create_form": "@obj:form:tai_chinh_don",
+  "rules": [
+    {
+      "key": "khoa_khi_da_gui",
+      "message": "Đơn đã gửi duyệt: chỉ sửa được khi đơn đang nháp hoặc bị trả lại",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed",
+              "field": "cpbh"
+            }
+          },
+          {
+            "kind": "field",
+            "rule": {
+              "field": "don_hang.trang_thai",
+              "op": "not_in",
+              "value": [
+                "nhap",
+                "tra_lai"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "chi_he_thong_chot",
+      "message": "Số chốt do hệ thống ghi",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed_any",
+              "fields": [
+                "pl_chot",
+                "cau_hinh_chot",
+                "ln_thuan_chot",
+                "dat_chot",
+                "chot_luc"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

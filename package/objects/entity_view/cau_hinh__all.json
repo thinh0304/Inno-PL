@@ -1,0 +1,11 @@
+{
+  "name": "Cấu hình",
+  "type": "grid",
+  "columns": [
+    "ten"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

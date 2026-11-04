@@ -1,0 +1,6 @@
+{
+  "label": "Nhóm kỹ thuật được xem",
+  "type": "reference_list",
+  "target_entity_id": "@req:entity:group",
+  "sortable": false
+}

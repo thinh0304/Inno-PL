@@ -1,0 +1,32 @@
+{
+  "name": "Giá bán dòng",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "dong_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:dong_hang",
+        "x-entityField": "dong_hang"
+      },
+      "don_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:don_hang",
+        "x-entityField": "don_hang"
+      },
+      "don_gia_ban": {
+        "type": "number",
+        "x-entityField": "don_gia_ban"
+      },
+      "chiet_khau": {
+        "type": "number",
+        "x-entityField": "chiet_khau"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:gia_ban_dong"
+}

@@ -1,0 +1,64 @@
+{
+  "label": "Loại",
+  "type": "enum",
+  "required": true,
+  "facetable": true,
+  "enum_values": [
+    {
+      "value": "tb",
+      "label": "TB"
+    },
+    {
+      "value": "lic",
+      "label": "LIC"
+    },
+    {
+      "value": "lic_dk",
+      "label": "LIC-DK"
+    },
+    {
+      "value": "lic_ntnn",
+      "label": "LIC-NTNN"
+    },
+    {
+      "value": "dvtk_i",
+      "label": "DVTK-I"
+    },
+    {
+      "value": "dvtk_o",
+      "label": "DVTK-O"
+    },
+    {
+      "value": "dvdk_i",
+      "label": "DVDK-I"
+    },
+    {
+      "value": "dvdk_o",
+      "label": "DVDK-O"
+    },
+    {
+      "value": "dvdk_ntnn",
+      "label": "DVDK-NTNN"
+    },
+    {
+      "value": "cloud_server",
+      "label": "Cloud Server"
+    },
+    {
+      "value": "colocation",
+      "label": "Colocation"
+    },
+    {
+      "value": "veeam",
+      "label": "Veeam"
+    },
+    {
+      "value": "manage_service",
+      "label": "Manage Service"
+    },
+    {
+      "value": "other_services",
+      "label": "Other Services"
+    }
+  ]
+}

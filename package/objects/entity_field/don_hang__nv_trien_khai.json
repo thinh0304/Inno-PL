@@ -1,0 +1,5 @@
+{
+  "label": "NV triển khai",
+  "type": "reference",
+  "target_entity_id": "@req:entity:user"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Task",
+  "type": "grid",
+  "columns": [
+    "don_hang",
+    "ma",
+    "vai_tro",
+    "trang_thai",
+    "han"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

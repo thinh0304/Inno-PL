@@ -1,0 +1,617 @@
+{
+  "key": "don_hang",
+  "name": "Đơn hàng",
+  "description": "Một đơn hàng bán ra và trạng thái quy trình của nó.",
+  "icon": "inbox",
+  "accent": "sky",
+  "fields": [
+    {
+      "key": "ma_don",
+      "label": "Mã đơn",
+      "type": "auto_number",
+      "auto_number_scope": "don_hang",
+      "auto_number_format": "DH-{{ value | pad(4) }}"
+    },
+    {
+      "key": "ten_kh",
+      "label": "Tên khách hàng",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "ma_kh",
+      "label": "Mã KH",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "mst",
+      "label": "MST",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "nguoi_lien_he",
+      "label": "Người liên hệ",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "noi_dung",
+      "label": "Nội dung đơn hàng",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "so_hd_noi_bo",
+      "label": "Số HĐ nội bộ",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "am",
+      "label": "AM phụ trách",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001",
+      "required": true
+    },
+    {
+      "key": "is",
+      "label": "Inside Sale",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001",
+      "required": true
+    },
+    {
+      "key": "hang_kh",
+      "label": "Hạng KH",
+      "type": "enum",
+      "required": true,
+      "facetable": true,
+      "enum_values": [
+        {
+          "value": "vip",
+          "label": "VIP",
+          "color": "amber"
+        },
+        {
+          "value": "tiem_nang",
+          "label": "Tiềm năng",
+          "color": "sky"
+        },
+        {
+          "value": "pho_thong",
+          "label": "Phổ thông",
+          "color": "gray"
+        }
+      ]
+    },
+    {
+      "key": "cong_no_ngay",
+      "label": "Số ngày công nợ",
+      "type": "number",
+      "required": true
+    },
+    {
+      "key": "nv_trien_khai",
+      "label": "NV triển khai",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "nv_tu_van",
+      "label": "NV tư vấn",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "tv_proposal",
+      "label": "Tư vấn: Proposal",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
+    },
+    {
+      "key": "tv_poc",
+      "label": "Tư vấn: PoC",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
+    },
+    {
+      "key": "loai_hd_chon",
+      "label": "Loại HĐ áp ngưỡng",
+      "type": "enum",
+      "enum_values": [
+        {
+          "value": "thuong_mai",
+          "label": "Thương mại 1 lần"
+        },
+        {
+          "value": "license_runrate",
+          "label": "Thương mại định kỳ"
+        },
+        {
+          "value": "dv_loai_1",
+          "label": "Dịch vụ 1 lần"
+        },
+        {
+          "value": "dv_loai_2",
+          "label": "Dịch vụ định kỳ"
+        },
+        {
+          "value": "fulfillment",
+          "label": "Fulfillment"
+        }
+      ]
+    },
+    {
+      "key": "tu_truoc",
+      "label": "KH tạm ứng trước khi giao / triển khai",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
+    },
+    {
+      "key": "trang_thai",
+      "label": "Trạng thái",
+      "type": "enum",
+      "facetable": true,
+      "default": {
+        "kind": "literal",
+        "value": "nhap"
+      },
+      "enum_values": [
+        {
+          "value": "nhap",
+          "label": "Nháp",
+          "color": "gray"
+        },
+        {
+          "value": "dang_xu_ly",
+          "label": "Đang xử lý",
+          "color": "sky"
+        },
+        {
+          "value": "tra_lai",
+          "label": "Bị trả lại",
+          "color": "rose"
+        },
+        {
+          "value": "da_phe_duyet",
+          "label": "Đã phê duyệt",
+          "color": "teal"
+        },
+        {
+          "value": "hoan_tat",
+          "label": "Hoàn tất",
+          "color": "emerald"
+        },
+        {
+          "value": "close_lost",
+          "label": "Close-lost",
+          "color": "fuchsia"
+        }
+      ]
+    },
+    {
+      "key": "giai_doan",
+      "label": "Giai đoạn",
+      "type": "number",
+      "default": {
+        "kind": "literal",
+        "value": 1
+      }
+    },
+    {
+      "key": "co_dich_vu",
+      "label": "Có dịch vụ",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
+    },
+    {
+      "key": "co_hang_hoa",
+      "label": "Có TB / License",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
+    },
+    {
+      "key": "ky_thuat",
+      "label": "Nhóm kỹ thuật được xem",
+      "type": "reference_list",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000002",
+      "sortable": false
+    },
+    {
+      "key": "mua_hang",
+      "label": "Nhóm mua hàng được xem",
+      "type": "reference_list",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000002",
+      "sortable": false
+    },
+    {
+      "key": "ly_do",
+      "label": "Lý do trả lại",
+      "type": "text"
+    }
+  ],
+  "natural_key": [],
+  "display_field": "ma_don",
+  "views": [
+    {
+      "key": "all",
+      "name": "Đơn hàng",
+      "columns": [
+        "ma_don",
+        "ten_kh",
+        "am",
+        "trang_thai",
+        "giai_doan"
+      ]
+    }
+  ],
+  "create_form": {
+    "name": "Đơn hàng",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ten_kh": {
+          "type": "string",
+          "x-entityField": "ten_kh"
+        },
+        "ma_kh": {
+          "type": "string",
+          "x-entityField": "ma_kh"
+        },
+        "mst": {
+          "type": "string",
+          "x-entityField": "mst"
+        },
+        "nguoi_lien_he": {
+          "type": "string",
+          "x-entityField": "nguoi_lien_he"
+        },
+        "noi_dung": {
+          "type": "string",
+          "x-entityField": "noi_dung"
+        },
+        "so_hd_noi_bo": {
+          "type": "string",
+          "x-entityField": "so_hd_noi_bo"
+        },
+        "am": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "am"
+        },
+        "is": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "is"
+        },
+        "hang_kh": {
+          "type": "string",
+          "enum": [
+            "vip",
+            "tiem_nang",
+            "pho_thong"
+          ],
+          "x-entityField": "hang_kh"
+        },
+        "cong_no_ngay": {
+          "type": "number",
+          "x-entityField": "cong_no_ngay"
+        },
+        "nv_trien_khai": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "nv_trien_khai"
+        },
+        "nv_tu_van": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "nv_tu_van"
+        },
+        "tv_proposal": {
+          "type": "boolean",
+          "x-entityField": "tv_proposal"
+        },
+        "tv_poc": {
+          "type": "boolean",
+          "x-entityField": "tv_poc"
+        },
+        "loai_hd_chon": {
+          "type": "string",
+          "enum": [
+            "thuong_mai",
+            "license_runrate",
+            "dv_loai_1",
+            "dv_loai_2",
+            "fulfillment"
+          ],
+          "x-entityField": "loai_hd_chon"
+        },
+        "tu_truoc": {
+          "type": "boolean",
+          "x-entityField": "tu_truoc"
+        }
+      }
+    }
+  },
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sales}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "am"
+              },
+              {
+                "kind": "field",
+                "field": "is"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "am"
+              },
+              {
+                "kind": "field",
+                "field": "is"
+              }
+            ]
+          },
+          {
+            "operation": "update",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "am"
+              },
+              {
+                "kind": "field",
+                "field": "is"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tm}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "ky_thuat"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "ky_thuat"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_proc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "mua_hang"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "mua_hang"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "rules": [
+    {
+      "key": "khoa_khi_da_gui",
+      "message": "Đơn đã gửi duyệt: chỉ sửa được khi đơn đang nháp hoặc bị trả lại",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "was",
+              "rule": {
+                "field": "trang_thai",
+                "op": "not_in",
+                "value": [
+                  "nhap",
+                  "tra_lai"
+                ]
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "${param:nhom_tu_dong}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "chi_he_thong_doi_trang_thai",
+      "message": "Trạng thái, giai đoạn và nhóm xem của đơn do hệ thống ghi",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed_any",
+              "fields": [
+                "trang_thai",
+                "giai_doan",
+                "co_dich_vu",
+                "co_hang_hoa",
+                "ky_thuat",
+                "mua_hang"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "${param:nhom_tu_dong}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

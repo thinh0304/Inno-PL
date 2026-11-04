@@ -1,0 +1,112 @@
+{
+  "name": "Đơn hàng",
+  "description": "Một đơn hàng bán ra và trạng thái quy trình của nó.",
+  "icon": "inbox",
+  "accent": "sky",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:don_hang/ma_don",
+    "@obj:entity_field:don_hang/ten_kh",
+    "@obj:entity_field:don_hang/ma_kh",
+    "@obj:entity_field:don_hang/mst",
+    "@obj:entity_field:don_hang/nguoi_lien_he",
+    "@obj:entity_field:don_hang/noi_dung",
+    "@obj:entity_field:don_hang/so_hd_noi_bo",
+    "@obj:entity_field:don_hang/am",
+    "@obj:entity_field:don_hang/is",
+    "@obj:entity_field:don_hang/hang_kh",
+    "@obj:entity_field:don_hang/cong_no_ngay",
+    "@obj:entity_field:don_hang/nv_trien_khai",
+    "@obj:entity_field:don_hang/nv_tu_van",
+    "@obj:entity_field:don_hang/tv_proposal",
+    "@obj:entity_field:don_hang/tv_poc",
+    "@obj:entity_field:don_hang/loai_hd_chon",
+    "@obj:entity_field:don_hang/tu_truoc",
+    "@obj:entity_field:don_hang/trang_thai",
+    "@obj:entity_field:don_hang/giai_doan",
+    "@obj:entity_field:don_hang/co_dich_vu",
+    "@obj:entity_field:don_hang/co_hang_hoa",
+    "@obj:entity_field:don_hang/ky_thuat",
+    "@obj:entity_field:don_hang/mua_hang",
+    "@obj:entity_field:don_hang/ly_do"
+  ],
+  "natural_key": [],
+  "display_field": "ma_don",
+  "create_form": "@obj:form:don_hang",
+  "rules": [
+    {
+      "key": "khoa_khi_da_gui",
+      "message": "Đơn đã gửi duyệt: chỉ sửa được khi đơn đang nháp hoặc bị trả lại",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "was",
+              "rule": {
+                "field": "trang_thai",
+                "op": "not_in",
+                "value": [
+                  "nhap",
+                  "tra_lai"
+                ]
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "chi_he_thong_doi_trang_thai",
+      "message": "Trạng thái, giai đoạn và nhóm xem của đơn do hệ thống ghi",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed_any",
+              "fields": [
+                "trang_thai",
+                "giai_doan",
+                "co_dich_vu",
+                "co_hang_hoa",
+                "ky_thuat",
+                "mua_hang"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

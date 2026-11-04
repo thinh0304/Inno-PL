@@ -1,0 +1,5 @@
+{
+  "label": "Tên",
+  "type": "text",
+  "required": true
+}

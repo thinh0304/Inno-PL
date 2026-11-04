@@ -5,14 +5,160 @@
 export const PACKAGE = { id: 'inno/pl', version: '0.1.0' } as const;
 
 /** Every object of the package, with the version of the contract this code was written against. */
-export const OBJECTS = {} as const;
+export const OBJECTS = {
+  'entity:cau_hinh': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:don_hang': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:dong_hang': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:gia_ban_dong': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:tai_chinh_don': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity:task': { kind: 'entity', contractVersion: '0.1.0' },
+  'entity_field:cau_hinh/gia_tri': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:cau_hinh/ten': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/am': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/co_dich_vu': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/co_hang_hoa': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/cong_no_ngay': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/giai_doan': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/hang_kh': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/is': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/ky_thuat': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/loai_hd_chon': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/ly_do': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/ma_don': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/ma_kh': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/mst': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/mua_hang': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/nguoi_lien_he': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/noi_dung': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/nv_trien_khai': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/nv_tu_van': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/so_hd_noi_bo': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/ten_kh': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/trang_thai': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/tu_truoc': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/tv_poc': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:don_hang/tv_proposal': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/don_hang': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/dvt': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/gia_mua': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/loai': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/mo_ta': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/ncc': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/sku': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/so_luong': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/so_thang': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:dong_hang/stt': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:gia_ban_dong/chiet_khau': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:gia_ban_dong/don_gia_ban': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:gia_ban_dong/don_hang': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:gia_ban_dong/dong_hang': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:tai_chinh_don/cau_hinh_chot': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:tai_chinh_don/chot_luc': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:tai_chinh_don/cpbh': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:tai_chinh_don/dat_chot': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:tai_chinh_don/don_hang': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:tai_chinh_don/ln_thuan_chot': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:tai_chinh_don/pl_chot': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/am': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/don_hang': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/han': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/is': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/ly_do': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/ma': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/nhom': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/trang_thai': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/uu_tien': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_field:task/vai_tro': { kind: 'entity_field', contractVersion: '0.1.0' },
+  'entity_view:cau_hinh/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:don_hang/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:dong_hang/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:gia_ban_dong/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:tai_chinh_don/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'entity_view:task/all': { kind: 'entity_view', contractVersion: '0.1.0' },
+  'form:cau_hinh': { kind: 'form', contractVersion: '0.1.0' },
+  'form:don_hang': { kind: 'form', contractVersion: '0.1.0' },
+  'form:dong_hang': { kind: 'form', contractVersion: '0.1.0' },
+  'form:gia_ban_dong': { kind: 'form', contractVersion: '0.1.0' },
+  'form:tai_chinh_don': { kind: 'form', contractVersion: '0.1.0' },
+  'form:task': { kind: 'form', contractVersion: '0.1.0' },
+} as const;
 
 export type LogicalKey = keyof typeof OBJECTS;
-export type EntityKey = never;
+export type EntityKey = 'cau_hinh' | 'don_hang' | 'dong_hang' | 'gia_ban_dong' | 'tai_chinh_don' | 'task';
 export type WorkflowKey = never;
 
 /** The value of each field of each entity, as a record carries it. */
-export interface EntityFields {}
+export interface EntityFields {
+  cau_hinh: {
+    gia_tri?: string | null;
+    ten?: string | null;
+  };
+  don_hang: {
+    am?: string | null;
+    co_dich_vu?: boolean | null;
+    co_hang_hoa?: boolean | null;
+    cong_no_ngay?: number | null;
+    giai_doan?: number | null;
+    hang_kh?: 'vip' | 'tiem_nang' | 'pho_thong' | null;
+    is?: string | null;
+    ky_thuat?: string[] | null;
+    loai_hd_chon?: 'thuong_mai' | 'license_runrate' | 'dv_loai_1' | 'dv_loai_2' | 'fulfillment' | null;
+    ly_do?: string | null;
+    ma_don?: string | null;
+    ma_kh?: string | null;
+    mst?: string | null;
+    mua_hang?: string[] | null;
+    nguoi_lien_he?: string | null;
+    noi_dung?: string | null;
+    nv_trien_khai?: string | null;
+    nv_tu_van?: string | null;
+    so_hd_noi_bo?: string | null;
+    ten_kh?: string | null;
+    trang_thai?: 'nhap' | 'dang_xu_ly' | 'tra_lai' | 'da_phe_duyet' | 'hoan_tat' | 'close_lost' | null;
+    tu_truoc?: boolean | null;
+    tv_poc?: boolean | null;
+    tv_proposal?: boolean | null;
+  };
+  dong_hang: {
+    don_hang?: string | null;
+    dvt?: string | null;
+    gia_mua?: number | null;
+    loai?: 'tb' | 'lic' | 'lic_dk' | 'lic_ntnn' | 'dvtk_i' | 'dvtk_o' | 'dvdk_i' | 'dvdk_o' | 'dvdk_ntnn' | 'cloud_server' | 'colocation' | 'veeam' | 'manage_service' | 'other_services' | null;
+    mo_ta?: string | null;
+    ncc?: string | null;
+    sku?: string | null;
+    so_luong?: number | null;
+    so_thang?: number | null;
+    stt?: number | null;
+  };
+  gia_ban_dong: {
+    chiet_khau?: number | null;
+    don_gia_ban?: number | null;
+    don_hang?: string | null;
+    dong_hang?: string | null;
+  };
+  tai_chinh_don: {
+    cau_hinh_chot?: string | null;
+    chot_luc?: string | null;
+    cpbh?: number | null;
+    dat_chot?: boolean | null;
+    don_hang?: string | null;
+    ln_thuan_chot?: number | null;
+    pl_chot?: string | null;
+  };
+  task: {
+    am?: string | null;
+    don_hang?: string | null;
+    han?: string | null;
+    is?: string | null;
+    ly_do?: string | null;
+    ma?: 't11' | 't22' | 't23' | 't31' | 't40' | 't44' | 't42' | 't41' | 't45' | 't51' | 't53' | 't61' | 't62' | 't71' | 't72' | null;
+    nhom?: string[] | null;
+    trang_thai?: 'cho' | 'dang_lam' | 'xong' | 'khong_ap_dung' | 'bo_qua' | 'tra_lai' | 'huy' | null;
+    uu_tien?: 'binh_thuong' | 'cao' | null;
+    vai_tro?: 'am' | 'is' | 'tm' | 'proc' | 'sd' | 'acc' | null;
+  };
+}
 
 /** What starting each workflow takes. */
 export interface WorkflowInputs {}

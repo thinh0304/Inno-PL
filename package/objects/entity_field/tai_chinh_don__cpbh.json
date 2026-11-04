@@ -1,0 +1,5 @@
+{
+  "label": "Chi phí bán hàng",
+  "type": "number",
+  "required": true
+}

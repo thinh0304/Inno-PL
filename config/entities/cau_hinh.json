@@ -1,0 +1,123 @@
+{
+  "key": "cau_hinh",
+  "name": "Cấu hình",
+  "description": "Tham số P&L và quy trình; giá trị ghi đè lên mặc định của app.",
+  "icon": "settings",
+  "accent": "slate",
+  "fields": [
+    {
+      "key": "ten",
+      "label": "Tên",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "gia_tri",
+      "label": "Tham số ghi đè (JSON)",
+      "type": "text"
+    }
+  ],
+  "natural_key": [
+    {
+      "id": "theo_ten",
+      "name": "Tên",
+      "fields": [
+        "ten"
+      ]
+    }
+  ],
+  "display_field": "ten",
+  "seed": [
+    {
+      "ten": "mac_dinh",
+      "name": "Cấu hình mặc định",
+      "gia_tri": "{}"
+    }
+  ],
+  "views": [
+    {
+      "key": "all",
+      "name": "Cấu hình",
+      "columns": [
+        "ten"
+      ]
+    }
+  ],
+  "create_form": {
+    "name": "Cấu hình",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ten": {
+          "type": "string",
+          "x-entityField": "ten"
+        },
+        "gia_tri": {
+          "type": "string",
+          "x-entityField": "gia_tri"
+        }
+      }
+    }
+  },
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:app_users}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null
+}

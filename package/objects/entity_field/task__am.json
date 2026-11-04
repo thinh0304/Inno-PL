@@ -1,0 +1,5 @@
+{
+  "label": "AM",
+  "type": "reference",
+  "target_entity_id": "@req:entity:user"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Giá bán dòng",
+  "type": "grid",
+  "columns": [
+    "don_hang",
+    "dong_hang",
+    "don_gia_ban",
+    "chiet_khau"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

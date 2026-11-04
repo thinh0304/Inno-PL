@@ -1,0 +1,29 @@
+{
+  "name": "Cấu hình",
+  "description": "Tham số P&L và quy trình; giá trị ghi đè lên mặc định của app.",
+  "icon": "settings",
+  "accent": "slate",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:cau_hinh/ten",
+    "@obj:entity_field:cau_hinh/gia_tri"
+  ],
+  "natural_key": [
+    {
+      "id": "theo_ten",
+      "name": "Tên",
+      "fields": [
+        "ten"
+      ]
+    }
+  ],
+  "display_field": "ten",
+  "seed": [
+    {
+      "ten": "mac_dinh",
+      "name": "Cấu hình mặc định",
+      "gia_tri": "{}"
+    }
+  ],
+  "create_form": "@obj:form:cau_hinh"
+}

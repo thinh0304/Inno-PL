@@ -1,0 +1,96 @@
+{
+  "name": "Đơn hàng",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "ten_kh": {
+        "type": "string",
+        "x-entityField": "ten_kh"
+      },
+      "ma_kh": {
+        "type": "string",
+        "x-entityField": "ma_kh"
+      },
+      "mst": {
+        "type": "string",
+        "x-entityField": "mst"
+      },
+      "nguoi_lien_he": {
+        "type": "string",
+        "x-entityField": "nguoi_lien_he"
+      },
+      "noi_dung": {
+        "type": "string",
+        "x-entityField": "noi_dung"
+      },
+      "so_hd_noi_bo": {
+        "type": "string",
+        "x-entityField": "so_hd_noi_bo"
+      },
+      "am": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "am"
+      },
+      "is": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "is"
+      },
+      "hang_kh": {
+        "type": "string",
+        "enum": [
+          "vip",
+          "tiem_nang",
+          "pho_thong"
+        ],
+        "x-entityField": "hang_kh"
+      },
+      "cong_no_ngay": {
+        "type": "number",
+        "x-entityField": "cong_no_ngay"
+      },
+      "nv_trien_khai": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "nv_trien_khai"
+      },
+      "nv_tu_van": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "nv_tu_van"
+      },
+      "tv_proposal": {
+        "type": "boolean",
+        "x-entityField": "tv_proposal"
+      },
+      "tv_poc": {
+        "type": "boolean",
+        "x-entityField": "tv_poc"
+      },
+      "loai_hd_chon": {
+        "type": "string",
+        "enum": [
+          "thuong_mai",
+          "license_runrate",
+          "dv_loai_1",
+          "dv_loai_2",
+          "fulfillment"
+        ],
+        "x-entityField": "loai_hd_chon"
+      },
+      "tu_truoc": {
+        "type": "boolean",
+        "x-entityField": "tu_truoc"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:don_hang"
+}

@@ -1,0 +1,76 @@
+{
+  "name": "Task",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "don_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:don_hang",
+        "x-entityField": "don_hang"
+      },
+      "ma": {
+        "type": "string",
+        "enum": [
+          "t11",
+          "t22",
+          "t23",
+          "t31",
+          "t40",
+          "t44",
+          "t42",
+          "t41",
+          "t45",
+          "t51",
+          "t53",
+          "t61",
+          "t62",
+          "t71",
+          "t72"
+        ],
+        "x-entityField": "ma"
+      },
+      "vai_tro": {
+        "type": "string",
+        "enum": [
+          "am",
+          "is",
+          "tm",
+          "proc",
+          "sd",
+          "acc"
+        ],
+        "x-entityField": "vai_tro"
+      },
+      "trang_thai": {
+        "type": "string",
+        "enum": [
+          "cho",
+          "dang_lam",
+          "xong",
+          "khong_ap_dung",
+          "bo_qua",
+          "tra_lai",
+          "huy"
+        ],
+        "x-entityField": "trang_thai"
+      },
+      "am": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "am"
+      },
+      "is": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "is"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:task"
+}

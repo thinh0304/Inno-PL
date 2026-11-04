@@ -1,0 +1,9 @@
+{
+  "label": "Đơn hàng",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:don_hang",
+  "required": true,
+  "inverse_key": "task",
+  "inverse_label": "Task",
+  "on_target_delete": "cascade"
+}

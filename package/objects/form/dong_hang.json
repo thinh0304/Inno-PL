@@ -1,0 +1,70 @@
+{
+  "name": "Dòng hàng",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "don_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:don_hang",
+        "x-entityField": "don_hang"
+      },
+      "stt": {
+        "type": "number",
+        "x-entityField": "stt"
+      },
+      "sku": {
+        "type": "string",
+        "x-entityField": "sku"
+      },
+      "mo_ta": {
+        "type": "string",
+        "x-entityField": "mo_ta"
+      },
+      "dvt": {
+        "type": "string",
+        "x-entityField": "dvt"
+      },
+      "so_luong": {
+        "type": "number",
+        "x-entityField": "so_luong"
+      },
+      "loai": {
+        "type": "string",
+        "enum": [
+          "tb",
+          "lic",
+          "lic_dk",
+          "lic_ntnn",
+          "dvtk_i",
+          "dvtk_o",
+          "dvdk_i",
+          "dvdk_o",
+          "dvdk_ntnn",
+          "cloud_server",
+          "colocation",
+          "veeam",
+          "manage_service",
+          "other_services"
+        ],
+        "x-entityField": "loai"
+      },
+      "so_thang": {
+        "type": "number",
+        "x-entityField": "so_thang"
+      },
+      "gia_mua": {
+        "type": "number",
+        "x-entityField": "gia_mua"
+      },
+      "ncc": {
+        "type": "string",
+        "x-entityField": "ncc"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:dong_hang"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Tài chính đơn",
+  "type": "grid",
+  "columns": [
+    "don_hang",
+    "cpbh",
+    "ln_thuan_chot",
+    "dat_chot",
+    "chot_luc"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

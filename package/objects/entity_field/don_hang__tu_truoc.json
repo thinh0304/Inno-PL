@@ -1,0 +1,8 @@
+{
+  "label": "KH tạm ứng trước khi giao / triển khai",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": false
+  }
+}
