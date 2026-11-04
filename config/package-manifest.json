@@ -3,8 +3,8 @@
   "formatVersion": 1,
   "id": "inno/pl",
   "version": "0.1.0",
-  "name": "TeraBox · Hiệu quả đơn hàng (P&L)",
-  "summary": "Lập đơn bán, tự tính P&L, điều phối 15 task giữa các phòng ban có SLA và trợ lý AI, theo dõi KPI.",
+  "name": "TeraBox · Hiệu quả đơn hàng",
+  "summary": "Đang xây dựng lại theo đặc tả mới.",
   "publisher": {
     "name": "Innomation",
     "contact": "thinh.nguyentruong@innomation.vn",
@@ -12,13 +12,13 @@
   },
   "license": "Proprietary",
   "dataHandling": {
-    "purpose": "Lập và duyệt đơn bán hàng: thông tin khách hàng, nhà cung cấp, danh mục hàng hóa / dịch vụ, giá bán, giá mua, bảng P&L của đơn, hợp đồng, nhật ký xử lý và chỉ tiêu KPI của nhân viên.",
+    "purpose": "Đang xây dựng lại: chưa lưu dữ liệu nghiệp vụ.",
     "storage": "In the organization's AgentFlow",
     "retention": "Tối thiểu 5 năm kể từ khi đơn hoàn tất hoặc đóng, theo yêu cầu lưu trữ chứng từ kế toán; tổ chức có thể giữ lâu hơn.",
     "privacy": "https://innomation.vn",
     "recipients": []
   },
-  "changelog": "Bản đầu: nền tảng cấu hình và bộ tính P&L.",
+  "changelog": "Khung rỗng: xây lại từ đầu theo đặc tả mới.",
   "contentLocale": "vi",
   "minPlatformVersion": "2026.10",
   "requires": {
@@ -41,62 +41,6 @@
           "entity.list",
           "entity.write"
         ]
-      },
-      {
-        "group": "@param:am_group",
-        "permissions": [
-          "entity.read",
-          "entity.list",
-          "entity.write"
-        ]
-      },
-      {
-        "group": "@param:sa_group",
-        "permissions": [
-          "entity.read",
-          "entity.list",
-          "entity.write"
-        ]
-      },
-      {
-        "group": "@param:tm_group",
-        "permissions": [
-          "entity.read",
-          "entity.list",
-          "entity.write"
-        ]
-      },
-      {
-        "group": "@param:sd_group",
-        "permissions": [
-          "entity.read",
-          "entity.list",
-          "entity.write"
-        ]
-      },
-      {
-        "group": "@param:proc_group",
-        "permissions": [
-          "entity.read",
-          "entity.list",
-          "entity.write"
-        ]
-      },
-      {
-        "group": "@param:acc_group",
-        "permissions": [
-          "entity.read",
-          "entity.list",
-          "entity.write"
-        ]
-      },
-      {
-        "group": "@param:admin_group",
-        "permissions": [
-          "entity.read",
-          "entity.list",
-          "entity.write"
-        ]
       }
     ]
   },
@@ -105,71 +49,8 @@
       "key": "app_users",
       "type": "group_ref",
       "required": true,
-      "label": "Người dùng PL",
-      "help": "Nhóm chứa mọi người dùng ứng dụng thuộc 7 vai trò (AM, Sales Admin, Technical Manager, Sales Director, Mua hàng, Kế toán bán hàng, Quản trị viên PL). Ai không ở nhóm này sẽ không thấy ứng dụng, kể cả khi đã ở nhóm vai trò. Thành viên cần một role có entity.read, entity.list và entity.write: role không đến từ nhóm."
-    },
-    {
-      "key": "am_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "AM · Nhân viên Sale",
-      "help": "Nhân viên kinh doanh (AM) lập đơn, nhập phiếu khảo sát, danh mục, giá bán và gửi duyệt. Thành viên cũng phải ở nhóm \"Người dùng PL\" và cần một role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "sa_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "Sales Admin",
-      "help": "Sales Admin hỗ trợ Sale lập đơn, soạn và theo dõi hợp đồng với khách hàng. Thành viên cũng phải ở nhóm \"Người dùng PL\" và cần một role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "tm_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "Technical Manager",
-      "help": "Trưởng bộ phận kỹ thuật: xem thông số, báo giá mua dịch vụ và xác nhận triển khai. Thành viên cũng phải ở nhóm \"Người dùng PL\" và cần một role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "sd_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "Sales Director",
-      "help": "Giám đốc kinh doanh: phê duyệt P&L và đồng ý trình ký. Thành viên cũng phải ở nhóm \"Người dùng PL\" và cần một role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "proc_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "Mua hàng",
-      "help": "Bộ phận Mua hàng: đề xuất giá mua, nhà cung cấp và đặt hàng. Thành viên cũng phải ở nhóm \"Người dùng PL\" và cần một role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "acc_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "Kế toán bán hàng",
-      "help": "Kế toán bán hàng: kiểm tra hợp đồng, xuất hóa đơn và đối soát thanh toán. Thành viên cũng phải ở nhóm \"Người dùng PL\" và cần một role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "admin_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "Quản trị viên PL",
-      "help": "Quản trị viên ứng dụng: sửa cấu hình (loại hàng, tỷ lệ, VAT, SLA, kế hoạch, KPI) và danh mục nhân sự. Thành viên cũng phải ở nhóm \"Người dùng PL\" và cần một role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "automation_group",
-      "type": "group_ref",
-      "required": true,
-      "label": "Tự động hóa PL",
-      "help": "Nhóm chứa service principal chạy các workflow tự động (tính P&L, điều phối task, nhắc SLA) và một tài khoản riêng không bao giờ đăng nhập, không ai khác. Service principal cần role có entity.read, entity.list và entity.write. Chọn một nhóm khác với nhóm \"Người dùng PL\" và các nhóm vai trò khác (nền tảng không cho một nhóm nhận hai bộ quyền trên cùng entity); thành viên được trùng nhau."
-    },
-    {
-      "key": "automation_principal",
-      "type": "service_principal_ref",
-      "required": true,
-      "label": "Tài khoản tự động hóa PL",
-      "help": "Service principal chạy các workflow tự động của ứng dụng (tính P&L, điều phối task, nhắc SLA). Đặt nó trong nhóm \"Tự động hóa PL\" và cho nó một role có entity.read, entity.list và entity.write."
+      "label": "Người dùng ứng dụng",
+      "help": "Nhóm chứa mọi người dùng ứng dụng. Ai không ở nhóm này sẽ không thấy ứng dụng. Thành viên cần một role có entity.read, entity.list và entity.write: role không đến từ nhóm."
     }
   ],
   "audience": "@param:app_users",

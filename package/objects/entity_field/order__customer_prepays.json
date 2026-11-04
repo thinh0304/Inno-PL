@@ -1,8 +1,0 @@
-{
-  "label": "KH tạm ứng trước",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": false
-  }
-}

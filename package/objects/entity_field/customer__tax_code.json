@@ -1,8 +1,0 @@
-{
-  "label": "Mã số thuế",
-  "type": "text",
-  "searchable": true,
-  "constraints": {
-    "pattern": "^\\d{10}(-\\d{3})?$"
-  }
-}

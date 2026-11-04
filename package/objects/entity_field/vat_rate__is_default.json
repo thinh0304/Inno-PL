@@ -1,8 +1,0 @@
-{
-  "label": "Mặc định",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": false
-  }
-}

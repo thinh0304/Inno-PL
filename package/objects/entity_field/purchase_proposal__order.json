@@ -1,9 +1,0 @@
-{
-  "label": "Đơn hàng",
-  "type": "reference",
-  "target_entity_id": "@obj:entity:order",
-  "required": true,
-  "on_target_delete": "cascade",
-  "inverse_key": "purchase_proposals",
-  "inverse_label": "Đề xuất mua"
-}

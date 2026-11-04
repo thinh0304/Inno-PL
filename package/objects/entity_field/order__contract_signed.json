@@ -1,8 +1,0 @@
-{
-  "label": "Đã ký HĐ khách hàng",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": false
-  }
-}

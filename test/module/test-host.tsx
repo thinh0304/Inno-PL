@@ -9,7 +9,7 @@ export function testHost(path = '/', locale = 'vi'): TestHost {
   const paths: string[] = [];
   return {
     paths,
-    context: { person: { id: 'u-am', name: 'Nguyễn Thuận', email: null }, org: { id: 'org', name: 'TeraBox' }, locale,
+    context: { person: { id: 'u-test', name: 'Test', email: null }, org: { id: 'org', name: 'TeraBox' }, locale,
       theme: { mode: 'light', brand: 'agentflow' } },
     onLocaleChange: () => () => {},
     onThemeChange: () => () => {},

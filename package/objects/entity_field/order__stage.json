@@ -1,8 +1,0 @@
-{
-  "label": "Giai đoạn",
-  "type": "number",
-  "default": {
-    "kind": "literal",
-    "value": 1
-  }
-}

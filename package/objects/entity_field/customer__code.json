@@ -1,9 +1,0 @@
-{
-  "label": "Mã khách hàng",
-  "type": "text",
-  "required": true,
-  "searchable": true,
-  "constraints": {
-    "pattern": "^[A-Z0-9_-]{2,20}$"
-  }
-}

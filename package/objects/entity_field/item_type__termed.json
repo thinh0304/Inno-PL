@@ -1,8 +1,0 @@
-{
-  "label": "Có kỳ hạn",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": false
-  }
-}

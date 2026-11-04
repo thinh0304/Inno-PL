@@ -1,9 +1,0 @@
-{
-  "label": "Đơn giá mua thực tế",
-  "type": "number",
-  "format": "currency",
-  "format_options": {
-    "currency_code": "VND",
-    "decimal_places": 0
-  }
-}

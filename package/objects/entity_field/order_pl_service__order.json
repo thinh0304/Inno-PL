@@ -1,9 +1,0 @@
-{
-  "label": "Đơn hàng",
-  "type": "reference",
-  "target_entity_id": "@obj:entity:order",
-  "required": true,
-  "on_target_delete": "cascade",
-  "inverse_key": "pl_service",
-  "inverse_label": "P&L phần dịch vụ"
-}

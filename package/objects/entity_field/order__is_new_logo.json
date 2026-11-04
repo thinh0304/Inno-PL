@@ -1,8 +1,0 @@
-{
-  "label": "Khách hàng mới (new logo)",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": false
-  }
-}

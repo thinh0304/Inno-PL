@@ -1,8 +1,0 @@
-{
-  "label": "Đang giao dịch",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": true
-  }
-}

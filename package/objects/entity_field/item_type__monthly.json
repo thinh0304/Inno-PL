@@ -1,8 +1,0 @@
-{
-  "label": "Tính theo tháng",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": false
-  }
-}

@@ -1,9 +1,0 @@
-{
-  "label": "Giá vốn dịch vụ",
-  "type": "number",
-  "format": "currency",
-  "format_options": {
-    "currency_code": "VND",
-    "decimal_places": 0
-  }
-}

@@ -1,6 +1,0 @@
-{
-  "label": "Mã nhân viên",
-  "type": "text",
-  "required": true,
-  "searchable": true
-}

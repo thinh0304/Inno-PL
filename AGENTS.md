@@ -1,8 +1,9 @@
 # Notes for coding agents
 
-This project is an AgentFlow app, built with the AgentFlow SDK: `inno/pl`, "TeraBox · Hiệu quả đơn hàng (P&L)" — sales orders, their P&L, the 15-task approval flow and KPIs (design: `docs/superpowers/specs/2026-11-02-pl-agentflow-design.md`, plans: `docs/superpowers/plans/`). `config/` describes an app package, and the builder turns
-it into `package/`.
-`src/module/` is the package's UI module.
+This project is an AgentFlow app, built with the AgentFlow SDK: `inno/pl`, "TeraBox · Hiệu quả đơn hàng". It is being
+rebuilt from scratch on a new specification: today `config/` describes an empty package (no entities, no workflows), and
+`src/module/` shows a placeholder screen. The new spec goes in `docs/superpowers/specs/`, its plans in
+`docs/superpowers/plans/`. `config/` describes an app package, and the builder turns it into `package/`.
 
 ## Skills
 
@@ -24,25 +25,39 @@ Without the plugin, read the skills themselves: they are Markdown in the SDK rep
 GitHub), one folder each under `claude-plugin/skills/`, a `SKILL.md` and its `reference/`. The builder's README,
 `node_modules/@reflexify/agentflow-app-builder/README.md`, documents every file under `config/`.
 
+## The old app (v1) and its specification
+
+The first version was built on a specification that turned out wrong, and was thrown away.
+
+- **Never read, search or reuse `docs/archive/`** (the v1 source spec, mockup and sample workbook) **unless the user
+  explicitly asks** to consult it in that conversation. Keep it out of searches: give a path or a glob that excludes it.
+- The same holds for the git tag `archive/pl-v1` (the v1 code, specs and plans): do not check it out, diff against it or
+  copy from it unless the user asks.
+- The new specification is the only source of truth for what the app does. Do not carry over v1's entities, roles, task
+  codes, business rules or screens because they "were there before".
+- `docs/sdk-feedback.md` is about the AgentFlow platform, not the business: read it, it still applies. Its examples name
+  v1 objects; take the platform's behaviour from them, never the business rules.
+
 ## Commands
 
-- `pnpm build`: `node scripts/build-code.mjs && agentflow-app build`: bundles the P&L engine into
-  `config/code/compute_pl.js`, then writes `package/` from `config/`. `pnpm build:code` does the first part alone.
+- `pnpm build`: `node scripts/build-code.mjs && agentflow-app build`: bundles each Code step's TypeScript (the `ENTRIES`
+  of `scripts/build-code.mjs`, none yet) into `config/code/<name>.js`, then writes `package/` from `config/`.
+  `pnpm build:code` does the first part alone.
 - `pnpm build` also writes the UI module into `package/ui`: built with Vite, or copied as it is when `ui` in
   `agentflow.app.mjs` names a `prebuilt` folder.
 - `pnpm check`: `agentflow-app build --check`: fails when the committed `package/` is not what `config/` builds.
   `pnpm check` compares package/ui with the module when package/ui exists (git ignores that folder; `pnpm build`
   writes it).
-- `pnpm test`: the Vitest tests, if the project has any, then the check.
-- `pnpm test:sandbox`: the black-box tests in `e2e/*.sandbox.test.ts` against the sandbox in `.agentflow/sandbox.json`
-  (made by `pnpm af deploy --sandbox` from `sandbox.json`); `pnpm test` never runs them.
+- `pnpm test`: all the Vitest tests, then the check and `types --check`. See "Testing": not after every phase.
+- `pnpm vitest run <files or folders>`: only those tests.
+- `pnpm test:sandbox [e2e/<file>]`: the black-box tests in `e2e/*.sandbox.test.ts` (all, or the files named) against the
+  sandbox in `.agentflow/sandbox.json` (made by `pnpm af deploy --sandbox` from `sandbox.json`); `pnpm test` never runs them.
 - `pnpm typecheck`: TypeScript over the project's `.ts` and `.tsx` files.
 - `pnpm exec agentflow-app types`: TypeScript for the package's objects (`LogicalKey`, `EntityFields`,
   `WorkflowInputs`), from `package/`: run `pnpm build` first.
 - `src/generated/app.ts` is what `types` writes, and the project commits it. `pnpm test` ends with
-  `agentflow-app types --check`, which fails with `TYPES_STALE` when the file is behind `package/`: after a change
-  under `config/` that adds, renames or removes an object, run `pnpm build`, then `pnpm exec agentflow-app types`.
-- `pnpm demo`: the UI module on in-memory data, at `http://localhost:5174/module.html`.
+  `agentflow-app types --check`, which fails with `TYPES_STALE` when the file is behind `package/`.
+- `pnpm demo`: the UI module in a browser, at `http://localhost:5174/module.html`.
 - `pnpm exec agentflow-app keygen --key-id <id>`: once per publisher, a signing key in `keys/`.
 - `pnpm seal`: `agentflow-app seal`: signs `package/` into `dist-app/`.
 - `pnpm exec agentflow-app lint`: checks `package/` against the AgentFlow at `AGENTFLOW_URL`, with the key in `AGENTFLOW_TOKEN`.
@@ -56,69 +71,71 @@ and never print, read back or commit `.env`.
 
 Every `agentflow-app` command takes `--json` for one JSON value on stdout. A refusal prints `<CODE>: <message>` and exits `1`.
 
+## Testing
+
+Running every suite after every phase cost too much time in v1. So:
+
+- **During a phase** (one plan, or one task of it), run only the tests that cover what the phase changed:
+  - `pnpm vitest run <test files or folders>`: the tests the phase wrote or touched (or
+    `pnpm vitest related --run <changed source files>`);
+  - `pnpm typecheck`, and `pnpm build` then `pnpm check` (both quick) when `config/` or `src/module/` changed;
+  - on the sandbox, only the phase's own files (`pnpm test:sandbox e2e/<file>.sandbox.test.ts`), and only when the
+    phase changes what runs on AgentFlow (entities, access, rules, workflows, triggers). Deploy the sandbox once per
+    phase, not per task.
+- Each plan lists, per task and for the whole phase, exactly which test files prove it ("Kiểm tra"). The final reviewer
+  of a plan reads the code and runs those, not the full suites.
+- **The full suites**, `pnpm test` and the whole `pnpm test:sandbox`, run once when the whole app is built and
+  deployed, and again before a release is sealed or pushed. Not after each phase.
+
+## Platform notes
+
+What v1 learnt about AgentFlow, which any app here will meet (details and repros in `docs/sdk-feedback.md`):
+
+- Triggers always ship off: `deploy --sandbox` arms them; on a real AgentFlow the admin turns them on. After
+  `deploy --sandbox` they may take a few minutes to start (F-20; the delay was never measured).
+- The sandbox's workflow runner is slow (7 s to 2 min a run): sandbox tests run one file at a time
+  (`vitest.sandbox.config.ts`) and wait on conditions rather than fixed sleeps.
+- Creating a record does not fire an `updated` trigger: a workflow must not rely on another workflow's creations to
+  wake it.
+- A workflow people start runs as them; one that must run as the app's service principal is started by a trigger.
+- API records carry their fields under `body`. Times arrive as `2026-11-03T18:54:44.945958101+07:00`: in code a Code
+  step runs, parse them with a helper that handles nanoseconds and the offset, never `Date.parse`.
+- A create form refuses `null` for a number field: leave an empty number out. An entity's create form keeps only the
+  fields it binds.
+- The builder seeds `done_at` on a task entity itself.
+- Enum colours must be gray, sky, teal, amber, emerald, violet, indigo, rose or fuchsia (the install refuses others, the
+  builder does not). A routing rule's `when` is one json-logic operator, like a trigger filter.
+- An installed app cannot upload attachments (`POST /attachments` answers 403, F-25), files a workflow run produced
+  answer 404 through the app (F-27), and `GET /app/objects` only answers the app's own caller (F-22).
+
 ## Where things are
 
-- `config/package-manifest.json`: the package's identity and parameters; raise `version` for every release.
-  Its `ui` and `launcher` members declare the module and its entry in AgentFlow's sidebar.
-- `src/pl/`: the P&L engine, pure TypeScript (`computePl()`, `PlConfig`, `DEFAULT_CONFIG`, `configFromRecords()`),
-  tested in `test/pl/` (the TM-1040 golden case among them). The source of truth for the formulas.
-- `scripts/build-code.mjs`: bundles `src/pl/code-entry.ts` into `config/code/compute_pl.js` with esbuild.
-- `config/code/compute_pl.js`: generated by `scripts/build-code.mjs`, committed; the `compute_pl` Code step's source.
-- `config/entities/`: the configuration entities with seeds equal to `src/pl/defaults.ts`
-  (`item_type`, `contract_type_rate`, `fin_cost_tier`, `vat_rate`, `pl_setting`, `task_sla`, `deal_stage_weight`,
-  `business_plan`, `kpi_target`) and the shared records `customer`, `supplier`, `staff`.
-- `config/build/pl-selftest.mjs`: the "Tự kiểm bộ tính P&L" workflow, the Code step on TM-1040.
-- `src/order/`: the order library (`OrderDraft`, `draftFromRecords`, `toPlOrderInput`, `checkFormat`, `validateOrder`,
-  `plRecordsFromResult`, `runComputeOrderPl`), tested in `test/order/`. The screens (plan 02b) and `compute_pl` share it.
-- `config/entities/`: the order entities `order`, `order_line`, `goods_line_price`, `service_line_price`, `order_finance`,
-  `purchase_proposal`, `order_pl`, `order_pl_service`, `order_pl_goods`. Money never sits on `order` / `order_line`.
-- `config/build/compute-pl.mjs`: the `compute_pl` workflow and its trigger `compute_pl_on_request` (an order's
-  `pl_requested_at` changes). It runs as `automation_principal`: a workflow people start must run as them, so the
-  screens request a computation by setting that field, never by starting the workflow.
-- `config/code/compute_order_pl.js`: generated by `scripts/build-code.mjs` from `src/order/code-entry.ts`; never edit it.
-- `src/flow/`: the 15-task flow, pure TypeScript (`TASKS`, `advanceOrder()`, `addWorkingDays()`, `sweepSla()`, `actionsFor()`), tested in
-  `test/flow/`. `advanceOrder()` is the source of truth for what opens, resets, approves and logs; it must stay idempotent.
-- `config/entities/order_task.json`, `order_event.json`: a task (the `work` contract, outcome rules, stage model) and the log
-  (nobody updates or deletes). The builder seeds `done_at` itself, so the task's finish time is `finished_at`; enum colours must be
-  gray, sky, teal, amber, emerald, violet, indigo, rose or fuchsia (the install refuses others, the builder does not).
-- `config/build/flow.mjs`: `init_order_tasks`, `advance_order`, `close_lost_order`, `sla_sweep` and their four triggers (seven triggers in all;
-  the admin turns them on). A routing rule's `when` is one json-logic operator, like a trigger filter.
-- `config/code/advance_order.js`, `sla_sweep.js`: generated by `scripts/build-code.mjs` from `src/flow/code-entry.ts`; never edit them.
-- Locks: `locked_after_submit` on `order`, `children_locked_after_submit` on its lines, prices and finance; only the automation group and
-  Admin write the flow fields (`stage`, `approved`, `approved_at`, `contract_signed`, `pending_roles`).
-- `OrdersApi` has `tasks`, `events`, `act`, `task`, `logEvent`, `myWork`, `actionable` (which of one order's tasks this person may act on: the work list only, never a read per row), `closeLost`; the flow screens (`StageBar`, `tabs/FlowTab`, `ActionPanel`, `TaskCard`, `tabs/HistoryTab`, `MyWorkScreen`) read them through `useFlow(api, orderId, onChanged)`
-  and never open tasks or write the order's status themselves. `src/flow/board.ts` and `warnings.ts` hold what they derive.
-- The create form of `order_event` keeps only the fields it binds: every field the module writes there must be a property of the form.
-- `pnpm test:sandbox` runs the files one at a time (the sandbox's workflow runner takes 7-18 s per run); wait a few minutes after `deploy --sandbox` for the triggers to start.
-- Times in records arrive as `2026-11-03T18:54:44.945958101+07:00`: read them with `parseTime` (`src/pl/time.ts`), never `Date.parse`, in code a Code step runs.
-- `e2e/`: the sandbox tests; API records carry their fields under `body`.
-- `agentflow.app.mjs`: what the build reads: the workflows, in publish order, and the exposed steps.
-- `src/module/module.tsx`: the module's entry, `mount(root, host)`; `App.tsx` picks the screen from the path.
-- `src/module/`: the order screens (list, order page and its tabs in `tabs/`) over `OrdersApi` (`orders-api.ts`):
-  `http-orders-api.ts` for AgentFlow, `memory-orders-api.ts` for the demo and the tests. Saving goes through
-  `save-plan.ts`, then sets `order.pl_requested_at`; the screens never start a workflow and never write P&L.
-- `config/build/request-pl.mjs`: two trigger workflows that set `pl_requested_at` when Purchasing writes a proposal.
-- `src/contract/`: the contract rules (`contractSlots`, `contractGate`, `prepayTotal`, `SIGNING_FIELDS`, `contractFromRecord`), tested in
-  `test/contract/`; `advance_order` (via `src/flow/code-entry.ts`) and the screens both use `contractGate`, so a change there changes both.
-- `config/entities/contract.json`: an upload is a new record (`version` + 1), never an edit; `file` is an array of attachment ids, and the
-  file's name comes from `GET /attachments/{id}` (F-26). The signing fields leave `locked_after_submit` and lock on `contract_signed`.
-- `tabs/ContractsTab.tsx` and `useContracts.ts`: the contracts tab; `OrdersApi.contracts / uploadContract / saveSigning / contractFileUrl`.
-  AgentFlow refuses uploads from an installed app (`UPLOAD_NOT_ALLOWED`, F-25) and files a run produced (F-27): no contract templates yet.
-- `e2e/module-helpers.ts`: `moduleApi(handle)`, the module's `OrdersApi` as a sandbox person.
+- `config/package-manifest.json`: the package's identity and parameters (today only `app_users`); raise `version` for
+  every release. Its `ui` and `launcher` members declare the module and its entry in AgentFlow's sidebar.
+- `config/entities/`, `config/build/`: none yet. `agentflow.app.mjs` merges the workflow modules of `config/build/`, in
+  publish order.
+- `scripts/build-code.mjs`: bundles a Code step's TypeScript into `config/code/<name>.js`; never edit those by hand.
+- `src/module/`: `module.tsx` (the entry, `mount(root, host)`), `mount.tsx` (the stylesheet in the shadow root, the
+  language and the theme), `App.tsx` (picks the screen), `kit.tsx` (the kit's elements for React), `icons.tsx`,
+  `format.ts` (money, percentages and days the Vietnamese way), `text.ts` (vi and en), `styles.css`, `demo.tsx`
+  (for `module.html`).
+- `test/module/`: `test-host.tsx` (a host for screen tests), `shims.ts` (what jsdom lacks), `styles.test.ts` and
+  `ui-build.test.ts` (the module rules), `app.test.tsx`.
+- `sandbox.json`: the sandbox's people, groups and roles: one user group today; rewrite it with the new spec's roles.
+- `docs/sdk-feedback.md`: the platform's snags, F-01 onwards. Add an F-xx for each new one, with "Cách tái hiện" and
+  "Đề xuất".
 
 ## Rules
 
 - Never commit `keys/`. It holds the signing key, and git ignores it.
-- Never write the value of `AGENTFLOW_TOKEN` into a file, a command line or a log.
-- Never edit `package/` by hand. Change `config/`, run `pnpm build`, and commit both.
-- After a change under `src/module/`, run `pnpm build` before `pnpm test`: the check compares the built `package/ui`.
-- Never edit `config/code/compute_pl.js` by hand. Change `src/pl/`, run `pnpm build`, and commit both.
-- When you change a default in `src/pl/defaults.ts`, change the matching entity's `seed` too:
-  `test/pl/config-records.test.ts` fails until they agree.
-- `README.md` and this file describe the starter's own example objects. When your objects replace them, rewrite both:
-  the objects, the parameters and the install notes (the starter has no trigger to turn on; an app with one needs the
-  admin to turn it on after the install).
+- Never print, read back or commit `.env`. Never write the value of `AGENTFLOW_TOKEN` into a file, a command line or a log.
+- Never edit `package/` or `config/code/` by hand. Change `config/` or the TypeScript, run `pnpm build`, and commit both.
+- After a change under `src/module/`, run `pnpm build` before `pnpm check`: the check compares the built `package/ui`.
+- After a change under `config/` that adds, renames or removes an object, run `pnpm build`, then
+  `pnpm exec agentflow-app types`, and commit `src/generated/app.ts`.
 - After every change under `config/`, run `pnpm build` and fix what it refuses: it names the file and the place.
+- Keep `README.md` and this file in step with the app: its objects, parameters, triggers and install notes.
 - In the module: one stylesheet in the shadow root, no listeners on `document`, sizes by container queries, every id
   read from `GET /app/objects`, and every link the browser opens itself made with `host.apiUrl`.
-  `test/module/styles.test.ts` and `test/module/ui-build.test.ts` check this in `pnpm test`.
+  `test/module/styles.test.ts` and `test/module/ui-build.test.ts` check this.
+- Never push to `main` until the user says so.

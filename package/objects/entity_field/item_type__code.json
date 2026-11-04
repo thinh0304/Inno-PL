@@ -1,6 +1,0 @@
-{
-  "label": "Mã loại",
-  "type": "text",
-  "required": true,
-  "searchable": true
-}

@@ -1,8 +1,0 @@
-{
-  "label": "Sử dụng chi phí dự phòng",
-  "type": "boolean",
-  "default": {
-    "kind": "literal",
-    "value": false
-  }
-}

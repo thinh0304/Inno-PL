@@ -1,5 +1,0 @@
-{
-  "label": "Người tải lên",
-  "type": "reference",
-  "target_entity_id": "@req:entity:user"
-}

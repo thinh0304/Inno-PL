@@ -1,9 +1,0 @@
-{
-  "label": "Dòng danh mục",
-  "type": "reference",
-  "target_entity_id": "@obj:entity:order_line",
-  "required": true,
-  "on_target_delete": "cascade",
-  "inverse_key": "goods_price",
-  "inverse_label": "Giá dòng hàng hóa"
-}

@@ -1,53 +1,14 @@
-// Bundles the P&L engine and the order flow into the Code steps' sources: config/code/compute_pl.js (src/pl/code-entry.ts, the
-// selftest), compute_order_pl.js (src/order/code-entry.ts, the compute_pl workflow), advance_order.js and sla_sweep.js
-// (src/flow/code-entry.ts, the flow workflows).
-// `pnpm build` runs this first; the code-bundle tests fail when a committed file is behind its source.
-import { writeFileSync } from 'node:fs';
+// Bundles the pure TypeScript a Code step runs into config/code/<name>.js with esbuild: each entry names its source and the
+// `main(inputs)` the Code runner calls, which reads only its step's declared inputs.
+// `pnpm build` runs this first; a code-bundle test should fail when a committed file is behind its source.
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
-// A binding is a ref, a template or a literal, so the seven configuration lists arrive as seven inputs;
-// all of them null means "use the defaults".
-const CONFIG_MAIN = '  var config = { item_type: inputs.cfg_item_type, contract_type_rate: inputs.cfg_contract_type_rate,\n'
-  + '    fin_cost_tier: inputs.cfg_fin_cost_tier, vat_rate: inputs.cfg_vat_rate, pl_setting: inputs.cfg_pl_setting,\n'
-  + '    task_sla: inputs.cfg_task_sla, deal_stage_weight: inputs.cfg_deal_stage_weight };\n'
-  + '  var keys = Object.keys(config);\n'
-  + '  var none = keys.every(function (k) { return config[k] == null; });\n'
-  + '  keys.forEach(function (k) { if (config[k] == null) config[k] = []; });\n';
-
-// The Code runner calls main(inputs); each main reads only its step's declared inputs.
-const ENTRIES = {
-  compute_pl: {
-    entry: 'src/pl/code-entry.ts',
-    main: 'function main(inputs) {\n  return PL.runComputePl({ input: inputs.input, config: inputs.config });\n}\n',
-  },
-  compute_order_pl: {
-    entry: 'src/order/code-entry.ts',
-    main: 'function main(inputs) {\n'
-      + CONFIG_MAIN
-      + '  return PL.runComputeOrderPl({\n'
-      + '    records: { order: inputs.order, lines: inputs.lines, goods_prices: inputs.goods_prices,\n'
-      + '      service_prices: inputs.service_prices, finance: inputs.finance },\n'
-      + '    proposals: inputs.proposals, existing: inputs.existing, config: none ? null : config, now: inputs.now,\n'
-      + '  });\n}\n',
-  },
-  advance_order: {
-    entry: 'src/flow/code-entry.ts',
-    main: 'function main(inputs) {\n'
-      + CONFIG_MAIN
-      + '  return PL.runAdvance({\n'
-      + '    order: inputs.order, tasks: inputs.tasks, pl: inputs.pl, contracts: inputs.contracts, lines: inputs.lines,\n'
-      + '    goods_prices: inputs.goods_prices, proposals: inputs.proposals,\n'
-      + '    service_prices: inputs.service_prices, finance: inputs.finance, config: none ? null : config, now: inputs.now,\n'
-      + '  });\n}\n',
-  },
-  sla_sweep: {
-    entry: 'src/flow/code-entry.ts',
-    main: 'function main(inputs) {\n  return PL.runSlaSweep({ tasks: inputs.tasks, now: inputs.now });\n}\n',
-  },
-};
+/** name -> { entry: 'src/…/code-entry.ts', main: 'function main(inputs) { return APP.run…(inputs); }\n' } */
+const ENTRIES = {};
 
 export async function bundle(name) {
   const { entry, main } = ENTRIES[name];
@@ -56,7 +17,7 @@ export async function bundle(name) {
     entryPoints: [entry],
     bundle: true,
     format: 'iife',
-    globalName: 'PL',
+    globalName: 'APP',
     target: 'es2020',
     minify: false,
     write: false,
@@ -68,7 +29,9 @@ export async function bundle(name) {
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  for (const name of Object.keys(ENTRIES)) {
+  const names = Object.keys(ENTRIES);
+  if (names.length) mkdirSync(`${root}config/code`, { recursive: true });
+  for (const name of names) {
     writeFileSync(`${root}config/code/${name}.js`, await bundle(name));
     console.log(`wrote config/code/${name}.js`);
   }

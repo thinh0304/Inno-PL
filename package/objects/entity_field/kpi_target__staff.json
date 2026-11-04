@@ -1,6 +1,0 @@
-{
-  "label": "Nhân viên",
-  "type": "reference",
-  "target_entity_id": "@obj:entity:staff",
-  "required": true
-}
