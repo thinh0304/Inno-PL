@@ -1,5 +1,5 @@
 {
-  "workflow": "@obj:workflow:dieu_phoi",
+  "workflow": "@obj:workflow:dieu_phoi_yeu_cau",
   "kind": "entity_record",
   "enabled": false,
   "config": {

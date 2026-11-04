@@ -79,9 +79,9 @@ const ghiLichSu = node("ghi_lich_su", "Ghi lịch sử", "for_each", {
   },
 });
 
-export const workflows = {
-  dieu_phoi: workflow(
-    "dieu_phoi", "Điều phối quy trình đơn hàng",
+// Một workflow chỉ có một trigger, nên task yêu cầu (tạo mới) có bản điều phối riêng, cùng đồ thị.
+const dieuPhoi = (key, name) => workflow(
+    key, name,
     "Khi một task xong, bị trả lại hoặc không áp dụng: mở các task đủ tiền đề, hủy task khi trả lại, ghi trạng thái đơn và chốt P&L.",
     servicePrincipal("tu_dong_principal"), NOBODY,
     graph("Điều phối quy trình đơn hàng", [
@@ -136,7 +136,11 @@ export const workflows = {
       ["e_mo_task", "mo_task", "ghi_tom_tat"], ["e_tom_tat", "ghi_tom_tat", "ghi_lich_su"], ["e_lich_su", "ghi_lich_su", "can_chot"], ["e_chot", "can_chot", "chot"], ["e_khong_chot", "can_chot", "xong"],
       ["e_da_chot", "chot", "xong_chot"],
     )),
-  ),
+  );
+
+export const workflows = {
+  dieu_phoi: dieuPhoi("dieu_phoi", "Điều phối quy trình đơn hàng"),
+  dieu_phoi_yeu_cau: dieuPhoi("dieu_phoi_yeu_cau", "Điều phối khi có yêu cầu Close-lost / Xin duyệt lại"),
 };
 
 // Nhắc hạn (spec §7.6): mỗi sáng đưa các task đang làm đã quá hạn lên ưu tiên cao, để hiện đầu My Work và thông báo của nền tảng.
@@ -172,7 +176,7 @@ export const triggers = {
 
 // Task yêu cầu của IS / AM (Close-lost, Xin duyệt lại): được tạo ở "đang làm", nên cần trigger lúc tạo (tạo bản ghi không kích hoạt trigger "updated").
 triggers.dieu_phoi_yeu_cau = {
-  workflow: "dieu_phoi",
+  workflow: "dieu_phoi_yeu_cau",
   kind: "entity_record",
   config: {
     entity_id: TASK, change_kind: "created", input_mappings: [],

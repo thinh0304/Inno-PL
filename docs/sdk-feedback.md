@@ -294,3 +294,11 @@ Nhãn độ chắc ở mục "Cách tái hiện": **Tái hiện được** (làm
 - **Bằng chứng:** `e2e/p02-quyen.sandbox.test.ts` ca "xóa đơn chỉ Admin" lần chạy đầu; `access.md` không nhắc.
 - **Làm tạm:** cấp `delete` `organization` cho nhóm Admin trên các entity con (kể cả `lich_su`, nên Admin xóa được cả lịch sử).
 - **Đề xuất:** ghi vào `access.md`; hoặc cho phép cascade qua quyền xóa của cha khi người xóa đã có `delete` trên cha.
+
+## F-32 · Một workflow chỉ nhận một trigger, nhưng `build` không báo
+
+- **Vướng:** hai trigger (`updated` và `created` của cùng entity) trỏ tới cùng một workflow `dieu_phoi`.
+- **Cách tái hiện** (tái hiện được): `export const triggers = { a: { workflow: "w", ... }, b: { workflow: "w", ... } }`, `pnpm build` qua, `pnpm af deploy --sandbox` báo `APP_PLAN_CHANGED ... STALE_VERSION on trigger:b: the workflow already has a trigger`.
+- **Bằng chứng:** lần deploy sandbox đầu của Phase 3 (05/11/2026); `workflows.md` ("Triggers") không nói điều này.
+- **Làm tạm:** nhân đôi workflow (cùng đồ thị, hai khóa), mỗi workflow một trigger. Hai bản có thể chạy chồng nhau trên cùng một đơn.
+- **Đề xuất:** `build` từ chối hai trigger cùng workflow và nêu hai khóa; hoặc nền tảng cho nhiều trigger mỗi workflow.
