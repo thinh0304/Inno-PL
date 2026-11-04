@@ -132,35 +132,6 @@ var APP = (() => {
     };
   }
 
-  // src/domain/codes.ts
-  var LINE_TYPE_OF_CODE = {
-    tb: "TB",
-    lic: "LIC",
-    lic_dk: "LIC-DK",
-    lic_ntnn: "LIC-NTNN",
-    dvtk_i: "DVTK-I",
-    dvtk_o: "DVTK-O",
-    dvdk_i: "DVDK-I",
-    dvdk_o: "DVDK-O",
-    dvdk_ntnn: "DVDK-NTNN",
-    cloud_server: "Cloud Server",
-    colocation: "Colocation",
-    veeam: "Veeam",
-    manage_service: "Manage Service",
-    other_services: "Other Services"
-  };
-  var LINE_CODES = Object.keys(LINE_TYPE_OF_CODE);
-  var CONTRACT_KIND_OF_CODE = {
-    thuong_mai: "Th\u01B0\u01A1ng M\u1EA1i",
-    license_runrate: "License/Runrate",
-    dv_loai_1: "D\u1ECBch v\u1EE5 Lo\u1EA1i I",
-    dv_loai_2: "D\u1ECBch v\u1EE5 Lo\u1EA1i II",
-    fulfillment: "Fulfillment"
-  };
-  var CODE_OF_CONTRACT_KIND = Object.fromEntries(
-    Object.entries(CONTRACT_KIND_OF_CODE).map(([code, kind]) => [kind, code])
-  );
-
   // src/domain/lines.ts
   var GOODS = ["TB", "LIC", "LIC-DK", "LIC-NTNN"];
   var MONTHLY = ["DVDK-I", "DVDK-O", "DVDK-NTNN", "Cloud Server", "Colocation", "Veeam", "Manage Service", "Other Services"];
@@ -266,6 +237,240 @@ var APP = (() => {
     };
   }
 
+  // src/domain/codes.ts
+  var LINE_TYPE_OF_CODE = {
+    tb: "TB",
+    lic: "LIC",
+    lic_dk: "LIC-DK",
+    lic_ntnn: "LIC-NTNN",
+    dvtk_i: "DVTK-I",
+    dvtk_o: "DVTK-O",
+    dvdk_i: "DVDK-I",
+    dvdk_o: "DVDK-O",
+    dvdk_ntnn: "DVDK-NTNN",
+    cloud_server: "Cloud Server",
+    colocation: "Colocation",
+    veeam: "Veeam",
+    manage_service: "Manage Service",
+    other_services: "Other Services"
+  };
+  var LINE_CODES = Object.keys(LINE_TYPE_OF_CODE);
+  var CONTRACT_KIND_OF_CODE = {
+    thuong_mai: "Th\u01B0\u01A1ng M\u1EA1i",
+    license_runrate: "License/Runrate",
+    dv_loai_1: "D\u1ECBch v\u1EE5 Lo\u1EA1i I",
+    dv_loai_2: "D\u1ECBch v\u1EE5 Lo\u1EA1i II",
+    fulfillment: "Fulfillment"
+  };
+  var CODE_OF_CONTRACT_KIND = Object.fromEntries(
+    Object.entries(CONTRACT_KIND_OF_CODE).map(([code, kind]) => [kind, code])
+  );
+
+  // src/domain/plinput.ts
+  function plInputFromForm(order, lines) {
+    return {
+      lines: lines.map((l) => ({
+        type: LINE_TYPE_OF_CODE[l.loai] ?? "TB",
+        qty: l.so_luong,
+        sell: l.don_gia_ban,
+        discountPct: l.chiet_khau,
+        buy: l.gia_mua,
+        months: l.so_thang
+      })),
+      tier: order.hang_kh,
+      creditDays: order.cong_no_ngay,
+      salesCost: order.cpbh,
+      chosenKind: order.loai_hd_chon ? CONTRACT_KIND_OF_CODE[order.loai_hd_chon] : void 0,
+      deployStaff: !!order.nv_trien_khai,
+      consultStaff: !!order.nv_tu_van,
+      proposal: order.tv_proposal,
+      poc: order.tv_poc
+    };
+  }
+
+  // src/domain/form.ts
+  var STAGE_CODES = ["co_hoi", "lam_ro", "bao_gia", "dam_phan", "chot", "hd_tt_cskh"];
+
+  // src/domain/validate.ts
+  var pad = (n2) => String(n2).padStart(2, "0");
+  var hasLetter = (s) => /\p{L}/u.test(s);
+  var collapse = (s) => s.trim().replace(/\s+/g, " ");
+  function validDate(d, m, y) {
+    if (y < 2e3 || y > 2100 || m < 1 || m > 12 || d < 1) return false;
+    return d <= new Date(y, m, 0).getDate();
+  }
+  function normalize(kind, raw) {
+    const s = raw.trim();
+    switch (kind) {
+      case "phone": {
+        let d = s.replace(/[\s.\-()]/g, "");
+        if (d.startsWith("+84")) d = `0${d.slice(3)}`;
+        if (!/^\d+$/.test(d)) return s;
+        if (/^0[35789]\d{8}$/.test(d)) return `${d.slice(0, 4)} ${d.slice(4, 7)} ${d.slice(7)}`;
+        if (/^02\d{9}$/.test(d)) return `${d.slice(0, 3)} ${d.slice(3, 7)} ${d.slice(7)}`;
+        return d;
+      }
+      case "date": {
+        const m = /^(\d{1,2})[-./](\d{1,2})[-./](\d{4})$/.exec(s) ?? /^(\d{4})-(\d{2})-(\d{2})$/.exec(s) ?? /^(\d{2})(\d{2})(\d{4})$/.exec(s);
+        if (!m) return s;
+        const iso = m[1].length === 4;
+        const [d, mo, y] = iso ? [+m[3], +m[2], +m[1]] : [+m[1], +m[2], +m[3]];
+        return `${pad(d)}/${pad(mo)}/${y}`;
+      }
+      case "taxId":
+        return s.replace(/\s+/g, "");
+      case "account":
+        return s.replace(/[\s.\-]/g, "");
+      case "customerCode":
+        return s.replace(/\s+/g, "").toUpperCase();
+      case "email":
+        return s.replace(/\s+/g, "").toLowerCase();
+      case "personName":
+      case "text":
+      case "unit":
+        return collapse(s);
+      case "creditDays":
+        return /^\d+$/.test(s) ? s : s.replace(/\s*ngày\s*$/i, "");
+      default:
+        return s;
+    }
+  }
+  var num = (s) => Number(s.replace(/\./g, "").replace(",", "."));
+  var int = (s) => /^\d+$/.test(s);
+  function checkFormat(kind, value) {
+    const v = normalize(kind, value);
+    const bad = `format.${kind}`;
+    const ok = (() => {
+      switch (kind) {
+        case "phone":
+          return /^0[35789]\d{2} \d{3} \d{3}$/.test(v) || /^02\d{1} \d{4} \d{4}$/.test(v);
+        case "email":
+          return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+        case "date": {
+          const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(v);
+          return !!m && validDate(+m[1], +m[2], +m[3]);
+        }
+        case "taxId":
+          return /^\d{10}(-\d{3})?$/.test(v);
+        case "account":
+          return /^\d{6,19}$/.test(v);
+        case "customerCode":
+          return /^[A-Z0-9\-_]{2,20}$/.test(v);
+        case "contractNo":
+          return /^[\p{L}\d/\-._]{2,40}$/u.test(v);
+        case "sku":
+          return /^[A-Za-z0-9\-_./+]{1,40}$/.test(v);
+        case "personName":
+          return v.length >= 2 && v.length <= 80 && hasLetter(v) && !/[\d@]/.test(v);
+        case "text":
+          return v.length >= 2 && v.length <= 300 && hasLetter(v);
+        case "unit":
+          return v.length >= 1 && v.length <= 20 && hasLetter(v);
+        case "money":
+          return /^\d+(\.\d{3})*(,\d+)?$/.test(v) || /^\d+(,\d+)?$/.test(v);
+        case "quantity":
+          return int(v) && +v > 0;
+        case "months":
+          return int(v) && +v <= 120;
+        case "percent":
+          return /^\d+(,\d+)?$/.test(v) && num(v) <= 100;
+        case "creditDays":
+        case "days":
+          return int(v) && +v <= 365;
+        case "payments":
+          return int(v) && +v >= 1 && +v <= 12;
+        case "count":
+          return int(v);
+      }
+    })();
+    return ok ? null : bad;
+  }
+  var parseDate = (s) => {
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(normalize("date", s));
+    return m && validDate(+m[1], +m[2], +m[3]) ? new Date(+m[3], +m[2] - 1, +m[1]) : null;
+  };
+  var monthsBetween = (a, b) => Math.round((b.getTime() - a.getTime()) / 864e5 / 30.4375);
+  var SUM_TOLERANCE = 1e-6;
+  function validateOrder(order, lines) {
+    const out = [];
+    const add = (field, code) => out.push({ field, code });
+    const need = (field, value, kind) => {
+      if (!value.trim()) return add(field, "required");
+      const err = kind ? checkFormat(kind, value) : null;
+      if (err) add(field, err);
+    };
+    const maybe = (field, value, kind) => {
+      if (!value.trim()) return;
+      const err = checkFormat(kind, value);
+      if (err) add(field, err);
+    };
+    need("ten_kh", order.ten_kh, "text");
+    need("ma_kh", order.ma_kh, "customerCode");
+    need("mst", order.mst, "taxId");
+    need("nguoi_lien_he", order.nguoi_lien_he, "personName");
+    need("noi_dung", order.noi_dung, "text");
+    need("so_hd_noi_bo", order.so_hd_noi_bo, "contractNo");
+    need("am", order.am);
+    need("is", order.is);
+    maybe("dien_thoai", order.dien_thoai, "phone");
+    maybe("email", order.email, "email");
+    maybe("sdt_nhan", order.sdt_nhan, "phone");
+    maybe("email_nhan_license", order.email_nhan_license, "email");
+    maybe("so_tk", order.so_tk, "account");
+    maybe("so_hd_po", order.so_hd_po, "contractNo");
+    maybe("nguoi_dai_dien", order.nguoi_dai_dien, "personName");
+    maybe("nguoi_nhan", order.nguoi_nhan, "personName");
+    for (const k of ["ngay_ky", "ngay_bao_gia", "hieu_luc_den"]) maybe(k, order[k], "date");
+    const quoted = parseDate(order.ngay_bao_gia);
+    const valid = parseDate(order.hieu_luc_den);
+    if (quoted && valid && valid <= quoted) add("hieu_luc_den", "range.after");
+    if (checkFormat("creditDays", String(order.cong_no_ngay))) add("cong_no_ngay", "format.creditDays");
+    if (order.so_lan_tt && checkFormat("payments", String(order.so_lan_tt))) add("so_lan_tt", "format.payments");
+    if (order.nguon_kh === "nguoi" && !order.nguon_kh_nguoi.trim()) add("nguon_kh_nguoi", "required");
+    if (!order.don_moi) {
+      if (order.nguon_kh !== "khong") add("nguon_kh", "renew.source");
+      need("so_hd_truoc", order.so_hd_truoc, "contractNo");
+      if (order.cpbh_truoc === null) add("cpbh_truoc", "required");
+      if (order.doanh_thu_truoc === null || order.doanh_thu_truoc <= 0) add("doanh_thu_truoc", "required");
+      if (order.ln_truoc === null) add("ln_truoc", "required");
+      else if (order.doanh_thu_truoc !== null && order.ln_truoc > order.doanh_thu_truoc) add("ln_truoc", "range.max");
+    }
+    order.giai_doan.forEach((s, i) => {
+      if (!s.nv.trim()) add(`giai_doan.${i}.nv`, "required");
+    });
+    const total = order.giai_doan.reduce((t, s) => t + s.pct, 0);
+    if (Math.abs(total - (order.don_moi ? 1 : 0.5)) > SUM_TOLERANCE) add("giai_doan.tong", "stages.total");
+    if (!lines.length) add("dong_hang", "required");
+    lines.forEach((l, i) => {
+      const f = (k) => `dong_${i + 1}.${k}`;
+      const type = LINE_TYPE_OF_CODE[l.loai];
+      const goods = !!type && isGoods(type);
+      need(f("mo_ta"), l.mo_ta, "text");
+      need(f("dvt"), l.dvt, "unit");
+      if (!(l.so_luong > 0) || !Number.isInteger(l.so_luong)) add(f("so_luong"), "format.quantity");
+      if (!(l.don_gia_ban > 0)) add(f("don_gia_ban"), "required");
+      if (goods) need(f("sku"), l.sku, "sku");
+      else maybe(f("sku"), l.sku, "sku");
+      if (l.loai === "tb" && !l.co_cq) add(f("co_cq"), "required");
+      const dated = !!type && (isPeriodic(type) || isMonthly(type));
+      const start = parseDate(l.ngay_bat_dau);
+      const end = parseDate(l.ngay_ket_thuc);
+      if (dated) {
+        if (!l.ngay_bat_dau.trim()) add(f("ngay_bat_dau"), "required");
+        else if (!start) add(f("ngay_bat_dau"), "format.date");
+        if (!l.ngay_ket_thuc.trim()) add(f("ngay_ket_thuc"), "required");
+        else if (!end) add(f("ngay_ket_thuc"), "format.date");
+        if (start && end && end <= start) add(f("ngay_ket_thuc"), "range.after");
+      }
+      if (type && isMonthly(type)) {
+        if (!(l.so_thang > 0)) add(f("so_thang"), "required");
+        else if (start && end && end > start && Math.abs(monthsBetween(start, end) - l.so_thang) > 1) add(f("so_thang"), "months.mismatch");
+      } else if (l.so_thang < 0 || l.so_thang > 120) add(f("so_thang"), "format.months");
+      need(f("ncc_id"), l.ncc_id);
+    });
+    return out;
+  }
+
   // src/domain/records.ts
   function flat(r) {
     const o = r ?? {};
@@ -273,7 +478,124 @@ var APP = (() => {
   }
   var list = (v) => Array.isArray(v) ? v.map(flat) : [];
   var n = (v) => typeof v === "number" ? v : Number(v) || 0;
+  var str = (v) => typeof v === "string" ? v : "";
   var idOf = (v) => v && typeof v === "object" ? String(v.id) : v ? String(v) : null;
+  var nullable = (v) => v === null || v === void 0 || v === "" ? null : n(v);
+  function fromIso(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(str(iso));
+    return m ? `${m[3]}/${m[2]}/${m[1]}` : "";
+  }
+  function stagesOf(v) {
+    const have = /* @__PURE__ */ new Map();
+    for (const s of Array.isArray(v) ? v : []) {
+      const o = flat(s);
+      const ma = str(o.ma);
+      if (STAGE_CODES.includes(ma)) have.set(ma, { ma, nv: idOf(o.nv) ?? "", pct: n(o.pct) });
+    }
+    return STAGE_CODES.map((ma) => have.get(ma) ?? { ma, nv: "", pct: 0 });
+  }
+  function formFromRecords(src) {
+    const d = flat(src.don);
+    const f = src.finance ? flat(src.finance) : void 0;
+    const order = {
+      id: d.id,
+      financeId: f?.id,
+      khach_hang_id: idOf(d.khach_hang) ?? "",
+      ten_kh: str(d.ten_kh),
+      ma_kh: str(d.ma_kh),
+      mst: str(d.mst),
+      nguoi_lien_he: str(d.nguoi_lien_he),
+      dien_thoai: str(d.dien_thoai),
+      email: str(d.email),
+      dia_chi: str(d.dia_chi),
+      nguoi_dai_dien: str(d.nguoi_dai_dien),
+      chuc_vu: str(d.chuc_vu),
+      so_tk: str(d.so_tk),
+      ngan_hang: str(d.ngan_hang),
+      noi_dung: str(d.noi_dung),
+      so_hd_noi_bo: str(d.so_hd_noi_bo),
+      so_hd_po: str(d.so_hd_po),
+      ngay_ky: fromIso(d.ngay_ky),
+      ngay_bao_gia: fromIso(d.ngay_bao_gia),
+      hieu_luc_den: fromIso(d.hieu_luc_den),
+      ty_gia: n(d.ty_gia) || 26e3,
+      nguoi_nhan: str(d.nguoi_nhan),
+      sdt_nhan: str(d.sdt_nhan),
+      dia_chi_nhan: str(d.dia_chi_nhan),
+      email_nhan_license: str(d.email_nhan_license),
+      ghi_chu_giao: str(d.ghi_chu_giao),
+      am: idOf(d.am) ?? "",
+      is: idOf(d.is) ?? "",
+      hang_kh: str(d.hang_kh) || "pho_thong",
+      cong_no_ngay: n(d.cong_no_ngay),
+      cpbh: n(f?.cpbh),
+      so_lan_tt: n(d.so_lan_tt),
+      nv_trien_khai: idOf(d.nv_trien_khai) ?? "",
+      nv_tu_van: idOf(d.nv_tu_van) ?? "",
+      tv_proposal: d.tv_proposal === true,
+      tv_poc: d.tv_poc === true,
+      loai_hd_chon: str(d.loai_hd_chon),
+      tu_truoc: d.tu_truoc === true,
+      don_moi: d.don_moi !== false,
+      kh_moi: d.kh_moi === true,
+      nguon_kh: str(d.nguon_kh) || "khong",
+      nguon_kh_nguoi: idOf(d.nguon_kh_nguoi) ?? "",
+      hinh_thuc: str(d.hinh_thuc),
+      so_hd_truoc: str(f?.so_hd_truoc),
+      cpbh_truoc: nullable(f?.cpbh_truoc),
+      doanh_thu_truoc: nullable(f?.doanh_thu_truoc),
+      ln_truoc: nullable(f?.ln_truoc),
+      giai_doan: stagesOf(d.giai_doan_deal)
+    };
+    const prices = new Map(list(src.gia_ban).map((p) => [idOf(p.dong_hang), p]));
+    const lines = list(src.dong).sort((a, b) => n(a.stt) - n(b.stt)).map((l) => {
+      const p = prices.get(l.id);
+      return {
+        id: l.id,
+        priceId: p?.id,
+        sku: str(l.sku),
+        mo_ta: str(l.mo_ta),
+        dvt: str(l.dvt),
+        so_luong: n(l.so_luong),
+        loai: str(l.loai) || "tb",
+        so_thang: n(l.so_thang),
+        gia_mua: n(l.gia_mua),
+        gia_mua_usd: n(l.gia_mua_usd),
+        don_gia_ban: n(p?.don_gia_ban),
+        chiet_khau: n(p?.chiet_khau),
+        vat: str(l.vat) || "8",
+        ncc_id: idOf(l.ncc_id) ?? "",
+        co_cq: str(l.co_cq),
+        ngay_bat_dau: fromIso(l.ngay_bat_dau),
+        ngay_ket_thuc: fromIso(l.ngay_ket_thuc)
+      };
+    });
+    return { order, lines };
+  }
+
+  // src/domain/stages.ts
+  function recipientsOf(stages, source) {
+    const out = [];
+    for (const s of stages) if (s.nv.trim() && !out.includes(s.nv)) out.push(s.nv);
+    if (source.kind === "nguoi" && source.nguoi.trim() && !out.includes(source.nguoi)) out.push(source.nguoi);
+    return out;
+  }
+
+  // src/domain/summary.ts
+  var CODE_OF_TYPE = Object.fromEntries(Object.entries(LINE_TYPE_OF_CODE).map(([code, type]) => [type, code]));
+  function summaryFor(part, lines, pl, cfg) {
+    if (part === "hang_hoa") {
+      const goods = lines.filter((l) => isGoods(l.type));
+      return { tong_gia_von: goods.reduce((t, l) => t + lineBuy(l, cfg), 0), so_dong: goods.length };
+    }
+    const out = {};
+    for (const l of lines.filter((x) => isService(x.type))) {
+      const code = CODE_OF_TYPE[l.type];
+      out[`doanh_thu.${code}`] = (out[`doanh_thu.${code}`] ?? 0) + lineSell(l);
+      out[`gia_von.${code}`] = (out[`gia_von.${code}`] ?? 0) + lineBuy(l, cfg);
+    }
+    return { ...out, ho_tro_kt: pl.techSupport, thuong_trien_khai: pl.deployBonus, thuong_tu_van: pl.consultBonus };
+  }
 
   // src/code/dieu-phoi.ts
   var SCOPE = ["t11", "t22", "t23", "t31"];
@@ -295,8 +617,6 @@ var APP = (() => {
   function run(inputs) {
     const don = flat(inputs.don);
     const tasks = list(inputs.tasks);
-    const prices = new Map(list(inputs.gia_ban).map((p) => [idOf(p.dong_hang), p]));
-    const finance = list(inputs.tai_chinh)[0];
     const cfg = mergeConfig(DEFAULT_CONFIG, list(inputs.cau_hinh)[0]?.gia_tri);
     const groups = {
       tm: inputs.nhom_tm,
@@ -304,41 +624,44 @@ var APP = (() => {
       sd: inputs.nhom_sd,
       acc: inputs.nhom_acc
     };
-    const lines = list(inputs.dong).map((l) => {
-      const p = prices.get(l.id);
-      return {
-        type: LINE_TYPE_OF_CODE[String(l.loai)] ?? "TB",
-        qty: n(l.so_luong),
-        sell: n(p?.don_gia_ban),
-        discountPct: n(p?.chiet_khau),
-        buy: n(l.gia_mua),
-        months: n(l.so_thang)
-      };
-    });
-    const pl = computePl({
-      lines,
-      tier: don.hang_kh || "pho_thong",
-      creditDays: n(don.cong_no_ngay),
-      salesCost: n(finance?.cpbh),
-      chosenKind: don.loai_hd_chon ? CONTRACT_KIND_OF_CODE[String(don.loai_hd_chon)] : void 0,
-      deployStaff: !!don.nv_trien_khai,
-      consultStaff: !!don.nv_tu_van,
-      proposal: !!don.tv_proposal,
-      poc: !!don.tv_poc
-    }, cfg);
-    const hasService = lines.some((l) => isService(l.type));
-    const hasGoods = lines.some((l) => isGoods(l.type));
+    const { order, lines } = formFromRecords({ don: inputs.don, finance: list(inputs.tai_chinh)[0], dong: inputs.dong, gia_ban: inputs.gia_ban });
+    const plInput = plInputFromForm(order, lines);
+    const pl = computePl(plInput, cfg);
+    const hasService = plInput.lines.some((l) => isService(l.type));
+    const hasGoods = plInput.lines.some((l) => isGoods(l.type));
+    const status = str(don.trang_thai);
+    const issues = validateOrder(order, lines);
+    const t11Done = tasks.some((t) => t.ma === "t11" && t.trang_thai === "xong");
+    const gated = t11Done && issues.length > 0 && (status === "nhap" || status === "tra_lai");
     const flowTasks = tasks.map((t) => ({
       id: t.id,
       code: t.ma,
-      status: t.ma === "t11" && t.trang_thai === "xong" && lines.length === 0 ? "tra_lai" : t.trang_thai
+      status: gated && t.ma === "t11" && t.trang_thai === "xong" ? "tra_lai" : t.trang_thai
     }));
     const actions = nextActions(
-      { hasService, hasGoods, advanceFirst: !!don.tu_truoc, revenue: pl.revenue, passed: pl.passed, status: don.trang_thai },
+      { hasService, hasGoods, advanceFirst: order.tu_truoc, revenue: pl.revenue, passed: pl.passed, status },
       flowTasks,
       SCOPE
     );
+    const returned = tasks.find((t) => t.trang_thai === "tra_lai");
+    const returning = gated || !!returned;
+    const reason = gated ? issues.map((i) => i.field).join(", ") : str(returned?.ly_do);
+    const locked = !!actions.order.lockPl;
     const groupOf = (role) => role === "am" || role === "is" ? [] : [groups[role]];
+    const history = (hanh_dong, task = "", ghi_chu = "", sau = "") => ({ don_hang: don.id, hanh_dong, task, ghi_chu, sau });
+    const lich_su = [];
+    if (gated) lich_su.push(history("tra_lai_may_chu", "t11", reason));
+    else if (returned) lich_su.push(history("tra_lai", str(returned.ma), reason));
+    else if (actions.create.some((c) => c.code === "t22" || c.code === "t23")) lich_su.push(history("gui_duyet", "t11"));
+    if (!returning) for (const c of actions.create) lich_su.push(history("mo_task", c.code, c.status));
+    for (const u of actions.update) lich_su.push(history("huy_task", tasks.find((t) => t.id === u.id)?.ma ?? "", ""));
+    if (locked && !returning) lich_su.push(history("chot_pl", "", "", String(pl.netProfit)));
+    if (actions.order.status === "da_phe_duyet" && status !== "da_phe_duyet") lich_su.push(history("phe_duyet", "t31"));
+    const tom_tat = [];
+    if (locked && !returning) {
+      if (hasService) tom_tat.push({ don_hang: don.id, phan: "dich_vu", du_lieu: JSON.stringify(summaryFor("dich_vu", plInput.lines, pl, cfg)), nhom_xem: [groups.tm] });
+      if (hasGoods) tom_tat.push({ don_hang: don.id, phan: "hang_hoa", du_lieu: JSON.stringify(summaryFor("hang_hoa", plInput.lines, pl, cfg)), nhom_xem: [groups.proc] });
+    }
     return {
       tao: actions.create.map((c) => ({
         don_hang: don.id,
@@ -352,14 +675,18 @@ var APP = (() => {
       })),
       cap_nhat: actions.update.map((u) => ({ id: u.id, trang_thai: u.status })),
       don: {
-        trang_thai: actions.order.status ?? String(don.trang_thai),
+        trang_thai: actions.order.status ?? status,
         giai_doan: actions.order.stage ?? n(don.giai_doan),
         co_dich_vu: hasService,
         co_hang_hoa: hasGoods,
         ky_thuat: hasService ? [groups.tm] : [],
-        mua_hang: hasGoods ? [groups.proc] : []
+        mua_hang: hasGoods ? [groups.proc] : [],
+        nguoi_duoc_chia: recipientsOf(order.giai_doan, { kind: order.nguon_kh, nguoi: order.nguon_kh_nguoi }),
+        ly_do_gui: returning ? reason : ""
       },
-      chot: actions.order.lockPl ? { pl_chot: JSON.stringify(pl), cau_hinh_chot: JSON.stringify(cfg), ln_thuan_chot: pl.netProfit, dat_chot: pl.passed } : null
+      chot: locked && !returning ? { pl_chot: JSON.stringify(pl), cau_hinh_chot: JSON.stringify(cfg), ln_thuan_chot: pl.netProfit, dat_chot: pl.passed } : null,
+      tom_tat,
+      lich_su
     };
   }
   return __toCommonJS(dieu_phoi_exports);
