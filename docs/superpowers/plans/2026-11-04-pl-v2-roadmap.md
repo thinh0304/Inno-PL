@@ -77,7 +77,7 @@ mới, `e2e/p01-lat-mong.sandbox.test.ts`.
 - `src/domain/validate.ts`: **quy tắc định dạng và trường bắt buộc** §12.1–12.2, dùng ở module và chặn ở Code step t11.
 - **Danh bạ KH** (gợi ý, tự điền ô trống, bảng chọn khi khác, mã KH không trùng), **danh bạ NCC** (đợt thanh toán, công nợ); sao chép danh
   mục; điền nhanh giao nhận; mã đơn TM-/DV-; xóa đơn.
-- **Quyền đầy đủ** §11.4: record scope AM, IS, `nguoi_duoc_chia`, `quan_ly` (tra sơ đồ tổ chức lúc gửi), `ky_thuat`/`mua_hang`;
+- **Quyền đầy đủ** §11.4: record scope AM, IS, `nguoi_duoc_chia`, `ky_thuat`/`mua_hang`;
   entity **Đề xuất mua hàng** (chỉ PROC, SD, ACC, Admin); **bản tóm tắt** cho TM và PROC.
 - Entity **Lịch sử** (§12.7) ghi thao tác, tự điền, thay đổi số P&L.
 
@@ -142,9 +142,9 @@ chạm tiêu biểu; AI chậm nên ít ca).
 - Sổ quỹ (góp / giữ chỗ / hoàn / điều chỉnh), **bù ngưỡng vừa đủ** ở t11/t31 (kiểm số dư ở server), kết chuyển quý, về 0 đầu năm.
 - Bản ghi **chia chỉ tiêu** chốt ở t72, kỳ theo **ngày xuất hóa đơn t71**; KPI giao theo năm; **KPI Mua hàng**.
 - **Thưởng quý** (`src/domain/bonus.ts`): bậc lũy tiến, new logo, cộng dồn phần thiếu, +5% quý sau.
-- Ai xem KPI (§5.2): AM/IS của mình, SM theo sơ đồ tổ chức, SD tất cả.
+- Ai xem KPI (§5.2): AM/IS của mình, SD tất cả (SM tạm thời bỏ qua).
 
-**Người dùng thử:** đơn không đạt dùng quỹ để đạt; AM xem KPI và thưởng quý của mình; SM xem đội; SD xem tất cả.
+**Người dùng thử:** đơn không đạt dùng quỹ để đạt; AM xem KPI và thưởng quý của mình; SD xem tất cả.
 
 **Kiểm tra:** `test/domain/fund.test.ts`, `kpi.test.ts`, `bonus.test.ts` (ví dụ số), `e2e/p06-kpi.sandbox.test.ts`.
 
