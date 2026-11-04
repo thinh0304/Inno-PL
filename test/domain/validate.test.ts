@@ -92,7 +92,8 @@ describe('validateOrder', () => {
     const o = { ...validOrder(), don_moi: false, nguon_kh: 'nguoi' as const, nguon_kh_nguoi: 'u-x' };
     const f = fields(o, [validLine()]);
     for (const k of ['so_hd_truoc', 'cpbh_truoc', 'doanh_thu_truoc', 'ln_truoc', 'nguon_kh']) expect(f).toContain(k);
-    const g = fields({ ...o, nguon_kh: 'khong', so_hd_truoc: 'HD-1', cpbh_truoc: 0, doanh_thu_truoc: 100, ln_truoc: 200 }, [validLine()]);
+    const renew = o.giai_doan.map((s, i) => ({ ...s, pct: [0, 0, 0.1, 0.1, 0.2, 0.1][i]! })); // bộ tmdk: tổng 0,5
+    const g = fields({ ...o, giai_doan: renew, nguon_kh: 'khong', so_hd_truoc: 'HD-1', cpbh_truoc: 0, doanh_thu_truoc: 100, ln_truoc: 200 }, [validLine()]);
     expect(g).toEqual(['ln_truoc']);
   });
 

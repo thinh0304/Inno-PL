@@ -141,7 +141,8 @@ export function validateOrder(order: OrderForm, lines: LineForm[]): Issue[] {
 
   order.giai_doan.forEach((s, i) => { if (!s.nv.trim()) add(`giai_doan.${i}.nv`, 'required'); });
   const total = order.giai_doan.reduce((t, s) => t + s.pct, 0);
-  if (Math.abs(total - 1) > SUM_TOLERANCE) add('giai_doan.tong', 'stages.total');
+  // Đơn mới: 6 giai đoạn cộng 1; đơn tái ký chỉ tính 50% LN nên cộng 0,5 (spec §5.1).
+  if (Math.abs(total - (order.don_moi ? 1 : 0.5)) > SUM_TOLERANCE) add('giai_doan.tong', 'stages.total');
 
   if (!lines.length) add('dong_hang', 'required');
   lines.forEach((l, i) => {
