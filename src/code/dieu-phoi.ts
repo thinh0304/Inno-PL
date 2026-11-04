@@ -76,7 +76,11 @@ export function run(inputs: DieuPhoiInputs): DieuPhoiOutput {
 
   const hasService = lines.some((l) => isService(l.type));
   const hasGoods = lines.some((l) => isGoods(l.type));
-  const flowTasks: FlowTask[] = tasks.map((t) => ({ id: t.id, code: t.ma as TaskCode, status: t.trang_thai as TaskStatus }));
+  // Máy chủ không tin module: t11 "xong" mà đơn chưa có dòng nào thì trả lại cho AM thay vì mở task cho người khác.
+  const flowTasks: FlowTask[] = tasks.map((t) => ({
+    id: t.id, code: t.ma as TaskCode,
+    status: t.ma === 't11' && t.trang_thai === 'xong' && lines.length === 0 ? 'tra_lai' : (t.trang_thai as TaskStatus),
+  }));
   const actions = nextActions(
     { hasService, hasGoods, advanceFirst: !!don.tu_truoc, revenue: pl.revenue, passed: pl.passed, status: don.trang_thai as OrderStatus },
     flowTasks, SCOPE,

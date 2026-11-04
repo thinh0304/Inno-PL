@@ -100,6 +100,9 @@ export function nextActions(order: FlowOrder, tasks: FlowTask[], scope: readonly
     }
   }
 
+  // t11 đang chờ AM (đơn vừa bị trả lại hoặc còn nháp): một lượt chạy muộn không được ghi đè trạng thái đơn.
+  if (status.get('t11') === 'dang_lam') return { create, update: [], order: {} };
+
   const approved = isDone('t31');
   const pending = scope.filter((c) => !isDone(c) && (status.has(c) || TASKS[c].kind !== 'submit'));
   const stage = pending.length ? Math.min(...pending.map((c) => TASKS[c].stage)) : Math.max(...scope.map((c) => TASKS[c].stage)) + 1;

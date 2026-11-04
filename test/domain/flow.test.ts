@@ -74,4 +74,10 @@ describe('nextActions', () => {
     expect(a.create.map((x) => x.code)).toEqual(['t22', 't23']);
     expect(a.update).toEqual([]);
   });
+  it('đơn đã bị trả lại, t11 mới còn đang làm: một lượt chạy muộn không ghi đè trạng thái đơn', () => {
+    const tasks = [t('a', 't11', 'huy'), t('b', 't22', 'huy'), t('c', 't23', 'huy'), t('d', 't31', 'huy'), t('e', 't11', 'dang_lam')];
+    const a = nextActions({ ...MIXED, status: 'tra_lai' }, tasks, P1);
+    expect(a.create).toEqual([]);
+    expect(a.order).toEqual({});
+  });
 });

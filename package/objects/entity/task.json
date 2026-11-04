@@ -96,8 +96,229 @@
           }
         ]
       }
+    },
+    {
+      "key": "khoa_danh_tinh_task",
+      "message": "Không đổi được mã, vai trò, đơn hay người được giao của task: do hệ thống ghi",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed_any",
+              "fields": [
+                "ma",
+                "vai_tro",
+                "don_hang",
+                "nhom",
+                "am",
+                "is",
+                "han"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "chi_tao_dang_lam",
+      "message": "Task mới chỉ được tạo ở trạng thái Đang làm",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_new"
+            }
+          },
+          {
+            "kind": "field",
+            "rule": {
+              "field": "trang_thai",
+              "op": "ne",
+              "value": "dang_lam"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "key": "chi_t22_t31_tra_lai",
+      "message": "Chỉ task Duyệt kỹ thuật (t22) và Phê duyệt đơn (t31) mới được Trả lại",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed",
+              "field": "trang_thai"
+            }
+          },
+          {
+            "kind": "field",
+            "rule": {
+              "field": "trang_thai",
+              "op": "eq",
+              "value": "tra_lai"
+            }
+          },
+          {
+            "kind": "field",
+            "rule": {
+              "field": "ma",
+              "op": "not_in",
+              "value": [
+                "t22",
+                "t31"
+              ]
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
     }
   ],
+  "stage_model": {
+    "status_field": "trang_thai",
+    "initial_statuses": [
+      "dang_lam",
+      "bo_qua",
+      "xong"
+    ],
+    "transitions": [
+      {
+        "from": "dang_lam",
+        "to": "xong",
+        "required_fields": [],
+        "movers": []
+      },
+      {
+        "from": "dang_lam",
+        "to": "tra_lai",
+        "required_fields": [],
+        "movers": []
+      },
+      {
+        "from": "dang_lam",
+        "to": "khong_ap_dung",
+        "required_fields": [],
+        "movers": []
+      },
+      {
+        "from": "cho",
+        "to": "huy",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "@param:nhom_tu_dong"
+          }
+        ]
+      },
+      {
+        "from": "dang_lam",
+        "to": "huy",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "@param:nhom_tu_dong"
+          }
+        ]
+      },
+      {
+        "from": "xong",
+        "to": "huy",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "@param:nhom_tu_dong"
+          }
+        ]
+      },
+      {
+        "from": "tra_lai",
+        "to": "huy",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "@param:nhom_tu_dong"
+          }
+        ]
+      },
+      {
+        "from": "bo_qua",
+        "to": "huy",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "@param:nhom_tu_dong"
+          }
+        ]
+      },
+      {
+        "from": "khong_ap_dung",
+        "to": "huy",
+        "required_fields": [],
+        "movers": [
+          {
+            "kind": "in_group",
+            "group_id": "@param:nhom_tu_dong"
+          }
+        ]
+      }
+    ]
+  },
   "work": {
     "lifecycle": {
       "status_field": "trang_thai",

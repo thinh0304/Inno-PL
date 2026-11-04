@@ -73,4 +73,11 @@ describe('Code step dieu_phoi', () => {
     const out = await runCode('dieu-phoi.js', { ...base, don: don('da_phe_duyet'), tasks });
     expect(out.chot).toBeNull();
   });
+  it('t11 xong nhưng đơn không có dòng nào: trả lại cho AM, không mở task nào cho TM/PROC/SD', async () => {
+    const out = await runCode('dieu-phoi.js', { ...base, dong: [], gia_ban: [], don: don('nhap'), tasks: [{ id: 'k1', ma: 't11', trang_thai: 'xong' }] });
+    expect(out.tao.map((x: { ma: string }) => x.ma)).toEqual(['t11']);
+    expect(out.cap_nhat).toEqual([{ id: 'k1', trang_thai: 'huy' }]);
+    expect(out.don.trang_thai).toBe('tra_lai');
+    expect(out.chot).toBeNull();
+  });
 });

@@ -133,4 +133,25 @@ describe('Phase 1: lát mỏng', () => {
     expect(await inWork(tm, t22.id)).toBe(true);
     expect(await inWork(proc, t22.id)).toBe(false);
   });
+  it('quyền trên task: AM không đổi mã task để tự duyệt; chỉ chuyển trạng thái đúng đường', async () => {
+    const am = as('am1'); const proc = as('proc1');
+
+    // C1: AM giữ t11 đang làm, thử biến nó thành t31 đã xong để tự phê duyệt đơn.
+    const forged = await newOrder('mixed');
+    const t11 = live(await tasksOf(am, forged.id), 't11')[0]!;
+    try { await ok(am.POST('/entities/{entity_id}/records/{record_id}/work/claim', { params: { path: { entity_id: E('task'), record_id: t11.id } } })); } catch { /* đã giữ */ }
+    await expect(patch(am, 'task', t11.id, { ma: 't31', trang_thai: 'xong' })).rejects.toThrow();
+    await expect(patch(am, 'task', t11.id, { vai_tro: 'sd' })).rejects.toThrow();
+    expect((await get(am, 'don_hang', forged.id)).body.trang_thai).toBe('nhap');
+
+    // I1: PROC không được "trả lại" (chỉ t22, t31 mới có), không đưa task đã xong về lại.
+    const don = await newOrder('mixed');
+    await submitT11(don.id);
+    await expect.poll(async () => live(await tasksOf(am, don.id), 't23').length, POLL).toBe(1);
+    const t23 = live(await tasksOf(proc, don.id), 't23')[0]!;
+    await expect(finish(proc, t23, 'tra_lai', 'thử trả lại')).rejects.toThrow();
+    await finish(proc, t23, 'xong');
+    await expect(patch(proc, 'task', t23.id, { trang_thai: 'dang_lam' })).rejects.toThrow();
+    await expect(patch(proc, 'task', t23.id, { trang_thai: 'tra_lai' })).rejects.toThrow();
+  });
 });

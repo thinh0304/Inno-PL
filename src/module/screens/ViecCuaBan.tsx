@@ -48,7 +48,8 @@ export function TaskList({ tasks, lang, busy, onAct, onOpen }: {
             <b>{t[`task.${task.ma}` as TextKey] ?? task.ma}</b>
             <button type="button" className="link" onClick={() => onOpen(task.orderId)}>{task.orderCode}</button>
           </div>
-          <TaskActions kind={task.kind} lang={lang} busy={busy} onAct={(status, reason) => onAct(task, status, reason)} />
+          {/* Gửi duyệt (t11) phải đi qua màn đơn: ở đó mới kiểm trường bắt buộc và lưu các thay đổi trước. */}
+          {task.kind === 'submit' ? null : <TaskActions kind={task.kind} lang={lang} busy={busy} onAct={(status, reason) => onAct(task, status, reason)} />}
         </li>
       ))}
     </ul>

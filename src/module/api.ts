@@ -3,7 +3,7 @@ import { getAppObjects, ok, type AppHost, type components } from '@reflexify/age
 import type { EntityKey, LogicalKey } from '../generated/app.js';
 import type { PlResult } from '../domain/pl.js';
 import type { FlowTask } from '../domain/flow.js';
-import { emptyOrder, type LineDraft, type OrderDraft } from './model.js';
+import { emptyOrder, onlyMine, type LineDraft, type OrderDraft } from './model.js';
 import type { MyTask } from './screens/ViecCuaBan.js';
 
 type Wire = components['schemas']['EntityRecord'];
@@ -22,6 +22,8 @@ export interface LoadedOrder {
   /** false khi người xem không đọc được giá bán / tài chính (Kỹ thuật, Mua hàng): ẩn P&L. */
   seesMoney: boolean;
   tasks: TaskRow[];
+  /** Task đang nằm trong My Work của người xem: chỉ với các task này mới hiện nút thao tác. */
+  workIds: Set<string>;
 }
 
 const bodyOf = (r: Wire): Body => r.body as Body;
@@ -91,6 +93,20 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
     don_hang: donId, stt, sku: l.sku, mo_ta: l.mo_ta, dvt: l.dvt, so_luong: l.so_luong, loai: l.loai, so_thang: l.so_thang, gia_mua: l.gia_mua, ncc: l.ncc,
   });
 
+  /** Id các task trong My Work của người xem (việc họ giữ hoặc được giao). */
+  async function workIds(): Promise<Set<string>> {
+    const ids = new Set<string>();
+    let cursor: string | null = null;
+    do {
+      const page: { items: { id: string }[]; next_cursor: string | null } = (await ok(host.api.GET('/work', {
+        params: { query: { view: 'all', ...(cursor ? { cursor } : {}) } as never },
+      }))) as never;
+      for (const x of page.items) ids.add(x.id);
+      cursor = page.next_cursor;
+    } while (cursor);
+    return ids;
+  }
+
   return {
     me,
 
@@ -113,11 +129,12 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
     async loadOrder(id: string): Promise<LoadedOrder> {
       const rec = await read('don_hang', id);
       const b = bodyOf(rec);
-      const [dong, prices, finance, tasks] = await Promise.all([
+      const [dong, prices, finance, tasks, mine] = await Promise.all([
         queryAll('dong_hang', [{ field: 'don_hang', op: 'eq', value: id }], 'stt'),
         queryAll('gia_ban_dong', [{ field: 'don_hang', op: 'eq', value: id }]).catch(() => null),
         queryAll('tai_chinh_don', [{ field: 'don_hang', op: 'eq', value: id }]).catch(() => null),
         queryAll('task', [{ field: 'don_hang', op: 'eq', value: id }]),
+        workIds().catch(() => new Set<string>()),
       ]);
       const priceOf = new Map((prices ?? []).map((p) => [str(bodyOf(p).dong_hang), p]));
       const fin = finance?.[0];
@@ -138,6 +155,7 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
         }),
         trang_thai: str(b.trang_thai), ma_don: str(b.ma_don), giai_doan: num(b.giai_doan), locked,
         seesMoney: prices !== null && finance !== null,
+        workIds: mine,
         tasks: tasks.map((t) => {
           const tb = bodyOf(t);
           return { id: t.id, ma: str(tb.ma), trang_thai: str(tb.trang_thai) as TaskRow['trang_thai'], vai_tro: str(tb.vai_tro), claimedBy: str(tb.claimed_by) || null };
@@ -177,7 +195,8 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
 
     /** Task đang chờ người xem: các task `dang_lam` họ đọc được (quyền do server lọc), kèm đơn của chúng. */
     async myTasks(): Promise<MyTask[]> {
-      const tasks = await queryAll('task', [{ field: 'trang_thai', op: 'eq', value: 'dang_lam' }]);
+      const [all, mine] = await Promise.all([queryAll('task', [{ field: 'trang_thai', op: 'eq', value: 'dang_lam' }]), workIds()]);
+      const tasks = onlyMine(all, mine);
       const orders = await queryAll('don_hang').catch(() => [] as Wire[]);
       const code = new Map(orders.map((o) => [o.id, str(bodyOf(o).ma_don)]));
       return tasks.map((t) => {

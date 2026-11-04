@@ -190,7 +190,7 @@ Excel.
 
 | Phase | Kế hoạch | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | `2026-11-04-p01-lat-mong.md` | kế hoạch đã viết, chờ duyệt | |
+| 1 | `2026-11-04-p01-lat-mong.md` | xong (nhánh `p01-lat-mong`, chưa merge) | e2e 4/4 trên sandbox; nền tảng sandbox đã nhận `minPlatformVersion` 2026.11; F-28, F-29 |
 | 2 | — | chưa bắt đầu | |
 | 3 | — | chưa bắt đầu | |
 | 4 | — | chưa bắt đầu | chờ 2026.11, F-27 |

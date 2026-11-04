@@ -48,6 +48,9 @@ export function toPlInput(order: OrderDraft, lines: LineDraft[]): PlInput {
   };
 }
 
+/** Giữ lại các task nằm trong My Work của người xem (nút thao tác chỉ hiện cho task của họ). */
+export const onlyMine = <T extends { id: string }>(tasks: T[], workIds: ReadonlySet<string>): T[] => tasks.filter((t) => workIds.has(t.id));
+
 /** Trường bắt buộc còn thiếu (spec §12.2, phần của Phase 1); chặn nút Gửi duyệt. */
 export function missingFields(order: OrderDraft, lines: LineDraft[]): string[] {
   const out: string[] = [];

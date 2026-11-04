@@ -115,6 +115,7 @@ var APP = (() => {
         changed = true;
       }
     }
+    if (status.get("t11") === "dang_lam") return { create, update: [], order: {} };
     const approved = isDone("t31");
     const pending = scope.filter((c) => !isDone(c) && (status.has(c) || TASKS[c].kind !== "submit"));
     const stage = pending.length ? Math.min(...pending.map((c) => TASKS[c].stage)) : Math.max(...scope.map((c) => TASKS[c].stage)) + 1;
@@ -325,7 +326,11 @@ var APP = (() => {
     }, cfg);
     const hasService = lines.some((l) => isService(l.type));
     const hasGoods = lines.some((l) => isGoods(l.type));
-    const flowTasks = tasks.map((t) => ({ id: t.id, code: t.ma, status: t.trang_thai }));
+    const flowTasks = tasks.map((t) => ({
+      id: t.id,
+      code: t.ma,
+      status: t.ma === "t11" && t.trang_thai === "xong" && lines.length === 0 ? "tra_lai" : t.trang_thai
+    }));
     const actions = nextActions(
       { hasService, hasGoods, advanceFirst: !!don.tu_truoc, revenue: pl.revenue, passed: pl.passed, status: don.trang_thai },
       flowTasks,

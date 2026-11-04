@@ -4,7 +4,7 @@ import { detectContractKinds } from '../../domain/lines.js';
 import { CODE_OF_CONTRACT_KIND } from '../../domain/codes.js';
 import { computePl } from '../../domain/pl.js';
 import type { Api, LoadedOrder } from '../api.js';
-import { emptyLine, missingFields, toPlInput, type LineDraft, type OrderDraft } from '../model.js';
+import { emptyLine, missingFields, onlyMine, toPlInput, type LineDraft, type OrderDraft } from '../model.js';
 import { TEXT, type Lang, type TextKey } from '../text.js';
 import { LinesTable } from './LinesTable.js';
 import { PlPanel } from './PlPanel.js';
@@ -58,7 +58,7 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
     setMessage({ kind: 'ok', text: t.saved });
   });
 
-  const mine = (loaded?.tasks ?? []).filter((x) => x.trang_thai === 'dang_lam');
+  const mine = onlyMine((loaded?.tasks ?? []).filter((x) => x.trang_thai === 'dang_lam'), loaded?.workIds ?? new Set<string>());
   const act = (taskId: string, status: 'xong' | 'tra_lai', reason: string) => run(async () => {
     // t11: lưu các thay đổi trước khi gửi duyệt, để số chốt tính trên đúng dữ liệu.
     if (mine.find((x) => x.id === taskId)?.ma === 't11') await api.saveOrder(order, lines, loaded?.lines ?? []);
@@ -103,6 +103,10 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
           {text('noi_dung', t.fContent)}{text('so_hd_noi_bo', t.fInternalNo)}
         </div>
       </section>
+
+      {!seesMoney && loaded ? (
+        <section className="panel"><h2>{t.lines}</h2><LinesTable lines={lines} editable={false} showPrices={false} lang={lang} onChange={() => {}} /></section>
+      ) : null}
 
       {seesMoney ? (
         <>
