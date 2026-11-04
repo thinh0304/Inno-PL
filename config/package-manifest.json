@@ -2,7 +2,7 @@
   "configVersion": 1,
   "formatVersion": 1,
   "id": "inno/pl",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "name": "TeraBox · Hiệu quả đơn hàng",
   "summary": "Hiệu quả đơn hàng (P&L) và quy trình đơn hàng của TeraBox: lập đơn, tính P&L, duyệt, task theo vai trò.",
   "publisher": {
@@ -18,7 +18,7 @@
     "privacy": "https://innomation.vn",
     "recipients": []
   },
-  "changelog": "Phase 1: đơn hàng, P&L, task t11–t31 với điều phối tự động.",
+  "changelog": "Phase 2: đơn đủ trường, danh bạ khách hàng và nhà cung cấp, đề xuất mua hàng, tóm tắt cho Kỹ thuật và Mua hàng, lịch sử.",
   "contentLocale": "vi",
   "minPlatformVersion": "2026.10",
   "requires": {

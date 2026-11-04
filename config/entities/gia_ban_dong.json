@@ -120,6 +120,11 @@
                 "kind": "parent_field",
                 "field": "don_hang",
                 "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
               }
             ]
           },
@@ -135,6 +140,11 @@
                 "kind": "parent_field",
                 "field": "don_hang",
                 "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
               }
             ]
           },

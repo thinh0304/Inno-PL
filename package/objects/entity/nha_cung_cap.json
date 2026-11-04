@@ -1,0 +1,26 @@
+{
+  "name": "Nhà cung cấp",
+  "description": "Danh bạ nhà cung cấp dùng chung; dòng hàng chỉ chọn theo tên.",
+  "icon": "truck",
+  "accent": "amber",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:nha_cung_cap/ten",
+    "@obj:entity_field:nha_cung_cap/nguoi_lien_he",
+    "@obj:entity_field:nha_cung_cap/sdt",
+    "@obj:entity_field:nha_cung_cap/email",
+    "@obj:entity_field:nha_cung_cap/cong_no_ngay",
+    "@obj:entity_field:nha_cung_cap/dot_thanh_toan"
+  ],
+  "natural_key": [
+    {
+      "id": "theo_ten",
+      "name": "Tên",
+      "fields": [
+        "ten"
+      ]
+    }
+  ],
+  "display_field": "ten",
+  "create_form": "@obj:form:nha_cung_cap"
+}

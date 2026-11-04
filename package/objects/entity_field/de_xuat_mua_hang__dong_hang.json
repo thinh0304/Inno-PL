@@ -1,0 +1,7 @@
+{
+  "label": "Dòng hàng",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:dong_hang",
+  "required": true,
+  "on_target_delete": "cascade"
+}

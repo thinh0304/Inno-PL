@@ -1,0 +1,65 @@
+{
+  "name": "Khách hàng",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "ma_kh": {
+        "type": "string",
+        "x-entityField": "ma_kh"
+      },
+      "ten": {
+        "type": "string",
+        "x-entityField": "ten"
+      },
+      "mst": {
+        "type": "string",
+        "x-entityField": "mst"
+      },
+      "dia_chi": {
+        "type": "string",
+        "x-entityField": "dia_chi"
+      },
+      "nguoi_dai_dien": {
+        "type": "string",
+        "x-entityField": "nguoi_dai_dien"
+      },
+      "chuc_vu": {
+        "type": "string",
+        "x-entityField": "chuc_vu"
+      },
+      "so_tk": {
+        "type": "string",
+        "x-entityField": "so_tk"
+      },
+      "ngan_hang": {
+        "type": "string",
+        "x-entityField": "ngan_hang"
+      },
+      "hang_kh": {
+        "type": "string",
+        "enum": [
+          "vip",
+          "tiem_nang",
+          "pho_thong"
+        ],
+        "x-entityField": "hang_kh"
+      },
+      "nguoi_lien_he": {
+        "type": "string",
+        "x-entityField": "nguoi_lien_he"
+      },
+      "email": {
+        "type": "string",
+        "x-entityField": "email"
+      },
+      "dien_thoai": {
+        "type": "string",
+        "x-entityField": "dien_thoai"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:khach_hang"
+}

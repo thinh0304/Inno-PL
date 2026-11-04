@@ -1,0 +1,49 @@
+{
+  "name": "Lịch sử",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "don_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:don_hang",
+        "x-entityField": "don_hang"
+      },
+      "thoi_gian": {
+        "type": "string",
+        "format": "date-time",
+        "x-entityField": "thoi_gian"
+      },
+      "nguoi": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "nguoi"
+      },
+      "hanh_dong": {
+        "type": "string",
+        "x-entityField": "hanh_dong"
+      },
+      "task": {
+        "type": "string",
+        "x-entityField": "task"
+      },
+      "ghi_chu": {
+        "type": "string",
+        "x-entityField": "ghi_chu"
+      },
+      "truoc": {
+        "type": "string",
+        "x-entityField": "truoc"
+      },
+      "sau": {
+        "type": "string",
+        "x-entityField": "sau"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:lich_su"
+}

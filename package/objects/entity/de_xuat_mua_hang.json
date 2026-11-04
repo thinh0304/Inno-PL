@@ -1,0 +1,25 @@
+{
+  "name": "Đề xuất mua hàng",
+  "description": "Giá Mua hàng đề xuất: chỉ Mua hàng, Giám đốc KD và Kế toán đọc được.",
+  "icon": "cart",
+  "accent": "rose",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:de_xuat_mua_hang/dong_hang",
+    "@obj:entity_field:de_xuat_mua_hang/don_hang",
+    "@obj:entity_field:de_xuat_mua_hang/gia_mua_de_xuat",
+    "@obj:entity_field:de_xuat_mua_hang/ncc_id",
+    "@obj:entity_field:de_xuat_mua_hang/ly_do"
+  ],
+  "natural_key": [
+    {
+      "id": "theo_dong",
+      "name": "Một đề xuất cho một dòng",
+      "fields": [
+        "dong_hang"
+      ]
+    }
+  ],
+  "display_field": "gia_mua_de_xuat",
+  "create_form": "@obj:form:de_xuat_mua_hang"
+}

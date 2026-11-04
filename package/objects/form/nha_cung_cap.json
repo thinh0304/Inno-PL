@@ -1,0 +1,36 @@
+{
+  "name": "Nhà cung cấp",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "ten": {
+        "type": "string",
+        "x-entityField": "ten"
+      },
+      "nguoi_lien_he": {
+        "type": "string",
+        "x-entityField": "nguoi_lien_he"
+      },
+      "sdt": {
+        "type": "string",
+        "x-entityField": "sdt"
+      },
+      "email": {
+        "type": "string",
+        "x-entityField": "email"
+      },
+      "cong_no_ngay": {
+        "type": "number",
+        "x-entityField": "cong_no_ngay"
+      },
+      "dot_thanh_toan": {
+        "type": "array",
+        "x-entityField": "dot_thanh_toan"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:nha_cung_cap"
+}

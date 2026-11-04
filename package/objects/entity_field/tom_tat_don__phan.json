@@ -1,0 +1,17 @@
+{
+  "label": "Phần",
+  "type": "enum",
+  "required": true,
+  "enum_values": [
+    {
+      "value": "dich_vu",
+      "label": "Dịch vụ",
+      "color": "violet"
+    },
+    {
+      "value": "hang_hoa",
+      "label": "Hàng hóa",
+      "color": "amber"
+    }
+  ]
+}

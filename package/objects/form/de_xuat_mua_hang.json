@@ -1,0 +1,38 @@
+{
+  "name": "Đề xuất mua hàng",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "dong_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:dong_hang",
+        "x-entityField": "dong_hang"
+      },
+      "don_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:don_hang",
+        "x-entityField": "don_hang"
+      },
+      "gia_mua_de_xuat": {
+        "type": "number",
+        "x-entityField": "gia_mua_de_xuat"
+      },
+      "ncc_id": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:nha_cung_cap",
+        "x-entityField": "ncc_id"
+      },
+      "ly_do": {
+        "type": "string",
+        "x-entityField": "ly_do"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:de_xuat_mua_hang"
+}

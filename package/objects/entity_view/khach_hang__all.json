@@ -1,0 +1,14 @@
+{
+  "name": "Khách hàng",
+  "type": "grid",
+  "columns": [
+    "ma_kh",
+    "ten",
+    "mst",
+    "dia_chi"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

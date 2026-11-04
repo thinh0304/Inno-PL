@@ -1,0 +1,5 @@
+{
+  "label": "Người thực hiện",
+  "type": "reference",
+  "target_entity_id": "@req:entity:user"
+}

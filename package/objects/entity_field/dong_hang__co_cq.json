@@ -1,0 +1,14 @@
+{
+  "label": "Khách yêu cầu CO/CQ",
+  "type": "enum",
+  "enum_values": [
+    {
+      "value": "co",
+      "label": "Có"
+    },
+    {
+      "value": "khong",
+      "label": "Không"
+    }
+  ]
+}

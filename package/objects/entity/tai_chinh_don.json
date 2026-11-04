@@ -11,7 +11,11 @@
     "@obj:entity_field:tai_chinh_don/cau_hinh_chot",
     "@obj:entity_field:tai_chinh_don/ln_thuan_chot",
     "@obj:entity_field:tai_chinh_don/dat_chot",
-    "@obj:entity_field:tai_chinh_don/chot_luc"
+    "@obj:entity_field:tai_chinh_don/chot_luc",
+    "@obj:entity_field:tai_chinh_don/so_hd_truoc",
+    "@obj:entity_field:tai_chinh_don/cpbh_truoc",
+    "@obj:entity_field:tai_chinh_don/doanh_thu_truoc",
+    "@obj:entity_field:tai_chinh_don/ln_truoc"
   ],
   "natural_key": [
     {

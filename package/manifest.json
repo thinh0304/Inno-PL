@@ -1,7 +1,7 @@
 {
   "formatVersion": 1,
   "id": "inno/pl",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "name": "TeraBox · Hiệu quả đơn hàng",
   "summary": "Hiệu quả đơn hàng (P&L) và quy trình đơn hàng của TeraBox: lập đơn, tính P&L, duyệt, task theo vai trò.",
   "publisher": {
@@ -17,7 +17,7 @@
     "privacy": "https://innomation.vn",
     "recipients": []
   },
-  "changelog": "Phase 1: đơn hàng, P&L, task t11–t31 với điều phối tự động.",
+  "changelog": "Phase 2: đơn đủ trường, danh bạ khách hàng và nhà cung cấp, đề xuất mua hàng, tóm tắt cho Kỹ thuật và Mua hàng, lịch sử.",
   "contentLocale": "vi",
   "minPlatformVersion": "2026.10",
   "requires": {
@@ -188,6 +188,38 @@
       "kind": "form"
     },
     {
+      "key": "entity:de_xuat_mua_hang",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:de_xuat_mua_hang/dong_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:de_xuat_mua_hang/don_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:de_xuat_mua_hang/gia_mua_de_xuat",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:de_xuat_mua_hang/ncc_id",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:de_xuat_mua_hang/ly_do",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:de_xuat_mua_hang/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:de_xuat_mua_hang",
+      "kind": "form"
+    },
+    {
       "key": "entity:don_hang",
       "kind": "entity"
     },
@@ -288,6 +320,118 @@
       "kind": "entity_field"
     },
     {
+      "key": "entity_field:don_hang/ma_loai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/khach_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/dien_thoai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/email",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/dia_chi",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nguoi_dai_dien",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/chuc_vu",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/so_tk",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ngan_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/so_hd_po",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ngay_ky",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ngay_bao_gia",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/hieu_luc_den",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ty_gia",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nguoi_nhan",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/sdt_nhan",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/dia_chi_nhan",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/email_nhan_license",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ghi_chu_giao",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/so_lan_tt",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/don_moi",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/kh_moi",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nguon_kh",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nguon_kh_nguoi",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/hinh_thuc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/giai_doan_deal",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/nguoi_duoc_chia",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:don_hang/ly_do_gui",
+      "kind": "entity_field"
+    },
+    {
       "key": "entity_view:don_hang/all",
       "kind": "entity_view"
     },
@@ -336,7 +480,27 @@
       "kind": "entity_field"
     },
     {
-      "key": "entity_field:dong_hang/ncc",
+      "key": "entity_field:dong_hang/gia_mua_usd",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/vat",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/ncc_id",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/co_cq",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/ngay_bat_dau",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:dong_hang/ngay_ket_thuc",
       "kind": "entity_field"
     },
     {
@@ -376,6 +540,146 @@
       "kind": "form"
     },
     {
+      "key": "entity:khach_hang",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:khach_hang/ma_kh",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/ten",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/mst",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/dia_chi",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/nguoi_dai_dien",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/chuc_vu",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/so_tk",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/ngan_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/hang_kh",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/nguoi_lien_he",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/email",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:khach_hang/dien_thoai",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:khach_hang/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:khach_hang",
+      "kind": "form"
+    },
+    {
+      "key": "entity:lich_su",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:lich_su/don_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:lich_su/thoi_gian",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:lich_su/nguoi",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:lich_su/hanh_dong",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:lich_su/task",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:lich_su/ghi_chu",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:lich_su/truoc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:lich_su/sau",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:lich_su/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:lich_su",
+      "kind": "form"
+    },
+    {
+      "key": "entity:nha_cung_cap",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:nha_cung_cap/ten",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:nha_cung_cap/nguoi_lien_he",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:nha_cung_cap/sdt",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:nha_cung_cap/email",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:nha_cung_cap/cong_no_ngay",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:nha_cung_cap/dot_thanh_toan",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:nha_cung_cap/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:nha_cung_cap",
+      "kind": "form"
+    },
+    {
       "key": "entity:tai_chinh_don",
       "kind": "entity"
     },
@@ -405,6 +709,22 @@
     },
     {
       "key": "entity_field:tai_chinh_don/chot_luc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/so_hd_truoc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/cpbh_truoc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/doanh_thu_truoc",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tai_chinh_don/ln_truoc",
       "kind": "entity_field"
     },
     {
@@ -468,6 +788,34 @@
       "kind": "form"
     },
     {
+      "key": "entity:tom_tat_don",
+      "kind": "entity"
+    },
+    {
+      "key": "entity_field:tom_tat_don/don_hang",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tom_tat_don/phan",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tom_tat_don/du_lieu",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_field:tom_tat_don/nhom_xem",
+      "kind": "entity_field"
+    },
+    {
+      "key": "entity_view:tom_tat_don/all",
+      "kind": "entity_view"
+    },
+    {
+      "key": "form:tom_tat_don",
+      "kind": "form"
+    },
+    {
       "key": "workflow:dieu_phoi",
       "kind": "workflow"
     },
@@ -506,6 +854,53 @@
       }
     },
     {
+      "key": "de_xuat_mua_hang_nhom_proc",
+      "to": "@param:nhom_proc",
+      "entity": "@obj:entity:de_xuat_mua_hang",
+      "operations": {
+        "create": "organization",
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "de_xuat_mua_hang_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:de_xuat_mua_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "de_xuat_mua_hang_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:de_xuat_mua_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "de_xuat_mua_hang_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:de_xuat_mua_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "de_xuat_mua_hang_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:de_xuat_mua_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
       "key": "don_hang_nhom_sales",
       "to": "@param:nhom_sales",
       "entity": "@obj:entity:don_hang",
@@ -521,6 +916,10 @@
           {
             "kind": "field",
             "field": "is"
+          },
+          {
+            "kind": "field",
+            "field": "nguoi_duoc_chia"
           }
         ],
         "list": [
@@ -531,6 +930,10 @@
           {
             "kind": "field",
             "field": "is"
+          },
+          {
+            "kind": "field",
+            "field": "nguoi_duoc_chia"
           }
         ],
         "update": [
@@ -607,7 +1010,8 @@
       "entity": "@obj:entity:don_hang",
       "operations": {
         "read": "organization",
-        "list": "organization"
+        "list": "organization",
+        "delete": "organization"
       }
     },
     {
@@ -647,6 +1051,11 @@
             "kind": "parent_field",
             "field": "don_hang",
             "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
           }
         ],
         "list": [
@@ -659,6 +1068,11 @@
             "kind": "parent_field",
             "field": "don_hang",
             "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
           }
         ],
         "update": [
@@ -792,6 +1206,11 @@
             "kind": "parent_field",
             "field": "don_hang",
             "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
           }
         ],
         "list": [
@@ -804,6 +1223,11 @@
             "kind": "parent_field",
             "field": "don_hang",
             "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
           }
         ],
         "update": [
@@ -869,6 +1293,198 @@
       }
     },
     {
+      "key": "khach_hang_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:khach_hang",
+      "operations": {
+        "create": "organization",
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "khach_hang_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:khach_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "khach_hang_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:khach_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "khach_hang_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:khach_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "khach_hang_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:khach_hang",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "lich_su_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:lich_su",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
+          }
+        ],
+        "list": [
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "am"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
+          }
+        ]
+      }
+    },
+    {
+      "key": "lich_su_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:lich_su",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "lich_su_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:lich_su",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "lich_su_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:lich_su",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "lich_su_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:lich_su",
+      "operations": {
+        "create": "organization",
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "nha_cung_cap_nhom_sales",
+      "to": "@param:nhom_sales",
+      "entity": "@obj:entity:nha_cung_cap",
+      "operations": {
+        "create": "organization",
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "nha_cung_cap_nhom_proc",
+      "to": "@param:nhom_proc",
+      "entity": "@obj:entity:nha_cung_cap",
+      "operations": {
+        "create": "organization",
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "nha_cung_cap_nhom_tm",
+      "to": "@param:nhom_tm",
+      "entity": "@obj:entity:nha_cung_cap",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "nha_cung_cap_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:nha_cung_cap",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "nha_cung_cap_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:nha_cung_cap",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "nha_cung_cap_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:nha_cung_cap",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "nha_cung_cap_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:nha_cung_cap",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
       "key": "tai_chinh_don_nhom_sales",
       "to": "@param:nhom_sales",
       "entity": "@obj:entity:tai_chinh_don",
@@ -895,6 +1511,11 @@
             "kind": "parent_field",
             "field": "don_hang",
             "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
           }
         ],
         "list": [
@@ -907,6 +1528,11 @@
             "kind": "parent_field",
             "field": "don_hang",
             "parent_field": "is"
+          },
+          {
+            "kind": "parent_field",
+            "field": "don_hang",
+            "parent_field": "nguoi_duoc_chia"
           }
         ],
         "update": [
@@ -1158,6 +1784,63 @@
       "key": "task_nhom_tu_dong",
       "to": "@param:nhom_tu_dong",
       "entity": "@obj:entity:task",
+      "operations": {
+        "create": "organization",
+        "read": "organization",
+        "list": "organization",
+        "update": "organization"
+      }
+    },
+    {
+      "key": "tom_tat_don_everyone",
+      "to": "everyone",
+      "entity": "@obj:entity:tom_tat_don",
+      "record_scopes": {
+        "read": [
+          {
+            "kind": "field",
+            "field": "nhom_xem"
+          }
+        ],
+        "list": [
+          {
+            "kind": "field",
+            "field": "nhom_xem"
+          }
+        ]
+      }
+    },
+    {
+      "key": "tom_tat_don_nhom_sd",
+      "to": "@param:nhom_sd",
+      "entity": "@obj:entity:tom_tat_don",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "tom_tat_don_nhom_acc",
+      "to": "@param:nhom_acc",
+      "entity": "@obj:entity:tom_tat_don",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "tom_tat_don_nhom_admin",
+      "to": "@param:nhom_admin",
+      "entity": "@obj:entity:tom_tat_don",
+      "operations": {
+        "read": "organization",
+        "list": "organization"
+      }
+    },
+    {
+      "key": "tom_tat_don_nhom_tu_dong",
+      "to": "@param:nhom_tu_dong",
+      "entity": "@obj:entity:tom_tat_don",
       "operations": {
         "create": "organization",
         "read": "organization",

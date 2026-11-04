@@ -57,9 +57,44 @@
         "type": "number",
         "x-entityField": "gia_mua"
       },
-      "ncc": {
+      "gia_mua_usd": {
+        "type": "number",
+        "x-entityField": "gia_mua_usd"
+      },
+      "vat": {
         "type": "string",
-        "x-entityField": "ncc"
+        "enum": [
+          "kct",
+          "0",
+          "5",
+          "8",
+          "10"
+        ],
+        "x-entityField": "vat"
+      },
+      "ncc_id": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:nha_cung_cap",
+        "x-entityField": "ncc_id"
+      },
+      "co_cq": {
+        "type": "string",
+        "enum": [
+          "co",
+          "khong"
+        ],
+        "x-entityField": "co_cq"
+      },
+      "ngay_bat_dau": {
+        "type": "string",
+        "format": "date",
+        "x-entityField": "ngay_bat_dau"
+      },
+      "ngay_ket_thuc": {
+        "type": "string",
+        "format": "date",
+        "x-entityField": "ngay_ket_thuc"
       }
     }
   },

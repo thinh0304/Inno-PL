@@ -1,0 +1,240 @@
+{
+  "key": "lich_su",
+  "name": "Lịch sử",
+  "description": "Lịch sử xử lý đơn: chỉ thêm, không sửa, không xóa.",
+  "icon": "archive",
+  "accent": "slate",
+  "fields": [
+    {
+      "key": "don_hang",
+      "label": "Đơn hàng",
+      "type": "reference",
+      "target_entity_id": "${entity:don_hang}",
+      "required": true,
+      "on_target_delete": "cascade"
+    },
+    {
+      "key": "thoi_gian",
+      "label": "Thời gian",
+      "type": "datetime"
+    },
+    {
+      "key": "nguoi",
+      "label": "Người thực hiện",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "hanh_dong",
+      "label": "Hành động",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "task",
+      "label": "Task",
+      "type": "text"
+    },
+    {
+      "key": "ghi_chu",
+      "label": "Ghi chú",
+      "type": "text"
+    },
+    {
+      "key": "truoc",
+      "label": "Trước",
+      "type": "text"
+    },
+    {
+      "key": "sau",
+      "label": "Sau",
+      "type": "text"
+    }
+  ],
+  "natural_key": [],
+  "display_field": "hanh_dong",
+  "views": [
+    {
+      "key": "all",
+      "name": "Lịch sử",
+      "columns": [
+        "don_hang",
+        "thoi_gian",
+        "nguoi",
+        "hanh_dong"
+      ]
+    }
+  ],
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sales}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "am"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "am"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "create_form": {
+    "name": "Lịch sử",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "don_hang": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "don_hang",
+          "x-entityField": "don_hang"
+        },
+        "thoi_gian": {
+          "type": "string",
+          "format": "date-time",
+          "x-entityField": "thoi_gian"
+        },
+        "nguoi": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "nguoi"
+        },
+        "hanh_dong": {
+          "type": "string",
+          "x-entityField": "hanh_dong"
+        },
+        "task": {
+          "type": "string",
+          "x-entityField": "task"
+        },
+        "ghi_chu": {
+          "type": "string",
+          "x-entityField": "ghi_chu"
+        },
+        "truoc": {
+          "type": "string",
+          "x-entityField": "truoc"
+        },
+        "sau": {
+          "type": "string",
+          "x-entityField": "sau"
+        }
+      }
+    }
+  }
+}

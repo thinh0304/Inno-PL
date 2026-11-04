@@ -1,0 +1,8 @@
+{
+  "label": "Tỷ giá",
+  "type": "number",
+  "default": {
+    "kind": "literal",
+    "value": 26000
+  }
+}

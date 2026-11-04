@@ -1,0 +1,14 @@
+{
+  "name": "Tóm tắt đơn",
+  "type": "grid",
+  "columns": [
+    "don_hang",
+    "phan",
+    "du_lieu",
+    "nhom_xem"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

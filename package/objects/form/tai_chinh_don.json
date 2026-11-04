@@ -12,6 +12,22 @@
       "cpbh": {
         "type": "number",
         "x-entityField": "cpbh"
+      },
+      "so_hd_truoc": {
+        "type": "string",
+        "x-entityField": "so_hd_truoc"
+      },
+      "cpbh_truoc": {
+        "type": "number",
+        "x-entityField": "cpbh_truoc"
+      },
+      "doanh_thu_truoc": {
+        "type": "number",
+        "x-entityField": "doanh_thu_truoc"
+      },
+      "ln_truoc": {
+        "type": "number",
+        "x-entityField": "ln_truoc"
       }
     }
   },

@@ -1,0 +1,30 @@
+{
+  "label": "VAT",
+  "type": "enum",
+  "default": {
+    "kind": "literal",
+    "value": "8"
+  },
+  "enum_values": [
+    {
+      "value": "kct",
+      "label": "KCT"
+    },
+    {
+      "value": "0",
+      "label": "0%"
+    },
+    {
+      "value": "5",
+      "label": "5%"
+    },
+    {
+      "value": "8",
+      "label": "8%"
+    },
+    {
+      "value": "10",
+      "label": "10%"
+    }
+  ]
+}

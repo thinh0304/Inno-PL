@@ -1,0 +1,52 @@
+{
+  "label": "Phân bổ giai đoạn deal",
+  "type": "list",
+  "sortable": false,
+  "item_fields": [
+    {
+      "key": "ma",
+      "label": "Giai đoạn",
+      "type": "enum",
+      "required": true,
+      "enum_values": [
+        {
+          "value": "co_hoi",
+          "label": "13/ Cơ hội"
+        },
+        {
+          "value": "lam_ro",
+          "label": "14/ Làm rõ yêu cầu"
+        },
+        {
+          "value": "bao_gia",
+          "label": "15/ Báo giá"
+        },
+        {
+          "value": "dam_phan",
+          "label": "16/ Đàm phán"
+        },
+        {
+          "value": "chot",
+          "label": "17/ Chốt deal"
+        },
+        {
+          "value": "hd_tt_cskh",
+          "label": "18/ HĐ · TT · CSKH"
+        }
+      ]
+    },
+    {
+      "key": "nv",
+      "label": "Người phụ trách (mã người dùng)",
+      "type": "text"
+    },
+    {
+      "key": "pct",
+      "label": "Hệ số",
+      "type": "number"
+    }
+  ],
+  "constraints": {
+    "max_items": 6
+  }
+}

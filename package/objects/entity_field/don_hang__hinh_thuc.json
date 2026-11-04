@@ -1,0 +1,18 @@
+{
+  "label": "Hình thức",
+  "type": "enum",
+  "enum_values": [
+    {
+      "value": "hop_dong",
+      "label": "Hợp đồng"
+    },
+    {
+      "value": "don_hang",
+      "label": "Đơn hàng"
+    },
+    {
+      "value": "thau",
+      "label": "Thầu"
+    }
+  ]
+}

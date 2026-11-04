@@ -1,0 +1,20 @@
+{
+  "label": "Loại mã đơn",
+  "type": "enum",
+  "enum_values": [
+    {
+      "value": "tm",
+      "label": "TM",
+      "color": "sky"
+    },
+    {
+      "value": "dv",
+      "label": "DV",
+      "color": "violet"
+    }
+  ],
+  "default": {
+    "kind": "literal",
+    "value": "tm"
+  }
+}

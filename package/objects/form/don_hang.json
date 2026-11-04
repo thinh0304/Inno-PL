@@ -3,6 +3,20 @@
   "schema_json": {
     "type": "object",
     "properties": {
+      "ma_loai": {
+        "type": "string",
+        "enum": [
+          "tm",
+          "dv"
+        ],
+        "x-entityField": "ma_loai"
+      },
+      "khach_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:khach_hang",
+        "x-entityField": "khach_hang"
+      },
       "ten_kh": {
         "type": "string",
         "x-entityField": "ten_kh"
@@ -19,6 +33,34 @@
         "type": "string",
         "x-entityField": "nguoi_lien_he"
       },
+      "dien_thoai": {
+        "type": "string",
+        "x-entityField": "dien_thoai"
+      },
+      "email": {
+        "type": "string",
+        "x-entityField": "email"
+      },
+      "dia_chi": {
+        "type": "string",
+        "x-entityField": "dia_chi"
+      },
+      "nguoi_dai_dien": {
+        "type": "string",
+        "x-entityField": "nguoi_dai_dien"
+      },
+      "chuc_vu": {
+        "type": "string",
+        "x-entityField": "chuc_vu"
+      },
+      "so_tk": {
+        "type": "string",
+        "x-entityField": "so_tk"
+      },
+      "ngan_hang": {
+        "type": "string",
+        "x-entityField": "ngan_hang"
+      },
       "noi_dung": {
         "type": "string",
         "x-entityField": "noi_dung"
@@ -26,6 +68,49 @@
       "so_hd_noi_bo": {
         "type": "string",
         "x-entityField": "so_hd_noi_bo"
+      },
+      "so_hd_po": {
+        "type": "string",
+        "x-entityField": "so_hd_po"
+      },
+      "ngay_ky": {
+        "type": "string",
+        "format": "date",
+        "x-entityField": "ngay_ky"
+      },
+      "ngay_bao_gia": {
+        "type": "string",
+        "format": "date",
+        "x-entityField": "ngay_bao_gia"
+      },
+      "hieu_luc_den": {
+        "type": "string",
+        "format": "date",
+        "x-entityField": "hieu_luc_den"
+      },
+      "ty_gia": {
+        "type": "number",
+        "x-entityField": "ty_gia"
+      },
+      "nguoi_nhan": {
+        "type": "string",
+        "x-entityField": "nguoi_nhan"
+      },
+      "sdt_nhan": {
+        "type": "string",
+        "x-entityField": "sdt_nhan"
+      },
+      "dia_chi_nhan": {
+        "type": "string",
+        "x-entityField": "dia_chi_nhan"
+      },
+      "email_nhan_license": {
+        "type": "string",
+        "x-entityField": "email_nhan_license"
+      },
+      "ghi_chu_giao": {
+        "type": "string",
+        "x-entityField": "ghi_chu_giao"
       },
       "am": {
         "type": "string",
@@ -51,6 +136,10 @@
       "cong_no_ngay": {
         "type": "number",
         "x-entityField": "cong_no_ngay"
+      },
+      "so_lan_tt": {
+        "type": "number",
+        "x-entityField": "so_lan_tt"
       },
       "nv_trien_khai": {
         "type": "string",
@@ -86,6 +175,43 @@
       "tu_truoc": {
         "type": "boolean",
         "x-entityField": "tu_truoc"
+      },
+      "don_moi": {
+        "type": "boolean",
+        "x-entityField": "don_moi"
+      },
+      "kh_moi": {
+        "type": "boolean",
+        "x-entityField": "kh_moi"
+      },
+      "nguon_kh": {
+        "type": "string",
+        "enum": [
+          "khong",
+          "nguoi",
+          "marketing",
+          "other"
+        ],
+        "x-entityField": "nguon_kh"
+      },
+      "nguon_kh_nguoi": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@req.key:entity:user",
+        "x-entityField": "nguon_kh_nguoi"
+      },
+      "hinh_thuc": {
+        "type": "string",
+        "enum": [
+          "hop_dong",
+          "don_hang",
+          "thau"
+        ],
+        "x-entityField": "hinh_thuc"
+      },
+      "giai_doan_deal": {
+        "type": "array",
+        "x-entityField": "giai_doan_deal"
       }
     }
   },

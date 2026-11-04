@@ -1,0 +1,197 @@
+{
+  "key": "de_xuat_mua_hang",
+  "name": "Đề xuất mua hàng",
+  "description": "Giá Mua hàng đề xuất: chỉ Mua hàng, Giám đốc KD và Kế toán đọc được.",
+  "icon": "cart",
+  "accent": "rose",
+  "fields": [
+    {
+      "key": "dong_hang",
+      "label": "Dòng hàng",
+      "type": "reference",
+      "target_entity_id": "${entity:dong_hang}",
+      "required": true,
+      "on_target_delete": "cascade"
+    },
+    {
+      "key": "don_hang",
+      "label": "Đơn hàng",
+      "type": "reference",
+      "target_entity_id": "${entity:don_hang}",
+      "required": true,
+      "on_target_delete": "cascade"
+    },
+    {
+      "key": "gia_mua_de_xuat",
+      "label": "Đơn giá mua đề xuất",
+      "type": "number",
+      "required": true
+    },
+    {
+      "key": "ncc_id",
+      "label": "Nhà cung cấp đề xuất",
+      "type": "reference",
+      "target_entity_id": "${entity:nha_cung_cap}"
+    },
+    {
+      "key": "ly_do",
+      "label": "Lý do khi cao hơn giá Sale",
+      "type": "text"
+    }
+  ],
+  "natural_key": [
+    {
+      "id": "theo_dong",
+      "name": "Một đề xuất cho một dòng",
+      "fields": [
+        "dong_hang"
+      ]
+    }
+  ],
+  "display_field": "gia_mua_de_xuat",
+  "views": [
+    {
+      "key": "all",
+      "name": "Đề xuất mua hàng",
+      "columns": [
+        "dong_hang",
+        "don_hang",
+        "gia_mua_de_xuat",
+        "ncc_id"
+      ]
+    }
+  ],
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_proc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "create_form": {
+    "name": "Đề xuất mua hàng",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "dong_hang": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "dong_hang",
+          "x-entityField": "dong_hang"
+        },
+        "don_hang": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "don_hang",
+          "x-entityField": "don_hang"
+        },
+        "gia_mua_de_xuat": {
+          "type": "number",
+          "x-entityField": "gia_mua_de_xuat"
+        },
+        "ncc_id": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "nha_cung_cap",
+          "x-entityField": "ncc_id"
+        },
+        "ly_do": {
+          "type": "string",
+          "x-entityField": "ly_do"
+        }
+      }
+    }
+  }
+}
