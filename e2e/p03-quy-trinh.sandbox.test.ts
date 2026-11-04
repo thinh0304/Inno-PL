@@ -22,6 +22,8 @@ const proposeAll = async (o: NewOrder, price = 38_000_000) => {
 };
 const request = (c: Client, don: string, kind: 'yc_close_lost' | 'yc_xin_duyet_lai', ly_do = 'Lý do thử') =>
   create(c, 'task', { don_hang: don, ma: kind, vai_tro: 'is', trang_thai: 'dang_lam', ly_do });
+/** Đơn dịch vụ tự duyệt: chờ t40 mở xong rồi mới gửi yêu cầu (hai lượt điều phối chạy chồng nhau là F-32). */
+const settled = (don: string) => expect.poll(async () => live(await tasksOf(am(), don), 't40').filter((t) => t.body.trang_thai === 'dang_lam').length, POLL).toBe(1);
 const hasLive = async (don: string, ma: string) => live(await tasksOf(am(), don), ma).length > 0;
 
 describe('Phase 3: quy trình đủ 15 task', () => {
@@ -40,8 +42,8 @@ describe('Phase 3: quy trình đủ 15 task', () => {
     await step(don, 't71'); await step(don, 't72');
     await expect.poll(async () => (await orderStatus(don)).trang_thai, POLL).toBe('hoan_tat');
     expect(String((await orderStatus(don)).ngay_het_han)).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    const history = await query(as('admin'), 'lich_su', [{ field: 'don_hang', op: 'eq', value: don }]);
-    expect(history.map((h) => h.body.hanh_dong)).toEqual(expect.arrayContaining(['hoan_tat', 'hoan_tat_gd']));
+    // Lịch sử ghi sau trạng thái đơn trong cùng lượt chạy.
+    await expect.poll(async () => (await query(as('admin'), 'lich_su', [{ field: 'don_hang', op: 'eq', value: don }])).map((h) => h.body.hanh_dong), POLL).toEqual(expect.arrayContaining(['hoan_tat', 'hoan_tat_gd']));
   }, LONG);
 
   it('KH tạm ứng trước = Có: t61 và t62 chờ t51', async () => {
@@ -93,6 +95,7 @@ describe('Phase 3: quy trình đủ 15 task', () => {
     await submitT11(don);
     await step(don, 't22');
     await expect.poll(async () => (await orderStatus(don)).trang_thai, POLL).toBe('da_phe_duyet');
+    await settled(don);
     await denied(patch(am(), 'dong_hang', o.dong[0]!.id, { so_luong: 2 }));
 
     await request(as('is1'), don, 'yc_xin_duyet_lai', 'Giá HĐ đàm phán lệch số đã duyệt');
