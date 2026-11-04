@@ -190,7 +190,7 @@ Excel.
 
 | Phase | Kế hoạch | Trạng thái | Ghi chú |
 |---|---|---|---|
-| 1 | — | chưa bắt đầu | |
+| 1 | `2026-11-04-p01-lat-mong.md` | kế hoạch đã viết, chờ duyệt | |
 | 2 | — | chưa bắt đầu | |
 | 3 | — | chưa bắt đầu | |
 | 4 | — | chưa bắt đầu | chờ 2026.11, F-27 |
