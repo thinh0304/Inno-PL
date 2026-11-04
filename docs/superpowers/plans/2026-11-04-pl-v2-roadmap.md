@@ -192,7 +192,7 @@ Excel.
 |---|---|---|---|
 | 1 | `2026-11-04-p01-lat-mong.md` | xong (nhánh `p01-lat-mong`, chưa merge) | e2e 4/4 trên sandbox; nền tảng sandbox đã nhận `minPlatformVersion` 2026.11; F-28, F-29 |
 | 2 | `2026-11-05-p02-du-lieu-quyen.md` | xong (nhánh `p02-du-lieu-quyen`, chưa merge) | e2e p02 4/4 và p01 4/4; F-30, F-31; bộ chọn người, số năm trước tự lấy, nút xóa của AM để sau |
-| 3 | `2026-11-05-p03-quy-trinh.md` | đang làm (nhánh `p03`) | F-32: một workflow chỉ có một trigger, nên có `dieu_phoi_yeu_cau`; email nhắc hạn để sau (cần kết nối gửi thư) |
+| 3 | `2026-11-05-p03-quy-trinh.md` | xong, chờ review (nhánh `p03`); e2e p03 6/6, p01 4/4, p02 4/4 | F-32: một workflow chỉ có một trigger, nên có `dieu_phoi_yeu_cau`; email nhắc hạn để sau (cần kết nối gửi thư) |
 | 4 | — | chưa bắt đầu | chờ 2026.11, F-27 |
 | 5 | — | chưa bắt đầu | |
 | 6 | — | chưa bắt đầu | |

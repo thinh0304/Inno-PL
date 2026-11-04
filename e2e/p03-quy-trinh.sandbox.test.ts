@@ -1,6 +1,6 @@
 // Phase 3 trên sandbox: quy trình đủ 15 task, Close-lost, Yêu cầu sửa dự thảo, Xin duyệt lại, KH tạm ứng trước, cổng t23. Cần `pnpm af deploy --sandbox` trước.
 import { describe, expect, it } from 'vitest';
-import { POLL, as, create, denied, finish, get, live, newOrder, patch, query, supplier, submitT11, tasksOf, uid, type Client, type NewOrder } from './helpers';
+import { POLL, as, create, denied, finish, get, live, newOrder, patch, proposeAll, query, submitT11, tasksOf, uid, type Client } from './helpers';
 
 const LONG = 1_200_000;
 const am = () => as('am1');
@@ -13,13 +13,6 @@ async function step(don: string, ma: string, status = 'xong', reason?: string) {
   await finish(c, live(await tasksOf(c, don), ma).filter((t) => t.body.trang_thai === 'dang_lam')[0]!, status, reason);
 }
 const orderStatus = async (don: string) => (await get(am(), 'don_hang', don)).body;
-const proposeAll = async (o: NewOrder, price = 38_000_000) => {
-  const ncc = await supplier();
-  for (const [i, l] of o.lines.entries()) {
-    if (!['tb', 'lic', 'lic_dk', 'lic_ntnn'].includes(l.loai)) continue;
-    await create(as('proc1'), 'de_xuat_mua_hang', { dong_hang: o.dong[i]!.id, don_hang: o.don.id, gia_mua_de_xuat: price, ncc_id: ncc });
-  }
-};
 const request = (c: Client, don: string, kind: 'yc_close_lost' | 'yc_xin_duyet_lai', ly_do = 'Lý do thử') =>
   create(c, 'task', { don_hang: don, ma: kind, vai_tro: 'is', trang_thai: 'dang_lam', ly_do });
 /** Đơn dịch vụ tự duyệt: chờ t40 mở xong rồi mới gửi yêu cầu (hai lượt điều phối chạy chồng nhau là F-32). */

@@ -4,12 +4,14 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_CONFIG } from '../src/domain/config';
 import { computePl } from '../src/domain/pl';
 import { plInputFromForm } from '../src/domain/plinput';
-import { E, POLL, as, finish, get, live, newOrder, patch, query, submitT11, tasksOf, type Client } from './helpers';
+import { E, POLL, as, finish, get, live, newOrder, patch, proposeAll, query, submitT11, tasksOf, type Client } from './helpers';
 
 describe('Phase 1: lát mỏng', () => {
   it('đơn hỗn hợp: t22 ∥ t23 → đúng một t31; TM không đọc được số; trả lại rồi duyệt lại; SD duyệt → đã phê duyệt', async () => {
     const am = as('am1'); const tm = as('tm1'); const proc = as('proc1'); const sd = as('sd1');
-    const { don, order, lines } = await newOrder('mixed');
+    const placed = await newOrder('mixed');
+    const { don, order, lines } = placed;
+    await proposeAll(placed);
     await submitT11(don.id);
 
     // t22 cho TM, t23 cho PROC; số P&L được chốt đúng bằng computePl.
