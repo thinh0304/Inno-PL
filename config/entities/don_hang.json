@@ -9,44 +9,38 @@
       "key": "ma_don",
       "label": "Mã đơn",
       "type": "auto_number",
-      "auto_number_scope": "don_hang",
-      "auto_number_format": "DH-{{ value | pad(4) }}"
+      "auto_number_scope": "don_hang:{{ ma_loai }}",
+      "auto_number_format": "{{ ma_loai | upper }}-{{ value | pad(4) }}"
     },
     {
       "key": "ten_kh",
       "label": "Tên khách hàng",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "ma_kh",
       "label": "Mã KH",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "mst",
       "label": "MST",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "nguoi_lien_he",
       "label": "Người liên hệ",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "noi_dung",
       "label": "Nội dung đơn hàng",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "so_hd_noi_bo",
       "label": "Số HĐ nội bộ",
-      "type": "text",
-      "required": true
+      "type": "text"
     },
     {
       "key": "am",
@@ -59,14 +53,12 @@
       "key": "is",
       "label": "Inside Sale",
       "type": "reference",
-      "target_entity_id": "ffffffff-0000-0000-0000-000000000001",
-      "required": true
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
     },
     {
       "key": "hang_kh",
       "label": "Hạng KH",
       "type": "enum",
-      "required": true,
       "facetable": true,
       "enum_values": [
         {
@@ -89,8 +81,7 @@
     {
       "key": "cong_no_ngay",
       "label": "Số ngày công nợ",
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     {
       "key": "nv_trien_khai",
@@ -245,6 +236,266 @@
       "key": "ly_do",
       "label": "Lý do trả lại",
       "type": "text"
+    },
+    {
+      "key": "ma_loai",
+      "label": "Loại mã đơn",
+      "type": "enum",
+      "enum_values": [
+        {
+          "value": "tm",
+          "label": "TM",
+          "color": "sky"
+        },
+        {
+          "value": "dv",
+          "label": "DV",
+          "color": "violet"
+        }
+      ],
+      "default": {
+        "kind": "literal",
+        "value": "tm"
+      }
+    },
+    {
+      "key": "khach_hang",
+      "label": "Hồ sơ khách hàng",
+      "type": "reference",
+      "target_entity_id": "${entity:khach_hang}"
+    },
+    {
+      "key": "dien_thoai",
+      "label": "Điện thoại KH",
+      "type": "text"
+    },
+    {
+      "key": "email",
+      "label": "Email KH",
+      "type": "text"
+    },
+    {
+      "key": "dia_chi",
+      "label": "Địa chỉ KH",
+      "type": "text"
+    },
+    {
+      "key": "nguoi_dai_dien",
+      "label": "Người đại diện",
+      "type": "text"
+    },
+    {
+      "key": "chuc_vu",
+      "label": "Chức vụ",
+      "type": "text"
+    },
+    {
+      "key": "so_tk",
+      "label": "Số tài khoản",
+      "type": "text"
+    },
+    {
+      "key": "ngan_hang",
+      "label": "Ngân hàng",
+      "type": "text"
+    },
+    {
+      "key": "so_hd_po",
+      "label": "Số HĐ / PO khách hàng",
+      "type": "text"
+    },
+    {
+      "key": "ngay_ky",
+      "label": "Ngày ký",
+      "type": "date"
+    },
+    {
+      "key": "ngay_bao_gia",
+      "label": "Ngày báo giá",
+      "type": "date"
+    },
+    {
+      "key": "hieu_luc_den",
+      "label": "Hiệu lực đến",
+      "type": "date"
+    },
+    {
+      "key": "ty_gia",
+      "label": "Tỷ giá",
+      "type": "number",
+      "default": {
+        "kind": "literal",
+        "value": 26000
+      }
+    },
+    {
+      "key": "nguoi_nhan",
+      "label": "Người nhận",
+      "type": "text"
+    },
+    {
+      "key": "sdt_nhan",
+      "label": "SĐT nhận",
+      "type": "text"
+    },
+    {
+      "key": "dia_chi_nhan",
+      "label": "Địa chỉ nhận",
+      "type": "text"
+    },
+    {
+      "key": "email_nhan_license",
+      "label": "Email nhận license",
+      "type": "text"
+    },
+    {
+      "key": "ghi_chu_giao",
+      "label": "Ghi chú giao hàng",
+      "type": "text"
+    },
+    {
+      "key": "so_lan_tt",
+      "label": "Số lần thanh toán",
+      "type": "number"
+    },
+    {
+      "key": "don_moi",
+      "label": "Đơn hàng mới",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": true
+      }
+    },
+    {
+      "key": "kh_moi",
+      "label": "Khách hàng mới (new logo)",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
+    },
+    {
+      "key": "nguon_kh",
+      "label": "Nguồn KH",
+      "type": "enum",
+      "default": {
+        "kind": "literal",
+        "value": "khong"
+      },
+      "enum_values": [
+        {
+          "value": "khong",
+          "label": "Không (KH cũ)",
+          "color": "gray"
+        },
+        {
+          "value": "nguoi",
+          "label": "Một người",
+          "color": "sky"
+        },
+        {
+          "value": "marketing",
+          "label": "Team Marketing",
+          "color": "teal"
+        },
+        {
+          "value": "other",
+          "label": "Other",
+          "color": "gray"
+        }
+      ]
+    },
+    {
+      "key": "nguon_kh_nguoi",
+      "label": "Người mang KH về",
+      "type": "reference",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001"
+    },
+    {
+      "key": "hinh_thuc",
+      "label": "Hình thức",
+      "type": "enum",
+      "enum_values": [
+        {
+          "value": "hop_dong",
+          "label": "Hợp đồng"
+        },
+        {
+          "value": "don_hang",
+          "label": "Đơn hàng"
+        },
+        {
+          "value": "thau",
+          "label": "Thầu"
+        }
+      ]
+    },
+    {
+      "key": "giai_doan_deal",
+      "label": "Phân bổ giai đoạn deal",
+      "type": "list",
+      "sortable": false,
+      "item_fields": [
+        {
+          "key": "ma",
+          "label": "Giai đoạn",
+          "type": "enum",
+          "required": true,
+          "enum_values": [
+            {
+              "value": "co_hoi",
+              "label": "13/ Cơ hội"
+            },
+            {
+              "value": "lam_ro",
+              "label": "14/ Làm rõ yêu cầu"
+            },
+            {
+              "value": "bao_gia",
+              "label": "15/ Báo giá"
+            },
+            {
+              "value": "dam_phan",
+              "label": "16/ Đàm phán"
+            },
+            {
+              "value": "chot",
+              "label": "17/ Chốt deal"
+            },
+            {
+              "value": "hd_tt_cskh",
+              "label": "18/ HĐ · TT · CSKH"
+            }
+          ]
+        },
+        {
+          "key": "nv",
+          "label": "Người phụ trách (mã người dùng)",
+          "type": "text"
+        },
+        {
+          "key": "pct",
+          "label": "Hệ số",
+          "type": "number"
+        }
+      ],
+      "constraints": {
+        "max_items": 6
+      }
+    },
+    {
+      "key": "nguoi_duoc_chia",
+      "label": "Người được chia chỉ tiêu",
+      "type": "reference_list",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000001",
+      "sortable": false
+    },
+    {
+      "key": "ly_do_gui",
+      "label": "Lý do bị trả lại khi gửi duyệt",
+      "type": "text"
     }
   ],
   "natural_key": [],
@@ -257,6 +508,7 @@
         "ma_don",
         "ten_kh",
         "am",
+        "is",
         "trang_thai",
         "giai_doan"
       ]
@@ -267,6 +519,20 @@
     "schema": {
       "type": "object",
       "properties": {
+        "ma_loai": {
+          "type": "string",
+          "enum": [
+            "tm",
+            "dv"
+          ],
+          "x-entityField": "ma_loai"
+        },
+        "khach_hang": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "khach_hang",
+          "x-entityField": "khach_hang"
+        },
         "ten_kh": {
           "type": "string",
           "x-entityField": "ten_kh"
@@ -283,6 +549,34 @@
           "type": "string",
           "x-entityField": "nguoi_lien_he"
         },
+        "dien_thoai": {
+          "type": "string",
+          "x-entityField": "dien_thoai"
+        },
+        "email": {
+          "type": "string",
+          "x-entityField": "email"
+        },
+        "dia_chi": {
+          "type": "string",
+          "x-entityField": "dia_chi"
+        },
+        "nguoi_dai_dien": {
+          "type": "string",
+          "x-entityField": "nguoi_dai_dien"
+        },
+        "chuc_vu": {
+          "type": "string",
+          "x-entityField": "chuc_vu"
+        },
+        "so_tk": {
+          "type": "string",
+          "x-entityField": "so_tk"
+        },
+        "ngan_hang": {
+          "type": "string",
+          "x-entityField": "ngan_hang"
+        },
         "noi_dung": {
           "type": "string",
           "x-entityField": "noi_dung"
@@ -290,6 +584,49 @@
         "so_hd_noi_bo": {
           "type": "string",
           "x-entityField": "so_hd_noi_bo"
+        },
+        "so_hd_po": {
+          "type": "string",
+          "x-entityField": "so_hd_po"
+        },
+        "ngay_ky": {
+          "type": "string",
+          "format": "date",
+          "x-entityField": "ngay_ky"
+        },
+        "ngay_bao_gia": {
+          "type": "string",
+          "format": "date",
+          "x-entityField": "ngay_bao_gia"
+        },
+        "hieu_luc_den": {
+          "type": "string",
+          "format": "date",
+          "x-entityField": "hieu_luc_den"
+        },
+        "ty_gia": {
+          "type": "number",
+          "x-entityField": "ty_gia"
+        },
+        "nguoi_nhan": {
+          "type": "string",
+          "x-entityField": "nguoi_nhan"
+        },
+        "sdt_nhan": {
+          "type": "string",
+          "x-entityField": "sdt_nhan"
+        },
+        "dia_chi_nhan": {
+          "type": "string",
+          "x-entityField": "dia_chi_nhan"
+        },
+        "email_nhan_license": {
+          "type": "string",
+          "x-entityField": "email_nhan_license"
+        },
+        "ghi_chu_giao": {
+          "type": "string",
+          "x-entityField": "ghi_chu_giao"
         },
         "am": {
           "type": "string",
@@ -315,6 +652,10 @@
         "cong_no_ngay": {
           "type": "number",
           "x-entityField": "cong_no_ngay"
+        },
+        "so_lan_tt": {
+          "type": "number",
+          "x-entityField": "so_lan_tt"
         },
         "nv_trien_khai": {
           "type": "string",
@@ -350,6 +691,43 @@
         "tu_truoc": {
           "type": "boolean",
           "x-entityField": "tu_truoc"
+        },
+        "don_moi": {
+          "type": "boolean",
+          "x-entityField": "don_moi"
+        },
+        "kh_moi": {
+          "type": "boolean",
+          "x-entityField": "kh_moi"
+        },
+        "nguon_kh": {
+          "type": "string",
+          "enum": [
+            "khong",
+            "nguoi",
+            "marketing",
+            "other"
+          ],
+          "x-entityField": "nguon_kh"
+        },
+        "nguon_kh_nguoi": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "user",
+          "x-entityField": "nguon_kh_nguoi"
+        },
+        "hinh_thuc": {
+          "type": "string",
+          "enum": [
+            "hop_dong",
+            "don_hang",
+            "thau"
+          ],
+          "x-entityField": "hinh_thuc"
+        },
+        "giai_doan_deal": {
+          "type": "array",
+          "x-entityField": "giai_doan_deal"
         }
       }
     }
@@ -378,6 +756,10 @@
               {
                 "kind": "field",
                 "field": "is"
+              },
+              {
+                "kind": "field",
+                "field": "nguoi_duoc_chia"
               }
             ]
           },
@@ -391,6 +773,10 @@
               {
                 "kind": "field",
                 "field": "is"
+              },
+              {
+                "kind": "field",
+                "field": "nguoi_duoc_chia"
               }
             ]
           },
@@ -511,6 +897,10 @@
           {
             "operation": "list",
             "scope": "organization"
+          },
+          {
+            "operation": "delete",
+            "scope": "organization"
           }
         ]
       },
@@ -601,7 +991,10 @@
                 "co_dich_vu",
                 "co_hang_hoa",
                 "ky_thuat",
-                "mua_hang"
+                "mua_hang",
+                "ma_loai",
+                "nguoi_duoc_chia",
+                "ly_do_gui"
               ]
             }
           },

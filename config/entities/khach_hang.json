@@ -1,0 +1,270 @@
+{
+  "key": "khach_hang",
+  "name": "Khách hàng",
+  "description": "Danh bạ khách hàng dùng lại giữa các đơn; mã KH không trùng.",
+  "icon": "building",
+  "accent": "teal",
+  "fields": [
+    {
+      "key": "ma_kh",
+      "label": "Mã KH",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "ten",
+      "label": "Tên khách hàng",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "mst",
+      "label": "MST",
+      "type": "text"
+    },
+    {
+      "key": "dia_chi",
+      "label": "Địa chỉ",
+      "type": "text"
+    },
+    {
+      "key": "nguoi_dai_dien",
+      "label": "Người đại diện",
+      "type": "text"
+    },
+    {
+      "key": "chuc_vu",
+      "label": "Chức vụ",
+      "type": "text"
+    },
+    {
+      "key": "so_tk",
+      "label": "Số tài khoản",
+      "type": "text"
+    },
+    {
+      "key": "ngan_hang",
+      "label": "Ngân hàng",
+      "type": "text"
+    },
+    {
+      "key": "hang_kh",
+      "label": "Hạng KH",
+      "type": "enum",
+      "enum_values": [
+        {
+          "value": "vip",
+          "label": "VIP",
+          "color": "amber"
+        },
+        {
+          "value": "tiem_nang",
+          "label": "Tiềm năng",
+          "color": "sky"
+        },
+        {
+          "value": "pho_thong",
+          "label": "Phổ thông",
+          "color": "gray"
+        }
+      ]
+    },
+    {
+      "key": "nguoi_lien_he",
+      "label": "Người liên hệ",
+      "type": "text"
+    },
+    {
+      "key": "email",
+      "label": "Email",
+      "type": "text"
+    },
+    {
+      "key": "dien_thoai",
+      "label": "Điện thoại",
+      "type": "text"
+    }
+  ],
+  "natural_key": [
+    {
+      "id": "theo_ma",
+      "name": "Mã KH",
+      "fields": [
+        "ma_kh"
+      ]
+    }
+  ],
+  "display_field": "ten",
+  "views": [
+    {
+      "key": "all",
+      "name": "Khách hàng",
+      "columns": [
+        "ma_kh",
+        "ten",
+        "mst",
+        "dia_chi"
+      ]
+    }
+  ],
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sales}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "create_form": {
+    "name": "Khách hàng",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ma_kh": {
+          "type": "string",
+          "x-entityField": "ma_kh"
+        },
+        "ten": {
+          "type": "string",
+          "x-entityField": "ten"
+        },
+        "mst": {
+          "type": "string",
+          "x-entityField": "mst"
+        },
+        "dia_chi": {
+          "type": "string",
+          "x-entityField": "dia_chi"
+        },
+        "nguoi_dai_dien": {
+          "type": "string",
+          "x-entityField": "nguoi_dai_dien"
+        },
+        "chuc_vu": {
+          "type": "string",
+          "x-entityField": "chuc_vu"
+        },
+        "so_tk": {
+          "type": "string",
+          "x-entityField": "so_tk"
+        },
+        "ngan_hang": {
+          "type": "string",
+          "x-entityField": "ngan_hang"
+        },
+        "hang_kh": {
+          "type": "string",
+          "enum": [
+            "vip",
+            "tiem_nang",
+            "pho_thong"
+          ],
+          "x-entityField": "hang_kh"
+        },
+        "nguoi_lien_he": {
+          "type": "string",
+          "x-entityField": "nguoi_lien_he"
+        },
+        "email": {
+          "type": "string",
+          "x-entityField": "email"
+        },
+        "dien_thoai": {
+          "type": "string",
+          "x-entityField": "dien_thoai"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "label": "Các đợt thanh toán",
+  "type": "list",
+  "sortable": false,
+  "item_fields": [
+    {
+      "key": "ten",
+      "label": "Đợt",
+      "type": "text"
+    },
+    {
+      "key": "ty_le",
+      "label": "Tỷ lệ %",
+      "type": "number"
+    },
+    {
+      "key": "ngay",
+      "label": "Ngày",
+      "type": "number"
+    }
+  ]
+}

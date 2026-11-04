@@ -1,0 +1,7 @@
+{
+  "label": "Đơn hàng",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:don_hang",
+  "required": true,
+  "on_target_delete": "cascade"
+}

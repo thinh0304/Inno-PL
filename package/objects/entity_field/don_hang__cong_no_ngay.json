@@ -1,5 +1,4 @@
 {
   "label": "Số ngày công nợ",
-  "type": "number",
-  "required": true
+  "type": "number"
 }

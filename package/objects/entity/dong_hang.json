@@ -14,7 +14,12 @@
     "@obj:entity_field:dong_hang/loai",
     "@obj:entity_field:dong_hang/so_thang",
     "@obj:entity_field:dong_hang/gia_mua",
-    "@obj:entity_field:dong_hang/ncc"
+    "@obj:entity_field:dong_hang/gia_mua_usd",
+    "@obj:entity_field:dong_hang/vat",
+    "@obj:entity_field:dong_hang/ncc_id",
+    "@obj:entity_field:dong_hang/co_cq",
+    "@obj:entity_field:dong_hang/ngay_bat_dau",
+    "@obj:entity_field:dong_hang/ngay_ket_thuc"
   ],
   "natural_key": [],
   "display_field": "mo_ta",

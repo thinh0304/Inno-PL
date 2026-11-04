@@ -1,0 +1,253 @@
+{
+  "key": "nha_cung_cap",
+  "name": "Nhà cung cấp",
+  "description": "Danh bạ nhà cung cấp dùng chung; dòng hàng chỉ chọn theo tên.",
+  "icon": "truck",
+  "accent": "amber",
+  "fields": [
+    {
+      "key": "ten",
+      "label": "Tên nhà cung cấp",
+      "type": "text",
+      "required": true
+    },
+    {
+      "key": "nguoi_lien_he",
+      "label": "Người liên hệ",
+      "type": "text"
+    },
+    {
+      "key": "sdt",
+      "label": "SĐT",
+      "type": "text"
+    },
+    {
+      "key": "email",
+      "label": "Email",
+      "type": "text"
+    },
+    {
+      "key": "cong_no_ngay",
+      "label": "Công nợ (ngày)",
+      "type": "number"
+    },
+    {
+      "key": "dot_thanh_toan",
+      "label": "Các đợt thanh toán",
+      "type": "list",
+      "sortable": false,
+      "item_fields": [
+        {
+          "key": "ten",
+          "label": "Đợt",
+          "type": "text"
+        },
+        {
+          "key": "ty_le",
+          "label": "Tỷ lệ %",
+          "type": "number"
+        },
+        {
+          "key": "ngay",
+          "label": "Ngày",
+          "type": "number"
+        }
+      ]
+    }
+  ],
+  "natural_key": [
+    {
+      "id": "theo_ten",
+      "name": "Tên",
+      "fields": [
+        "ten"
+      ]
+    }
+  ],
+  "display_field": "ten",
+  "views": [
+    {
+      "key": "all",
+      "name": "Nhà cung cấp",
+      "columns": [
+        "ten",
+        "nguoi_lien_he",
+        "sdt",
+        "email"
+      ]
+    }
+  ],
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sales}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_proc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tm}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "create_form": {
+    "name": "Nhà cung cấp",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "ten": {
+          "type": "string",
+          "x-entityField": "ten"
+        },
+        "nguoi_lien_he": {
+          "type": "string",
+          "x-entityField": "nguoi_lien_he"
+        },
+        "sdt": {
+          "type": "string",
+          "x-entityField": "sdt"
+        },
+        "email": {
+          "type": "string",
+          "x-entityField": "email"
+        },
+        "cong_no_ngay": {
+          "type": "number",
+          "x-entityField": "cong_no_ngay"
+        },
+        "dot_thanh_toan": {
+          "type": "array",
+          "x-entityField": "dot_thanh_toan"
+        }
+      }
+    }
+  }
+}

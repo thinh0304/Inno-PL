@@ -114,18 +114,21 @@ What v1 learnt about AgentFlow, which any app here will meet (details and repros
   `nhom_tm`, `nhom_proc`, `nhom_sd`, `nhom_acc`, `nhom_admin`, plus the automation pair `tu_dong_principal` and
   `nhom_tu_dong`); raise `version` for every release. Its `ui` and `launcher` members declare the module and its entry.
 - `config/entities/`: `don_hang`, `dong_hang`, `gia_ban_dong`, `tai_chinh_don`, `task` (a `work` entity: one record per
-  task of an order), `cau_hinh`. The money lives apart from what Kỹ thuật and Mua hàng read (spec §11.4).
+  task of an order), `cau_hinh`, and (Phase 2) `khach_hang`, `nha_cung_cap` (address books), `de_xuat_mua_hang` (only PROC, SD, ACC
+  and Admin read), `tom_tat_don` (the part of an order TM or PROC may see, written by the workflow), `lich_su` (append-only). The money lives apart from what Kỹ thuật and Mua hàng read (spec §11.4).
   `config/build/dieu-phoi.mjs` is the one workflow (trigger on a task's status; runs as the automation principal);
   `agentflow.app.mjs` merges it.
 - `src/domain/`: the pure functions the module and the Code step share: `pl.ts` (the P&L formula), `lines.ts`, `config.ts`
-  (defaults), `flow.ts` (which tasks open when), `codes.ts`. `src/code/dieu-phoi.ts` is the Code step's entry; esbuild bundles
+  (defaults), `flow.ts` (which tasks open when), `codes.ts`, `form.ts` (an order as typed), `validate.ts` (format and required
+  rules, spec §12.1–12.2), `stages.ts` (deal-stage shares), `records.ts` (records ↔ form; `forCreate` drops empty fields because a
+  create form refuses `null`), `summary.ts`, `plinput.ts`. Never write a regex with a backslash through a shell or Python heredoc: use the editor tools. `src/code/dieu-phoi.ts` is the Code step's entry; esbuild bundles
   it into `config/code/dieu-phoi.js` (`scripts/build-code.mjs`): never edit that file by hand.
 - `src/module/`: `module.tsx` (the entry, `mount(root, host)`), `mount.tsx` (the stylesheet in the shadow root, the
   language and the theme), `App.tsx` (routes `/`, `/don/new`, `/don/<id>`, `/viec`), `api.ts` (records through `host.api`),
   `model.ts`, `screens/`, `kit.tsx`, `format.ts`, `text.ts` (vi and en), `styles.css`, `demo.tsx`.
 - `test/domain/`, `test/code/` (`run-code.ts` runs a Code step as AgentFlow does), `test/module/`, and
-  `e2e/p01-lat-mong.sandbox.test.ts` (Phase 1 on the sandbox).
-- `sandbox.json`: one person per role (`am1`, `is1`, `tm1`, `proc1`, `sd1`, `acc1`, `admin`) and the automation principal.
+  `e2e/helpers.ts` (shared sandbox calls and `newOrder`), `e2e/p01-lat-mong.sandbox.test.ts` and `e2e/p02-quyen.sandbox.test.ts`.
+- `sandbox.json`: one person per role (`am1`, `is1`, `tm1`, `proc1`, `sd1`, `acc1`, `admin`), `am2` (shares an order's target) and `am3` (unrelated), and the automation principal.
 - `docs/superpowers/specs/2026-11-04-pl-v2-design.md`: the spec; `docs/superpowers/plans/`: the roadmap and each phase's plan.
 - `docs/sdk-feedback.md`: the platform's snags, F-01 onwards. Add an F-xx for each new one, with "Cách tái hiện" and
   "Đề xuất".

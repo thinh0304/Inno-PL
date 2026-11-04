@@ -4,11 +4,11 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { LinesTable } from '../../src/module/screens/LinesTable';
 import { TaskActions, TaskList } from '../../src/module/screens/ViecCuaBan';
-import { onlyMine, type LineDraft } from '../../src/module/model';
+import { emptyLine, onlyMine, type LineForm } from '../../src/module/model';
 
 afterEach(cleanup);
 
-const line = (loai: string): LineDraft => ({ mo_ta: 'Dòng', dvt: 'Gói', so_luong: 1, loai, so_thang: 12, gia_mua: 1, don_gia_ban: 2, chiet_khau: 0, sku: '', ncc: '' });
+const line = (loai: string): LineForm => ({ ...emptyLine(), mo_ta: 'Dòng', dvt: 'Gói', so_luong: 1, loai, so_thang: 12, gia_mua: 1, don_gia_ban: 2 });
 
 describe('LinesTable', () => {
   it('ô số tháng đổi tên theo loại dòng: dịch vụ định kỳ → số tháng dịch vụ, TB → tháng bảo hành', () => {

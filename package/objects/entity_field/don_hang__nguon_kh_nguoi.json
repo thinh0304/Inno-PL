@@ -1,0 +1,5 @@
+{
+  "label": "Người mang KH về",
+  "type": "reference",
+  "target_entity_id": "@req:entity:user"
+}

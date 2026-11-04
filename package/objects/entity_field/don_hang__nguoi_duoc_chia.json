@@ -1,0 +1,6 @@
+{
+  "label": "Người được chia chỉ tiêu",
+  "type": "reference_list",
+  "target_entity_id": "@req:entity:user",
+  "sortable": false
+}

@@ -1,0 +1,5 @@
+{
+  "label": "Hồ sơ khách hàng",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:khach_hang"
+}

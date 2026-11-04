@@ -1,7 +1,6 @@
 {
   "label": "Hạng KH",
   "type": "enum",
-  "required": true,
   "facetable": true,
   "enum_values": [
     {

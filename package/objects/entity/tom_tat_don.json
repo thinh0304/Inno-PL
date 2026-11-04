@@ -1,0 +1,53 @@
+{
+  "name": "Tóm tắt đơn",
+  "description": "Số liệu rút gọn cho Kỹ thuật (phần dịch vụ) và Mua hàng (phần hàng hóa); hệ thống ghi.",
+  "icon": "clipboard",
+  "accent": "slate",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:tom_tat_don/don_hang",
+    "@obj:entity_field:tom_tat_don/phan",
+    "@obj:entity_field:tom_tat_don/du_lieu",
+    "@obj:entity_field:tom_tat_don/nhom_xem"
+  ],
+  "natural_key": [
+    {
+      "id": "theo_don_phan",
+      "name": "Một bản mỗi phần của đơn",
+      "fields": [
+        "don_hang",
+        "phan"
+      ]
+    }
+  ],
+  "display_field": "phan",
+  "create_form": "@obj:form:tom_tat_don",
+  "rules": [
+    {
+      "key": "chi_he_thong_ghi",
+      "message": "Bản tóm tắt do hệ thống ghi",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_new"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "@param:nhom_tu_dong"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

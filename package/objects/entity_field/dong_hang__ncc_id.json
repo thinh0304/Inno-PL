@@ -1,0 +1,5 @@
+{
+  "label": "Nhà cung cấp",
+  "type": "reference",
+  "target_entity_id": "@obj:entity:nha_cung_cap"
+}

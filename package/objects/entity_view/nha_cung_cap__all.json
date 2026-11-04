@@ -1,0 +1,14 @@
+{
+  "name": "Nhà cung cấp",
+  "type": "grid",
+  "columns": [
+    "ten",
+    "nguoi_lien_he",
+    "sdt",
+    "email"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

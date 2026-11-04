@@ -1,0 +1,14 @@
+{
+  "name": "Đề xuất mua hàng",
+  "type": "grid",
+  "columns": [
+    "dong_hang",
+    "don_hang",
+    "gia_mua_de_xuat",
+    "ncc_id"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

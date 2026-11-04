@@ -1,0 +1,5 @@
+{
+  "label": "Đơn giá mua đề xuất",
+  "type": "number",
+  "required": true
+}

@@ -101,3 +101,10 @@
 .tasks { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
 .task { border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: grid; gap: 8px; }
 .actions { display: grid; gap: 8px; }
+
+.pl [aria-invalid='true'] { border-color: var(--danger); background: var(--danger-soft); }
+.pl .err, .pl small.err { color: var(--danger-ink); font-size: 12px; }
+.pl td.err { color: var(--danger-ink); font-weight: 600; }
+.suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.conflicts { display: grid; gap: 8px; margin-top: 8px; padding: 8px 12px; background: var(--warn-soft); border-radius: var(--r); }
+.tbl-wrap input, .tbl-wrap select { min-width: 72px; }

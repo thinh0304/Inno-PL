@@ -43,6 +43,26 @@
       "key": "chot_luc",
       "label": "Chốt lúc",
       "type": "datetime"
+    },
+    {
+      "key": "so_hd_truoc",
+      "label": "Số HĐ / PO năm trước",
+      "type": "text"
+    },
+    {
+      "key": "cpbh_truoc",
+      "label": "CPBH năm trước",
+      "type": "number"
+    },
+    {
+      "key": "doanh_thu_truoc",
+      "label": "Doanh thu năm trước",
+      "type": "number"
+    },
+    {
+      "key": "ln_truoc",
+      "label": "LN thuần năm trước",
+      "type": "number"
     }
   ],
   "natural_key": [
@@ -82,6 +102,22 @@
         "cpbh": {
           "type": "number",
           "x-entityField": "cpbh"
+        },
+        "so_hd_truoc": {
+          "type": "string",
+          "x-entityField": "so_hd_truoc"
+        },
+        "cpbh_truoc": {
+          "type": "number",
+          "x-entityField": "cpbh_truoc"
+        },
+        "doanh_thu_truoc": {
+          "type": "number",
+          "x-entityField": "doanh_thu_truoc"
+        },
+        "ln_truoc": {
+          "type": "number",
+          "x-entityField": "ln_truoc"
         }
       }
     }
@@ -123,6 +159,11 @@
                 "kind": "parent_field",
                 "field": "don_hang",
                 "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
               }
             ]
           },
@@ -138,6 +179,11 @@
                 "kind": "parent_field",
                 "field": "don_hang",
                 "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
               }
             ]
           },
@@ -206,6 +252,10 @@
           {
             "operation": "list",
             "scope": "organization"
+          },
+          {
+            "operation": "delete",
+            "scope": "organization"
           }
         ]
       },
@@ -243,8 +293,20 @@
           {
             "kind": "write",
             "write": {
-              "op": "changed",
-              "field": "cpbh"
+              "op": "is_update"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "changed_any",
+              "fields": [
+                "cpbh",
+                "so_hd_truoc",
+                "cpbh_truoc",
+                "doanh_thu_truoc",
+                "ln_truoc"
+              ]
             }
           },
           {

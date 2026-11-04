@@ -1,0 +1,8 @@
+{
+  "label": "Đơn hàng mới",
+  "type": "boolean",
+  "default": {
+    "kind": "literal",
+    "value": true
+  }
+}

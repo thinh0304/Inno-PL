@@ -1,0 +1,32 @@
+{
+  "name": "Khách hàng",
+  "description": "Danh bạ khách hàng dùng lại giữa các đơn; mã KH không trùng.",
+  "icon": "building",
+  "accent": "teal",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:khach_hang/ma_kh",
+    "@obj:entity_field:khach_hang/ten",
+    "@obj:entity_field:khach_hang/mst",
+    "@obj:entity_field:khach_hang/dia_chi",
+    "@obj:entity_field:khach_hang/nguoi_dai_dien",
+    "@obj:entity_field:khach_hang/chuc_vu",
+    "@obj:entity_field:khach_hang/so_tk",
+    "@obj:entity_field:khach_hang/ngan_hang",
+    "@obj:entity_field:khach_hang/hang_kh",
+    "@obj:entity_field:khach_hang/nguoi_lien_he",
+    "@obj:entity_field:khach_hang/email",
+    "@obj:entity_field:khach_hang/dien_thoai"
+  ],
+  "natural_key": [
+    {
+      "id": "theo_ma",
+      "name": "Mã KH",
+      "fields": [
+        "ma_kh"
+      ]
+    }
+  ],
+  "display_field": "ten",
+  "create_form": "@obj:form:khach_hang"
+}

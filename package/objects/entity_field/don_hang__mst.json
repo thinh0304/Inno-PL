@@ -1,5 +1,4 @@
 {
   "label": "MST",
-  "type": "text",
-  "required": true
+  "type": "text"
 }

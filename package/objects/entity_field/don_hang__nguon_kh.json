@@ -1,0 +1,30 @@
+{
+  "label": "Nguồn KH",
+  "type": "enum",
+  "default": {
+    "kind": "literal",
+    "value": "khong"
+  },
+  "enum_values": [
+    {
+      "value": "khong",
+      "label": "Không (KH cũ)",
+      "color": "gray"
+    },
+    {
+      "value": "nguoi",
+      "label": "Một người",
+      "color": "sky"
+    },
+    {
+      "value": "marketing",
+      "label": "Team Marketing",
+      "color": "teal"
+    },
+    {
+      "value": "other",
+      "label": "Other",
+      "color": "gray"
+    }
+  ]
+}

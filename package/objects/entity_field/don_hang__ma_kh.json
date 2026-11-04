@@ -1,5 +1,4 @@
 {
   "label": "Mã KH",
-  "type": "text",
-  "required": true
+  "type": "text"
 }

@@ -1,0 +1,20 @@
+{
+  "name": "Lịch sử",
+  "description": "Lịch sử xử lý đơn: chỉ thêm, không sửa, không xóa.",
+  "icon": "archive",
+  "accent": "slate",
+  "access": "restricted",
+  "fields": [
+    "@obj:entity_field:lich_su/don_hang",
+    "@obj:entity_field:lich_su/thoi_gian",
+    "@obj:entity_field:lich_su/nguoi",
+    "@obj:entity_field:lich_su/hanh_dong",
+    "@obj:entity_field:lich_su/task",
+    "@obj:entity_field:lich_su/ghi_chu",
+    "@obj:entity_field:lich_su/truoc",
+    "@obj:entity_field:lich_su/sau"
+  ],
+  "natural_key": [],
+  "display_field": "hanh_dong",
+  "create_form": "@obj:form:lich_su"
+}

@@ -1,0 +1,235 @@
+{
+  "key": "tom_tat_don",
+  "name": "Tóm tắt đơn",
+  "description": "Số liệu rút gọn cho Kỹ thuật (phần dịch vụ) và Mua hàng (phần hàng hóa); hệ thống ghi.",
+  "icon": "clipboard",
+  "accent": "slate",
+  "fields": [
+    {
+      "key": "don_hang",
+      "label": "Đơn hàng",
+      "type": "reference",
+      "target_entity_id": "${entity:don_hang}",
+      "required": true,
+      "on_target_delete": "cascade"
+    },
+    {
+      "key": "phan",
+      "label": "Phần",
+      "type": "enum",
+      "required": true,
+      "enum_values": [
+        {
+          "value": "dich_vu",
+          "label": "Dịch vụ",
+          "color": "violet"
+        },
+        {
+          "value": "hang_hoa",
+          "label": "Hàng hóa",
+          "color": "amber"
+        }
+      ]
+    },
+    {
+      "key": "du_lieu",
+      "label": "Dữ liệu tóm tắt (JSON)",
+      "type": "text"
+    },
+    {
+      "key": "nhom_xem",
+      "label": "Nhóm được xem",
+      "type": "reference_list",
+      "target_entity_id": "ffffffff-0000-0000-0000-000000000002",
+      "sortable": false
+    }
+  ],
+  "natural_key": [
+    {
+      "id": "theo_don_phan",
+      "name": "Một bản mỗi phần của đơn",
+      "fields": [
+        "don_hang",
+        "phan"
+      ]
+    }
+  ],
+  "display_field": "phan",
+  "views": [
+    {
+      "key": "all",
+      "name": "Tóm tắt đơn",
+      "columns": [
+        "don_hang",
+        "phan",
+        "du_lieu",
+        "nhom_xem"
+      ]
+    }
+  ],
+  "access": {
+    "mode": "restricted",
+    "grants": [
+      {
+        "principal": {
+          "kind": "everyone"
+        },
+        "operations": [
+          {
+            "operation": "read",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom_xem"
+              }
+            ]
+          },
+          {
+            "operation": "list",
+            "record_scopes": [
+              {
+                "kind": "field",
+                "field": "nhom_xem"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_sd}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_acc}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_admin}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "delete",
+            "scope": "organization"
+          }
+        ]
+      },
+      {
+        "principal": {
+          "kind": "group",
+          "id": "${param:nhom_tu_dong}"
+        },
+        "design": false,
+        "operations": [
+          {
+            "operation": "create",
+            "scope": "organization"
+          },
+          {
+            "operation": "read",
+            "scope": "organization"
+          },
+          {
+            "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "update",
+            "scope": "organization"
+          }
+        ]
+      }
+    ]
+  },
+  "conversation": null,
+  "create_form": {
+    "name": "Tóm tắt đơn",
+    "schema": {
+      "type": "object",
+      "properties": {
+        "don_hang": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "don_hang",
+          "x-entityField": "don_hang"
+        },
+        "phan": {
+          "type": "string",
+          "enum": [
+            "dich_vu",
+            "hang_hoa"
+          ],
+          "x-entityField": "phan"
+        },
+        "du_lieu": {
+          "type": "string",
+          "x-entityField": "du_lieu"
+        }
+      }
+    }
+  },
+  "rules": [
+    {
+      "key": "chi_he_thong_ghi",
+      "message": "Bản tóm tắt do hệ thống ghi",
+      "condition": {
+        "join": "and",
+        "leaves": [
+          {
+            "kind": "write",
+            "write": {
+              "op": "is_new"
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "actor",
+              "negate": true,
+              "test": {
+                "kind": "in_group",
+                "group_id": "${param:nhom_tu_dong}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

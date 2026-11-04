@@ -119,9 +119,71 @@
       "type": "number"
     },
     {
-      "key": "ncc",
+      "key": "gia_mua_usd",
+      "label": "Đơn giá mua (USD)",
+      "type": "number"
+    },
+    {
+      "key": "vat",
+      "label": "VAT",
+      "type": "enum",
+      "default": {
+        "kind": "literal",
+        "value": "8"
+      },
+      "enum_values": [
+        {
+          "value": "kct",
+          "label": "KCT"
+        },
+        {
+          "value": "0",
+          "label": "0%"
+        },
+        {
+          "value": "5",
+          "label": "5%"
+        },
+        {
+          "value": "8",
+          "label": "8%"
+        },
+        {
+          "value": "10",
+          "label": "10%"
+        }
+      ]
+    },
+    {
+      "key": "ncc_id",
       "label": "Nhà cung cấp",
-      "type": "text"
+      "type": "reference",
+      "target_entity_id": "${entity:nha_cung_cap}"
+    },
+    {
+      "key": "co_cq",
+      "label": "Khách yêu cầu CO/CQ",
+      "type": "enum",
+      "enum_values": [
+        {
+          "value": "co",
+          "label": "Có"
+        },
+        {
+          "value": "khong",
+          "label": "Không"
+        }
+      ]
+    },
+    {
+      "key": "ngay_bat_dau",
+      "label": "Ngày bắt đầu",
+      "type": "date"
+    },
+    {
+      "key": "ngay_ket_thuc",
+      "label": "Ngày kết thúc",
+      "type": "date"
     }
   ],
   "natural_key": [],
@@ -198,9 +260,44 @@
           "type": "number",
           "x-entityField": "gia_mua"
         },
-        "ncc": {
+        "gia_mua_usd": {
+          "type": "number",
+          "x-entityField": "gia_mua_usd"
+        },
+        "vat": {
           "type": "string",
-          "x-entityField": "ncc"
+          "enum": [
+            "kct",
+            "0",
+            "5",
+            "8",
+            "10"
+          ],
+          "x-entityField": "vat"
+        },
+        "ncc_id": {
+          "type": "string",
+          "format": "entity",
+          "x-entity": "nha_cung_cap",
+          "x-entityField": "ncc_id"
+        },
+        "co_cq": {
+          "type": "string",
+          "enum": [
+            "co",
+            "khong"
+          ],
+          "x-entityField": "co_cq"
+        },
+        "ngay_bat_dau": {
+          "type": "string",
+          "format": "date",
+          "x-entityField": "ngay_bat_dau"
+        },
+        "ngay_ket_thuc": {
+          "type": "string",
+          "format": "date",
+          "x-entityField": "ngay_ket_thuc"
         }
       }
     }
@@ -242,6 +339,11 @@
                 "kind": "parent_field",
                 "field": "don_hang",
                 "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
               }
             ]
           },
@@ -257,6 +359,11 @@
                 "kind": "parent_field",
                 "field": "don_hang",
                 "parent_field": "is"
+              },
+              {
+                "kind": "parent_field",
+                "field": "don_hang",
+                "parent_field": "nguoi_duoc_chia"
               }
             ]
           },
@@ -397,6 +504,10 @@
           },
           {
             "operation": "list",
+            "scope": "organization"
+          },
+          {
+            "operation": "delete",
             "scope": "organization"
           }
         ]

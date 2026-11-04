@@ -1,0 +1,14 @@
+{
+  "name": "Lịch sử",
+  "type": "grid",
+  "columns": [
+    "don_hang",
+    "thoi_gian",
+    "nguoi",
+    "hanh_dong"
+  ],
+  "sort": {
+    "key": "updated_at",
+    "dir": "desc"
+  }
+}

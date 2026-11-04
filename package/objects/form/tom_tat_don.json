@@ -1,0 +1,30 @@
+{
+  "name": "Tóm tắt đơn",
+  "schema_json": {
+    "type": "object",
+    "properties": {
+      "don_hang": {
+        "type": "string",
+        "format": "entity",
+        "x-entity": "@obj.key:entity:don_hang",
+        "x-entityField": "don_hang"
+      },
+      "phan": {
+        "type": "string",
+        "enum": [
+          "dich_vu",
+          "hang_hoa"
+        ],
+        "x-entityField": "phan"
+      },
+      "du_lieu": {
+        "type": "string",
+        "x-entityField": "du_lieu"
+      }
+    }
+  },
+  "ui_schema_json": {
+    "type": "VerticalLayout"
+  },
+  "bound_entity_id": "@obj:entity:tom_tat_don"
+}
