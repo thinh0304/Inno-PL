@@ -97,13 +97,14 @@ var APP = (() => {
     const dropRequests = () => requests.map((r) => ({ id: r.id, status: "huy" }));
     const request = (code) => requests.find((r) => r.code === code);
     const doneNow = (c) => live.some((x) => x.code === c && DONE.includes(x.status));
-    if (order.status === "close_lost" || order.status === "hoan_tat") return { create: [], update: dropRequests(), order: {} };
+    if (order.status === "close_lost") return { create: [], update: [...live.map((x) => ({ id: x.id, status: "huy" })), ...dropRequests()], order: {}, flags: { noWrite: true } };
+    if (order.status === "hoan_tat") return { create: [], update: dropRequests(), order: {}, flags: { noWrite: true } };
     if (request("yc_close_lost")) {
-      if (doneNow("t41")) return { create: [], update: dropRequests(), order: {}, flags: { closeLostRejected: true } };
-      return { create: [], update: [...live.map((x) => ({ id: x.id, status: "huy" })), ...dropRequests()], order: { status: "close_lost" }, flags: { closeLost: true } };
+      if (doneNow("t41")) return { create: [], update: dropRequests(), order: {}, flags: { closeLostRejected: true, noWrite: true } };
+      return { create: [], update: [...live.map((x) => ({ id: x.id, status: "huy" })), ...dropRequests()], order: { status: "close_lost", choDuyetLai: false }, flags: { closeLost: true } };
     }
     if (request("yc_xin_duyet_lai")) {
-      if (order.status !== "da_phe_duyet") return { create: [], update: dropRequests(), order: {}, flags: { reapprovalRejected: true } };
+      if (order.status !== "da_phe_duyet") return { create: [], update: dropRequests(), order: {}, flags: { reapprovalRejected: true, noWrite: true } };
       const stage4 = live.filter((x) => TASKS[x.code].stage >= 4 || x.code === "t31");
       return {
         create: [{ code: "t31", role: "sd", status: "dang_lam" }],
@@ -746,8 +747,8 @@ var APP = (() => {
     const issues = validateOrder(order, lines);
     const t11Done = tasks.some((t) => t.ma === "t11" && t.trang_thai === "xong");
     const gated = t11Done && issues.length > 0 && (status === "nhap" || status === "tra_lai");
-    const owners = [idOf(don.am), idOf(don.is)];
-    const badRequest = (t) => str(t.ma).startsWith("yc_") && t.trang_thai === "dang_lam" && (!owners.includes(idOf(t.nguoi_tao)) || !str(t.ly_do).trim());
+    const isId = idOf(don.is);
+    const badRequest = (t) => str(t.ma).startsWith("yc_") && t.trang_thai === "dang_lam" && (!isId || idOf(t.nguoi_tao) !== isId || !str(t.ly_do).trim());
     const rejected = tasks.filter(badRequest);
     const proposals = list(inputs.de_xuat).map((p) => ({
       dong_hang: idOf(p.dong_hang) ?? "",
@@ -786,7 +787,7 @@ var APP = (() => {
     else if (returned) lich_su.push(history("tra_lai", str(returned.ma), reason));
     else if (actions.create.some((c) => (c.code === "t22" || c.code === "t23") && !reopenT23)) lich_su.push(history("gui_duyet", "t11"));
     if (reopenT23) lich_su.push(history("tra_lai_may_chu", "t23", proposalIssues.map((i) => i.field).join(", ")));
-    for (const t of rejected) lich_su.push(history("tu_choi_yeu_cau", str(t.ma), str(t.ly_do) || "thi\u1EBFu l\xFD do ho\u1EB7c kh\xF4ng ph\u1EA3i AM / IS c\u1EE7a \u0111\u01A1n"));
+    for (const t of rejected) lich_su.push(history("tu_choi_yeu_cau", str(t.ma), str(t.ly_do) || "thi\u1EBFu l\xFD do ho\u1EB7c kh\xF4ng ph\u1EA3i IS c\u1EE7a \u0111\u01A1n"));
     if (flags.closeLost && request) lich_su.push(history("close_lost", "", str(request.ly_do)));
     if (flags.closeLostRejected && request) lich_su.push(history("tu_choi_yeu_cau", str(request.ma), "\u0111\xE3 qua t41"));
     if (flags.reapproval && request) lich_su.push(history("xin_duyet_lai", "t31", str(request.ly_do)));
@@ -821,17 +822,21 @@ var APP = (() => {
     }
     const t61 = tasks.find((t) => t.ma === "t61" && t.trang_thai === "xong");
     const renewal = flags.completed ? renewalOf(lines, dateOnly(t61?.done_at)) : { ngay_het_han: str(don.ngay_het_han), theo_doi_tai_ky: don.theo_doi_tai_ky === true };
+    const toTask = (c) => ({
+      don_hang: don.id,
+      ma: c.code,
+      vai_tro: c.role,
+      trang_thai: c.status,
+      sla_ngay: cfg.slaDays[c.code] ?? 0,
+      am: idOf(don.am),
+      is: idOf(don.is),
+      nhom: groupOf(c.role)
+    });
+    const quiet = !!flags.noWrite || str(trigger.ma).startsWith("yc_") && rejected.some((t) => t.id === trigger.id);
     return {
-      tao: actions.create.map((c) => ({
-        don_hang: don.id,
-        ma: c.code,
-        vai_tro: c.role,
-        trang_thai: c.status,
-        sla_ngay: cfg.slaDays[c.code] ?? 0,
-        am: idOf(don.am),
-        is: idOf(don.is),
-        nhom: groupOf(c.role)
-      })),
+      ghi: !quiet,
+      tao: quiet ? [] : actions.create.map(toTask).filter((t) => t.sla_ngay > 0),
+      tao_khong_han: quiet ? [] : actions.create.map(toTask).filter((t) => t.sla_ngay <= 0),
       cap_nhat: actions.update.map((u) => ({ id: u.id, trang_thai: u.status })),
       don: {
         trang_thai: newStatus,

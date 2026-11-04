@@ -71,7 +71,7 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
   useEffect(() => { void Promise.all([api.customers(), api.suppliers()]).then(([c, s]) => { setCustomers(c); setSuppliers(s); }, () => undefined); }, [api]);
   useEffect(() => { void api.previousOrders(order.ma_kh, id ?? undefined).then(setPrevious, () => setPrevious([])); }, [api, order.ma_kh, id]);
 
-  const editable = !id || (loaded ? ['nhap', 'tra_lai'].includes(loaded.trang_thai) : false);
+  const editable = !id || (loaded ? ['nhap', 'tra_lai'].includes(loaded.trang_thai) || loaded.choDuyetLai : false);
   const seesMoney = !id || (loaded?.seesMoney ?? false);
   const plIn = useMemo(() => plInputFromForm(order, lines), [order, lines]);
   const live = useMemo(() => computePl(plIn, DEFAULT_CONFIG), [plIn]);
@@ -170,7 +170,7 @@ export function DonHang({ api, lang, id, onBack, onCreated }: { api: Api; lang: 
         </section>
       ) : null}
 
-      {id && loaded ? (
+      {id && loaded && order.is === api.me ? (
         <RequestPanel lang={lang} busy={busy} status={loaded.trang_thai} tasks={loaded.tasks}
           onRequest={(kind, reason) => void run(async () => { await api.requestOrder(id, kind, reason); setMessage({ kind: 'ok', text: t.requestSent }); })} />
       ) : null}

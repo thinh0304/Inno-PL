@@ -164,7 +164,24 @@ describe('nextActions: đủ 15 task', () => {
     expect(a.update).toEqual([{ id: 'id2', status: 'huy' }]);
     expect(a.flags?.reapprovalRejected).toBe(true);
   });
-  it('đơn đã close_lost hoặc hoàn tất: không làm gì', () => {
-    expect(nextActions({ ...MIXED, status: 'close_lost' }, upTo(D('t11')), ALL)).toMatchObject({ create: [], update: [], order: {} });
+  it('đơn đã close_lost: hủy nốt task còn sống, không tạo gì', () => {
+    expect(nextActions({ ...MIXED, status: 'close_lost' }, upTo(D('t11')), ALL)).toMatchObject({ create: [], update: [{ id: 'id0', status: 'huy' }], order: {} });
+  });
+});
+
+describe('nextActions: review cuối Phase 3', () => {
+  it('Close-lost lúc đang chờ duyệt lại: tắt cờ duyệt lại', () => {
+    const tasks = upTo(D('t11'), D('t22'), ['t23', 'bo_qua'], ['t31', 'dang_lam'], ['yc_close_lost', 'dang_lam']);
+    const a = nextActions({ ...SERVICE_ONLY, status: 'dang_xu_ly', reapproval: true }, tasks, ALL);
+    expect(a.order).toEqual({ status: 'close_lost', choDuyetLai: false });
+  });
+  it('đơn đã close_lost mà còn task sống (lượt chạy chồng): hủy nốt', () => {
+    const a = nextActions({ ...MIXED, status: 'close_lost' }, upTo(D('t11'), ['t41', 'dang_lam']), ALL);
+    expect(a.update).toEqual([{ id: 'id0', status: 'huy' }, { id: 'id1', status: 'huy' }]);
+  });
+  it('yêu cầu bị từ chối: không ghi gì ngoài hủy yêu cầu (flag noWrite)', () => {
+    const a = nextActions({ ...MIXED, status: 'dang_xu_ly' }, upTo(D('t11'), ['yc_xin_duyet_lai', 'dang_lam']), ALL);
+    expect(a.flags?.reapprovalRejected).toBe(true);
+    expect(a.flags?.noWrite).toBe(true);
   });
 });

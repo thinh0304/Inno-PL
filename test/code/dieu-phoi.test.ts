@@ -120,7 +120,7 @@ describe('Code step dieu_phoi', () => {
       expect(out.tao.map((x: { ma: string }) => x.ma)).toEqual(['t31']);
     });
 
-    it('Close-lost của AM/IS của đơn: hủy mọi task, đơn close_lost, ghi lịch sử', async () => {
+    it('Close-lost của IS của đơn: hủy mọi task, đơn close_lost, ghi lịch sử', async () => {
       const tasks = [...T23, { id: 'k4', ma: 'yc_close_lost', trang_thai: 'dang_lam', ly_do: 'KH chọn nhà thầu khác', nguoi_tao: 'u-is' }];
       const out = await runCode('dieu-phoi.js', withProposals([], tasks, 'da_phe_duyet'));
       expect(out.don.trang_thai).toBe('close_lost');
@@ -128,14 +128,23 @@ describe('Code step dieu_phoi', () => {
       expect(out.lich_su.map((h: { hanh_dong: string }) => h.hanh_dong)).toContain('close_lost');
     });
 
-    it('yêu cầu của người không phải AM/IS của đơn, hoặc thiếu lý do, bị từ chối', async () => {
-      for (const t of [{ nguoi_tao: 'u-khac', ly_do: 'có lý do' }, { nguoi_tao: 'u-is', ly_do: '' }]) {
+    it('yêu cầu của người không phải IS của đơn (kể cả AM), hoặc thiếu lý do, bị từ chối, và lượt đó không ghi đơn (ghi = false)', async () => {
+      for (const t of [{ nguoi_tao: 'u-khac', ly_do: 'có lý do' }, { nguoi_tao: 'u-am', ly_do: 'AM không được' }, { nguoi_tao: 'u-is', ly_do: '' }]) {
         const tasks = [...T23, { id: 'k4', ma: 'yc_close_lost', trang_thai: 'dang_lam', ...t }];
-        const out = await runCode('dieu-phoi.js', withProposals([], tasks, 'da_phe_duyet'));
+        const out = await runCode('dieu-phoi.js', { ...withProposals([], tasks, 'da_phe_duyet'), kich_hoat: { id: 'k4', body: { ma: 'yc_close_lost', trang_thai: 'dang_lam' } } });
         expect(out.don.trang_thai).not.toBe('close_lost');
+        expect(out.ghi).toBe(false);
+        expect(out.tao).toEqual([]);
         expect(out.cap_nhat).toContainEqual({ id: 'k4', trang_thai: 'huy' });
         expect(out.lich_su.map((h: { hanh_dong: string }) => h.hanh_dong)).toContain('tu_choi_yeu_cau');
       }
+    });
+
+    it('SLA = 0: task không có hạn nên nằm ở tao_khong_han', async () => {
+      const cau_hinh = [{ id: 'c1', body: { ten: 'mac_dinh', gia_tri: JSON.stringify({ slaDays: { t22: 0 } }) } }];
+      const out = await runCode('dieu-phoi.js', { ...inputs(validOrder(), [TB, DV], T11_DONE, 'nhap'), cau_hinh });
+      expect(out.tao.map((x: { ma: string }) => x.ma)).toEqual(['t23']);
+      expect(out.tao_khong_han.map((x: { ma: string }) => x.ma)).toEqual(['t22']);
     });
 
     it('t72 xong: đơn hoàn tất, ghi ngày hết hạn từ ngày giao t61 + bảo hành', async () => {

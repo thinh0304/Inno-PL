@@ -27,6 +27,8 @@ export interface LoadedOrder {
   trang_thai: string;
   ma_don: string;
   giai_doan: number;
+  /** Đơn đã phê duyệt đang chờ SD duyệt lại: AM, IS sửa được dòng hàng và giá (spec §12.6). */
+  choDuyetLai: boolean;
   lyDoGui: string;
   locked: { result: PlResult; at: string | null } | null;
   /** false khi người xem không đọc được giá bán / tài chính (Kỹ thuật, Mua hàng): ẩn P&L, hiện bản tóm tắt phần của họ. */
@@ -175,7 +177,7 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
       let locked: LoadedOrder['locked'] = null;
       if (fb.pl_chot) { try { locked = { result: JSON.parse(str(fb.pl_chot)) as PlResult, at: str(fb.chot_luc) || null }; } catch { locked = null; } }
       return {
-        order, lines, trang_thai: str(b.trang_thai), ma_don: str(b.ma_don), giai_doan: num(b.giai_doan), lyDoGui: str(b.ly_do_gui), locked,
+        order, lines, trang_thai: str(b.trang_thai), ma_don: str(b.ma_don), giai_doan: num(b.giai_doan), lyDoGui: str(b.ly_do_gui), choDuyetLai: b.cho_duyet_lai === true, locked,
         seesMoney: prices !== null && finance !== null,
         proposals: de_xuat ? de_xuat.map((x) => { const pb = bodyOf(x); return { id: x.id, dong_hang: str(pb.dong_hang), gia_mua_de_xuat: pb.gia_mua_de_xuat == null ? null : num(pb.gia_mua_de_xuat), ncc_id: str(pb.ncc_id), ly_do: str(pb.ly_do) }; }) : null,
         summaries: tomTat.map((t) => {

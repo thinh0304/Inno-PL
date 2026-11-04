@@ -35,7 +35,11 @@ export interface DieuPhoiInputs {
 }
 
 export interface DieuPhoiOutput {
+  /** Lượt này có ghi đơn, tạo task, tóm tắt không; false khi chỉ hủy một yêu cầu bị từ chối. */
+  ghi: boolean;
   tao: { don_hang: string; ma: TaskCode; vai_tro: Role; trang_thai: TaskStatus; sla_ngay: number; am: string | null; is: string | null; nhom: string[] }[];
+  /** Task không theo dõi hạn (N = 0): tạo không kèm `han`. */
+  tao_khong_han: DieuPhoiOutput['tao'];
   cap_nhat: { id: string; trang_thai: TaskStatus }[];
   don: {
     trang_thai: string; giai_doan: number; co_dich_vu: boolean; co_hang_hoa: boolean; ky_thuat: string[]; mua_hang: string[];
@@ -82,8 +86,9 @@ export function run(inputs: DieuPhoiInputs): DieuPhoiOutput {
   const gated = t11Done && issues.length > 0 && (status === 'nhap' || status === 'tra_lai');
 
   // Task yêu cầu (Close-lost, Xin duyệt lại): chỉ AM hoặc IS của đơn tạo được, và phải có lý do.
-  const owners = [idOf(don.am), idOf(don.is)];
-  const badRequest = (t: Rec) => str(t.ma).startsWith('yc_') && t.trang_thai === 'dang_lam' && (!owners.includes(idOf(t.nguoi_tao)) || !str(t.ly_do).trim());
+  // Spec §7.4: Close-lost và Xin duyệt lại do IS.
+  const isId = idOf(don.is);
+  const badRequest = (t: Rec) => str(t.ma).startsWith('yc_') && t.trang_thai === 'dang_lam' && (!isId || idOf(t.nguoi_tao) !== isId || !str(t.ly_do).trim());
   const rejected = tasks.filter(badRequest);
 
   // t23 "xong" khi chưa đủ đề xuất giá mua: mở lại t23 (task cũ bị hủy), không mở t31.
@@ -121,7 +126,7 @@ export function run(inputs: DieuPhoiInputs): DieuPhoiOutput {
   else if (returned) lich_su.push(history('tra_lai', str(returned.ma), reason));
   else if (actions.create.some((c) => (c.code === 't22' || c.code === 't23') && !reopenT23)) lich_su.push(history('gui_duyet', 't11'));
   if (reopenT23) lich_su.push(history('tra_lai_may_chu', 't23', proposalIssues.map((i) => i.field).join(', ')));
-  for (const t of rejected) lich_su.push(history('tu_choi_yeu_cau', str(t.ma), str(t.ly_do) || 'thiếu lý do hoặc không phải AM / IS của đơn'));
+  for (const t of rejected) lich_su.push(history('tu_choi_yeu_cau', str(t.ma), str(t.ly_do) || 'thiếu lý do hoặc không phải IS của đơn'));
   if (flags.closeLost && request) lich_su.push(history('close_lost', '', str(request.ly_do)));
   if (flags.closeLostRejected && request) lich_su.push(history('tu_choi_yeu_cau', str(request.ma), 'đã qua t41'));
   if (flags.reapproval && request) lich_su.push(history('xin_duyet_lai', 't31', str(request.ly_do)));
@@ -166,9 +171,14 @@ export function run(inputs: DieuPhoiInputs): DieuPhoiOutput {
   const t61 = tasks.find((t) => t.ma === 't61' && t.trang_thai === 'xong');
   const renewal = flags.completed ? renewalOf(lines, dateOnly(t61?.done_at)) : { ngay_het_han: str(don.ngay_het_han), theo_doi_tai_ky: don.theo_doi_tai_ky === true };
 
+  const toTask = (c: (typeof actions.create)[number]) => ({ don_hang: don.id, ma: c.code, vai_tro: c.role, trang_thai: c.status, sla_ngay: cfg.slaDays[c.code] ?? 0,
+    am: idOf(don.am), is: idOf(don.is), nhom: groupOf(c.role) });
+  // Lượt do một yêu cầu bị từ chối khởi động chỉ hủy yêu cầu đó: việc khác đã có lượt điều phối thường lo, ghi chồng lên có thể đè trạng thái mới hơn.
+  const quiet = !!flags.noWrite || (str(trigger.ma).startsWith('yc_') && rejected.some((t) => t.id === trigger.id));
   return {
-    tao: actions.create.map((c) => ({ don_hang: don.id, ma: c.code, vai_tro: c.role, trang_thai: c.status, sla_ngay: cfg.slaDays[c.code] ?? 0,
-      am: idOf(don.am), is: idOf(don.is), nhom: groupOf(c.role) })),
+    ghi: !quiet,
+    tao: quiet ? [] : actions.create.map(toTask).filter((t) => t.sla_ngay > 0),
+    tao_khong_han: quiet ? [] : actions.create.map(toTask).filter((t) => t.sla_ngay <= 0),
     cap_nhat: actions.update.map((u) => ({ id: u.id, trang_thai: u.status })),
     don: { trang_thai: newStatus, giai_doan: newStage,
       co_dich_vu: hasService, co_hang_hoa: hasGoods, ky_thuat: hasService ? [groups.tm] : [], mua_hang: hasGoods ? [groups.proc] : [],

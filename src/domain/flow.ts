@@ -60,7 +60,9 @@ export interface FlowActions {
   create: { code: TaskCode; role: Role; status: 'dang_lam' | 'bo_qua' | 'xong' }[];
   update: { id: string; status: TaskStatus }[];
   order: { status?: 'dang_xu_ly' | 'tra_lai' | 'da_phe_duyet' | 'hoan_tat' | 'close_lost'; stage?: number; lockPl?: boolean; choDuyetLai?: boolean };
-  flags?: { closeLost?: boolean; closeLostRejected?: boolean; reapproval?: boolean; reapprovalRejected?: boolean; draftRevision?: boolean; completed?: boolean };
+  flags?: { closeLost?: boolean; closeLostRejected?: boolean; reapproval?: boolean; reapprovalRejected?: boolean; draftRevision?: boolean; completed?: boolean;
+    /** Lượt chạy chỉ để hủy một yêu cầu bị từ chối: không được ghi gì lên đơn (có thể đang chạy chồng một lượt khác). */
+    noWrite?: boolean };
 }
 
 const DONE: readonly TaskStatus[] = ['xong', 'khong_ap_dung', 'bo_qua'];
@@ -84,17 +86,19 @@ export function nextActions(order: FlowOrder, allTasks: FlowTask[], scope: reado
   const request = (code: RequestCode) => requests.find((r) => r.code === code);
   const doneNow = (c: TaskCode) => live.some((x) => x.code === c && DONE.includes(x.status));
 
-  if (order.status === 'close_lost' || order.status === 'hoan_tat') return { create: [], update: dropRequests(), order: {} };
+  // Đơn đã dừng: một lượt chạy chồng có thể đã mở task sau khi Close-lost hủy xong, nên hủy nốt.
+  if (order.status === 'close_lost') return { create: [], update: [...live.map((x) => ({ id: x.id, status: 'huy' as const })), ...dropRequests()], order: {}, flags: { noWrite: true } };
+  if (order.status === 'hoan_tat') return { create: [], update: dropRequests(), order: {}, flags: { noWrite: true } };
 
   // Close-lost của IS: được tới hết t41 (spec §7.4), sau đó bị từ chối.
   if (request('yc_close_lost')) {
-    if (doneNow('t41')) return { create: [], update: dropRequests(), order: {}, flags: { closeLostRejected: true } };
-    return { create: [], update: [...live.map((x) => ({ id: x.id, status: 'huy' as const })), ...dropRequests()], order: { status: 'close_lost' }, flags: { closeLost: true } };
+    if (doneNow('t41')) return { create: [], update: dropRequests(), order: {}, flags: { closeLostRejected: true, noWrite: true } };
+    return { create: [], update: [...live.map((x) => ({ id: x.id, status: 'huy' as const })), ...dropRequests()], order: { status: 'close_lost', choDuyetLai: false }, flags: { closeLost: true } };
   }
 
   // Xin duyệt lại (§12.6): chỉ khi đơn đã phê duyệt; hủy GĐ4 trở đi, mở t31 mới cho SD, không tự duyệt.
   if (request('yc_xin_duyet_lai')) {
-    if (order.status !== 'da_phe_duyet') return { create: [], update: dropRequests(), order: {}, flags: { reapprovalRejected: true } };
+    if (order.status !== 'da_phe_duyet') return { create: [], update: dropRequests(), order: {}, flags: { reapprovalRejected: true, noWrite: true } };
     const stage4 = live.filter((x) => TASKS[x.code].stage >= 4 || x.code === 't31');
     return {
       create: [{ code: 't31', role: 'sd', status: 'dang_lam' }],

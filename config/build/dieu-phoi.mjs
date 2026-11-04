@@ -34,6 +34,22 @@ const moTask = node("mo_task", "Mở các task mới", "for_each", {
   },
 });
 
+const moTaskKhongHan = node("mo_task_khong_han", "Mở các task không theo dõi hạn", "for_each", {
+  listSource: `${OUT}.tao_khong_han`, itemAlias: "t", mode: "sequential", continueOnItemFailure: false, failOnItemFailure: true,
+  body: {
+    schemaVersion: "1.0", start: "ks", end: ["ke"],
+    nodes: [
+      node("ks", "Task", "start", {}),
+      create("tao", "Tạo task", TASK, [
+        bind("don_hang", ref("input.t.don_hang")), bind("ma", ref("input.t.ma")), bind("vai_tro", ref("input.t.vai_tro")),
+        bind("trang_thai", ref("input.t.trang_thai")), bind("am", ref("input.t.am")), bind("is", ref("input.t.is")), bind("nhom", ref("input.t.nhom")),
+      ]),
+      node("ke", "Xong", "end", {}),
+    ],
+    edges: edges(["ke0", "ks", "tao"], ["ke1", "tao", "ke"]),
+  },
+});
+
 const capNhat = node("cap_nhat", "Cập nhật task", "for_each", {
   listSource: `${OUT}.cap_nhat`, itemAlias: "u", mode: "sequential", continueOnItemFailure: false, failOnItemFailure: true,
   body: {
@@ -105,13 +121,15 @@ const dieuPhoi = (key, name) => workflow(
       ], {
         type: "object",
         properties: {
-          tao: { type: "array" }, cap_nhat: { type: "array" }, don: { type: "object" }, chot: { type: ["object", "null"] },
+          ghi: { type: "boolean" }, tao: { type: "array" }, tao_khong_han: { type: "array" }, cap_nhat: { type: "array" }, don: { type: "object" }, chot: { type: ["object", "null"] },
           tom_tat: { type: "array" }, lich_su: { type: "array" },
         },
-        required: ["tao", "cap_nhat", "don", "chot", "tom_tat", "lich_su"],
+        required: ["ghi", "tao", "tao_khong_han", "cap_nhat", "don", "chot", "tom_tat", "lich_su"],
       }),
       capNhat,
+      decision("co_ghi", "Có ghi đơn không?", [when("e_ghi", { "!!": [{ var: `${OUT}.ghi` }] }), otherwise("e_khong_ghi")]),
       moTask,
+      moTaskKhongHan,
       update("ghi_don", "Ghi trạng thái đơn", DON, "subject.record.don_hang", [
         bind("trang_thai", ref(`${OUT}.don.trang_thai`)), bind("giai_doan", ref(`${OUT}.don.giai_doan`)),
         bind("co_dich_vu", ref(`${OUT}.don.co_dich_vu`)), bind("co_hang_hoa", ref(`${OUT}.don.co_hang_hoa`)),
@@ -132,8 +150,8 @@ const dieuPhoi = (key, name) => workflow(
     ], edges(
       ["e_start", "start", "params"], ["e_params", "params", "nguoi"], ["e_nguoi", "nguoi", "don"], ["e_don", "don", "tasks"], ["e_tasks", "tasks", "dong"],
       ["e_dong", "dong", "gia"], ["e_gia", "gia", "tc"], ["e_tc", "tc", "dx"], ["e_dx", "dx", "ch"], ["e_ch", "ch", "tinh"],
-      ["e_tinh", "tinh", "cap_nhat"], ["e_cap_nhat", "cap_nhat", "ghi_don"], ["e_ghi_don_mo", "ghi_don", "mo_task"],
-      ["e_mo_task", "mo_task", "ghi_tom_tat"], ["e_tom_tat", "ghi_tom_tat", "ghi_lich_su"], ["e_lich_su", "ghi_lich_su", "can_chot"], ["e_chot", "can_chot", "chot"], ["e_khong_chot", "can_chot", "xong"],
+      ["e_tinh", "tinh", "cap_nhat"], ["e_cap_nhat", "cap_nhat", "co_ghi"], ["e_ghi", "co_ghi", "ghi_don"], ["e_khong_ghi", "co_ghi", "ghi_lich_su"], ["e_ghi_don_mo", "ghi_don", "mo_task"],
+      ["e_mo_task", "mo_task", "mo_task_khong_han"], ["e_mo_khong_han", "mo_task_khong_han", "ghi_tom_tat"], ["e_tom_tat", "ghi_tom_tat", "ghi_lich_su"], ["e_lich_su", "ghi_lich_su", "can_chot"], ["e_chot", "can_chot", "chot"], ["e_khong_chot", "can_chot", "xong"],
       ["e_da_chot", "chot", "xong_chot"],
     )),
   );
