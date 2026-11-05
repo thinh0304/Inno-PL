@@ -108,3 +108,9 @@
 .suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .conflicts { display: grid; gap: 8px; margin-top: 8px; padding: 8px 12px; background: var(--warn-soft); border-radius: var(--r); }
 .tbl-wrap input, .tbl-wrap select { min-width: 72px; }
+
+.warn { color: var(--danger-ink); background: var(--danger-soft); padding: 8px 12px; border-radius: var(--r); margin: 0 0 8px; }
+.sla { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 12px; background: var(--neutral-soft); }
+.sla-sap { background: var(--warn-soft); color: var(--warn-ink); }
+.sla-qua_han { color: var(--danger-ink); background: var(--danger-soft); }
+.badge { display: inline-block; min-width: 18px; padding: 0 6px; margin-left: 6px; border-radius: 999px; background: var(--danger); color: var(--surface); font-size: 12px; text-align: center; }

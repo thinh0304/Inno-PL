@@ -9,14 +9,17 @@ export function DanhSachDon({ api, lang, onOpen, onNew, onMyTasks }: {
   const t = TEXT[lang];
   const [rows, setRows] = useState<OrderRow[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const [waiting, setWaiting] = useState(0);
   useEffect(() => { api.listOrders().then(setRows, () => setFailed(true)); }, [api]);
+  // Huy hiệu số task đang chờ người xem (spec §7.6).
+  useEffect(() => { api.myTasks().then((ts) => setWaiting(ts.length), () => undefined); }, [api]);
 
   return (
     <main className="screen">
       <header className="bar">
         <h1>{t.orders}</h1>
         <div className="row">
-          <button type="button" className="btn" onClick={onMyTasks}>{t.myTasks}</button>
+          <button type="button" className="btn" onClick={onMyTasks}>{t.myTasks}{waiting ? <span className="badge" aria-label={`${waiting}`}>{waiting}</span> : null}</button>
           <button type="button" className="btn primary" onClick={onNew}>{t.newOrder}</button>
         </div>
       </header>

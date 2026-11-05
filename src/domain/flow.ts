@@ -4,7 +4,9 @@ import { TASK_CODES, type TaskCode } from './config';
 export { TASK_CODES, type TaskCode } from './config';
 
 export type Role = 'am' | 'is' | 'tm' | 'proc' | 'sd' | 'acc';
-export type TaskStatus = 'cho' | 'dang_lam' | 'xong' | 'khong_ap_dung' | 'bo_qua' | 'tra_lai' | 'huy';
+export type TaskStatus = 'cho' | 'dang_lam' | 'xong' | 'khong_ap_dung' | 'bo_qua' | 'tra_lai' | 'yeu_cau_sua' | 'huy';
+/** Task "yêu cầu" do IS tạo (Close-lost, Xin duyệt lại): không phải bước của quy trình, điều phối xử lý rồi hủy. */
+export type RequestCode = 'yc_close_lost' | 'yc_xin_duyet_lai';
 export type OrderStatus = 'nhap' | 'dang_xu_ly' | 'tra_lai' | 'da_phe_duyet' | 'hoan_tat' | 'close_lost';
 
 export interface TaskDef {
@@ -48,14 +50,19 @@ export interface FlowOrder {
   passed: boolean;
   /** Trạng thái hiện tại của đơn, để chỉ chốt P&L lúc vừa phê duyệt. */
   status?: OrderStatus;
+  /** Đơn đang chờ SD duyệt lại sau "Xin duyệt lại" (§12.6). */
+  reapproval?: boolean;
 }
 
-export interface FlowTask { id: string; code: TaskCode; status: TaskStatus }
+export interface FlowTask { id: string; code: TaskCode | RequestCode; status: TaskStatus }
 
 export interface FlowActions {
   create: { code: TaskCode; role: Role; status: 'dang_lam' | 'bo_qua' | 'xong' }[];
   update: { id: string; status: TaskStatus }[];
-  order: { status?: 'dang_xu_ly' | 'tra_lai' | 'da_phe_duyet'; stage?: number; lockPl?: boolean };
+  order: { status?: 'dang_xu_ly' | 'tra_lai' | 'da_phe_duyet' | 'hoan_tat' | 'close_lost'; stage?: number; lockPl?: boolean; choDuyetLai?: boolean };
+  flags?: { closeLost?: boolean; closeLostRejected?: boolean; reapproval?: boolean; reapprovalRejected?: boolean; draftRevision?: boolean; completed?: boolean;
+    /** Lượt chạy chỉ để hủy một yêu cầu bị từ chối: không được ghi gì lên đơn (có thể đang chạy chồng một lượt khác). */
+    noWrite?: boolean };
 }
 
 const DONE: readonly TaskStatus[] = ['xong', 'khong_ap_dung', 'bo_qua'];
@@ -71,18 +78,54 @@ const requiresOf = (d: TaskDef, o: FlowOrder): TaskCode[] =>
  * Việc điều phối phải làm, tính lại hoàn toàn từ dữ liệu hiện có (gọi lại bao nhiêu lần cũng không tạo trùng).
  * `scope` giới hạn các task được tạo: Phase 1 truyền t11–t31.
  */
-export function nextActions(order: FlowOrder, tasks: FlowTask[], scope: readonly TaskCode[]): FlowActions {
+export function nextActions(order: FlowOrder, allTasks: FlowTask[], scope: readonly TaskCode[]): FlowActions {
+  const requests = allTasks.filter((x): x is FlowTask & { code: RequestCode } => x.code.startsWith('yc_') && x.status === 'dang_lam');
+  const tasks = allTasks.filter((x) => !x.code.startsWith('yc_')) as (FlowTask & { code: TaskCode })[];
   const live = tasks.filter((x) => x.status !== 'huy');
+  const dropRequests = (): FlowActions['update'] => requests.map((r) => ({ id: r.id, status: 'huy' as const }));
+  const request = (code: RequestCode) => requests.find((r) => r.code === code);
+  const doneNow = (c: TaskCode) => live.some((x) => x.code === c && DONE.includes(x.status));
+
+  // Đơn đã dừng: một lượt chạy chồng có thể đã mở task sau khi Close-lost hủy xong, nên hủy nốt.
+  if (order.status === 'close_lost') return { create: [], update: [...live.map((x) => ({ id: x.id, status: 'huy' as const })), ...dropRequests()], order: {}, flags: { noWrite: true } };
+  if (order.status === 'hoan_tat') return { create: [], update: dropRequests(), order: {}, flags: { noWrite: true } };
+
+  // Close-lost của IS: được tới hết t41 (spec §7.4), sau đó bị từ chối.
+  if (request('yc_close_lost')) {
+    if (doneNow('t41')) return { create: [], update: dropRequests(), order: {}, flags: { closeLostRejected: true, noWrite: true } };
+    return { create: [], update: [...live.map((x) => ({ id: x.id, status: 'huy' as const })), ...dropRequests()], order: { status: 'close_lost', choDuyetLai: false }, flags: { closeLost: true } };
+  }
+
+  // Xin duyệt lại (§12.6): chỉ khi đơn đã phê duyệt; hủy GĐ4 trở đi, mở t31 mới cho SD, không tự duyệt.
+  if (request('yc_xin_duyet_lai')) {
+    if (order.status !== 'da_phe_duyet') return { create: [], update: dropRequests(), order: {}, flags: { reapprovalRejected: true, noWrite: true } };
+    const stage4 = live.filter((x) => TASKS[x.code].stage >= 4 || x.code === 't31');
+    return {
+      create: [{ code: 't31', role: 'sd', status: 'dang_lam' }],
+      update: [...stage4.map((x) => ({ id: x.id, status: 'huy' as const })), ...dropRequests()],
+      order: { status: 'dang_xu_ly', stage: 3, choDuyetLai: true },
+      flags: { reapproval: true },
+    };
+  }
 
   if (live.some((x) => x.status === 'tra_lai')) {
     return {
       create: [{ code: 't11', role: 'am', status: 'dang_lam' }],
       update: live.map((x) => ({ id: x.id, status: 'huy' as const })),
-      order: { status: 'tra_lai', stage: 1 },
+      order: { status: 'tra_lai', stage: 1, choDuyetLai: false },
     };
   }
 
-  const status = new Map<TaskCode, TaskStatus>(live.map((x) => [x.code, x.status]));
+  // t42 "Yêu cầu sửa dự thảo": hủy t42 cùng t40, t44 để mở lại (task cũ giữ trong lịch sử).
+  const revise = live.some((x) => x.code === 't42' && x.status === 'yeu_cau_sua');
+  const update: FlowActions['update'] = [];
+  const gone = new Set<string>();
+  if (revise) {
+    for (const x of live.filter((y) => y.code === 't42' || y.code === 't40' || y.code === 't44')) { update.push({ id: x.id, status: 'huy' }); gone.add(x.id); }
+  }
+  const kept = live.filter((x) => !gone.has(x.id));
+
+  const status = new Map<TaskCode, TaskStatus>(kept.map((x) => [x.code, x.status]));
   const isDone = (c: TaskCode) => DONE.includes(status.get(c) as TaskStatus);
   const create: FlowActions['create'] = [];
 
@@ -93,7 +136,7 @@ export function nextActions(order: FlowOrder, tasks: FlowTask[], scope: readonly
       if (!scope.includes(code) || d.kind === 'submit' || status.has(code)) continue;
       if (!requiresOf(d, order).every(isDone)) continue;
       let s: 'dang_lam' | 'bo_qua' | 'xong' = applies(d, order) ? 'dang_lam' : 'bo_qua';
-      if (code === 't31' && order.revenue <= AUTO_APPROVE_MAX && !order.hasGoods && order.passed) s = 'xong';
+      if (code === 't31' && !order.reapproval && order.revenue <= AUTO_APPROVE_MAX && !order.hasGoods && order.passed) s = 'xong';
       create.push({ code, role: d.role, status: s });
       status.set(code, s);
       changed = true;
@@ -104,18 +147,21 @@ export function nextActions(order: FlowOrder, tasks: FlowTask[], scope: readonly
   if (status.get('t11') === 'dang_lam') return { create, update: [], order: {} };
 
   const approved = isDone('t31');
+  const completed = isDone('t72');
   const pending = scope.filter((c) => !isDone(c) && (status.has(c) || TASKS[c].kind !== 'submit'));
-  const stage = pending.length ? Math.min(...pending.map((c) => TASKS[c].stage)) : Math.max(...scope.map((c) => TASKS[c].stage)) + 1;
+  const stage = completed ? 7 : pending.length ? Math.min(...pending.map((c) => TASKS[c].stage)) : Math.max(...scope.map((c) => TASKS[c].stage)) + 1;
   const firstWave = create.some((c) => TASKS[c.code].requires.includes('t11'));
   const justApproved = approved && order.status !== 'da_phe_duyet';
 
   return {
     create,
-    update: [],
+    update,
     order: {
-      status: approved ? 'da_phe_duyet' : 'dang_xu_ly',
+      status: completed ? 'hoan_tat' : approved ? 'da_phe_duyet' : 'dang_xu_ly',
       stage,
       ...(firstWave || justApproved ? { lockPl: true } : {}),
+      ...(order.reapproval ? { choDuyetLai: !approved } : {}),
     },
+    ...(revise || completed ? { flags: { ...(revise ? { draftRevision: true } : {}), ...(completed ? { completed: true } : {}) } } : {}),
   };
 }

@@ -496,6 +496,29 @@
       "key": "ly_do_gui",
       "label": "Lý do bị trả lại khi gửi duyệt",
       "type": "text"
+    },
+    {
+      "key": "cho_duyet_lai",
+      "label": "Đang chờ duyệt lại",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
+    },
+    {
+      "key": "ngay_het_han",
+      "label": "Ngày hết hạn (YYYY-MM-DD, theo dõi tái ký)",
+      "type": "text"
+    },
+    {
+      "key": "theo_doi_tai_ky",
+      "label": "Theo dõi tái ký",
+      "type": "boolean",
+      "default": {
+        "kind": "literal",
+        "value": false
+      }
     }
   ],
   "natural_key": [],
@@ -958,6 +981,17 @@
           {
             "kind": "write",
             "write": {
+              "op": "was",
+              "rule": {
+                "field": "cho_duyet_lai",
+                "op": "eq",
+                "value": false
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
               "op": "actor",
               "negate": true,
               "test": {
@@ -994,7 +1028,10 @@
                 "mua_hang",
                 "ma_loai",
                 "nguoi_duoc_chia",
-                "ly_do_gui"
+                "ly_do_gui",
+                "cho_duyet_lai",
+                "ngay_het_han",
+                "theo_doi_tai_ky"
               ]
             }
           },

@@ -56,7 +56,10 @@
     "@obj:entity_field:don_hang/hinh_thuc",
     "@obj:entity_field:don_hang/giai_doan_deal",
     "@obj:entity_field:don_hang/nguoi_duoc_chia",
-    "@obj:entity_field:don_hang/ly_do_gui"
+    "@obj:entity_field:don_hang/ly_do_gui",
+    "@obj:entity_field:don_hang/cho_duyet_lai",
+    "@obj:entity_field:don_hang/ngay_het_han",
+    "@obj:entity_field:don_hang/theo_doi_tai_ky"
   ],
   "natural_key": [],
   "display_field": "ma_don",
@@ -85,6 +88,17 @@
                   "nhap",
                   "tra_lai"
                 ]
+              }
+            }
+          },
+          {
+            "kind": "write",
+            "write": {
+              "op": "was",
+              "rule": {
+                "field": "cho_duyet_lai",
+                "op": "eq",
+                "value": false
               }
             }
           },
@@ -127,7 +141,10 @@
                 "mua_hang",
                 "ma_loai",
                 "nguoi_duoc_chia",
-                "ly_do_gui"
+                "ly_do_gui",
+                "cho_duyet_lai",
+                "ngay_het_han",
+                "theo_doi_tai_ky"
               ]
             }
           },

@@ -2,8 +2,9 @@
 
 `inno/pl` is an AgentFlow app, built with the AgentFlow SDK. It is being rebuilt from scratch on a new specification
 (`docs/superpowers/specs/2026-11-04-pl-v2-design.md`), phase by phase (`docs/superpowers/plans/2026-11-04-pl-v2-roadmap.md`).
-Phase 1 (the thin slice: an order goes through t11 → t22 ∥ t23 → t31 with tasks in My Work) and Phase 2 (the full order
-form with format checks, customer and supplier address books, who sees which order and which figures) are in. It holds:
+Phase 1 (the thin slice: an order goes through t11 → t22 ∥ t23 → t31 with tasks in My Work), Phase 2 (the full order
+form with format checks, customer and supplier address books, who sees which order and which figures) and Phase 3 (all 15 tasks
+to Hoàn tất, the purchase order tab, Close-lost, draft revision, re-approval, SLA chips and a daily overdue reminder) are in. It holds:
 
 - **An app package** that AgentFlow installs, described by `config/`. `agentflow-app build` turns `config/` into
   `package/`, which is committed, so a reviewer reads what ships.

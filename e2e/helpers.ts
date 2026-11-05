@@ -98,3 +98,12 @@ export const submitT11 = async (donId: string) => {
   await expect.poll(async () => live(await tasksOf(am, donId), 't11').filter((t) => t.body.trang_thai === 'dang_lam').length, POLL).toBe(1);
   await finish(am, live(await tasksOf(am, donId), 't11')[0]!, 'xong');
 };
+
+/** PROC đề xuất giá mua và NCC cho mọi dòng TB/License của đơn (điều kiện để t23 xong, spec §7.2). */
+export const proposeAll = async (o: NewOrder, price = 38_000_000) => {
+  const ncc = await supplier();
+  for (const [i, l] of o.lines.entries()) {
+    if (!['tb', 'lic', 'lic_dk', 'lic_ntnn'].includes(l.loai)) continue;
+    await create(as('proc1'), 'de_xuat_mua_hang', { dong_hang: o.dong[i]!.id, don_hang: o.don.id, gia_mua_de_xuat: price, ncc_id: ncc });
+  }
+};

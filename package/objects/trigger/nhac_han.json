@@ -1,0 +1,10 @@
+{
+  "workflow": "@obj:workflow:nhac_han",
+  "kind": "schedule",
+  "enabled": false,
+  "config": {
+    "cron": "0 8 * * 1-5",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "input_template": {}
+  }
+}

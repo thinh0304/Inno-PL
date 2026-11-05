@@ -116,8 +116,9 @@ What v1 learnt about AgentFlow, which any app here will meet (details and repros
 - `config/entities/`: `don_hang`, `dong_hang`, `gia_ban_dong`, `tai_chinh_don`, `task` (a `work` entity: one record per
   task of an order), `cau_hinh`, and (Phase 2) `khach_hang`, `nha_cung_cap` (address books), `de_xuat_mua_hang` (only PROC, SD, ACC
   and Admin read), `tom_tat_don` (the part of an order TM or PROC may see, written by the workflow), `lich_su` (append-only). The money lives apart from what Kỹ thuật and Mua hàng read (spec §11.4).
-  `config/build/dieu-phoi.mjs` is the one workflow (trigger on a task's status; runs as the automation principal);
-  `agentflow.app.mjs` merges it.
+  `config/build/dieu-phoi.mjs` holds the workflows: `dieu_phoi` (trigger on a task's status), `dieu_phoi_yeu_cau` (the same graph, trigger on a
+  request task being created: `yc_close_lost`, `yc_xin_duyet_lai`; a workflow has only one trigger, F-32) and `nhac_han` (daily, raises the
+  priority of overdue tasks); they run as the automation principal; `agentflow.app.mjs` merges them.
 - `src/domain/`: the pure functions the module and the Code step share: `pl.ts` (the P&L formula), `lines.ts`, `config.ts`
   (defaults), `flow.ts` (which tasks open when), `codes.ts`, `form.ts` (an order as typed), `validate.ts` (format and required
   rules, spec §12.1–12.2), `stages.ts` (deal-stage shares), `records.ts` (records ↔ form; `forCreate` drops empty fields because a

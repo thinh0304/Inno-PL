@@ -4,5 +4,5 @@ import * as dieuPhoi from "./config/build/dieu-phoi.mjs";
 // The workflow modules (config/build/*.mjs) and the order their workflows are published in, as the app gets them:
 // merge([a, b], ["workflow_a", "workflow_b"]).
 export default defineApp({
-  sections: merge([dieuPhoi], ["dieu_phoi"]),
+  sections: merge([dieuPhoi], ["dieu_phoi", "dieu_phoi_yeu_cau", "nhac_han"]),
 });

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Api } from '../api.js';
+import type { Api, TaskAct } from '../api.js';
 import { TEXT, type Lang } from '../text.js';
 import { TaskList, type MyTask } from './ViecCuaBan.js';
 
@@ -10,7 +10,7 @@ export function MyTasksScreen({ api, lang, onBack, onOpen }: { api: Api; lang: L
   const [failed, setFailed] = useState(false);
   const load = useCallback(() => api.myTasks().then(setTasks, () => setFailed(true)), [api]);
   useEffect(() => { void load(); }, [load]);
-  const act = async (task: MyTask, status: 'xong' | 'tra_lai', reason: string) => {
+  const act = async (task: MyTask, status: TaskAct, reason: string) => {
     setBusy(true); setFailed(false);
     try { await api.actOnTask(task.id, status, reason); await load(); } catch { setFailed(true); } finally { setBusy(false); }
   };

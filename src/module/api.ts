@@ -9,14 +9,16 @@ import type { PlResult } from '../domain/pl.js';
 import { financePayload, forCreate, formFromRecords, linePayload, orderPayload, str } from '../domain/records.js';
 import { shouldCreateCustomer, type CustomerRec } from './customerBook.js';
 import { onlyMine } from './model.js';
-import type { MyTask } from './screens/ViecCuaBan.js';
+import { taskKind, type MyTask } from './screens/ViecCuaBan.js';
 
 type Wire = components['schemas']['EntityRecord'];
 type Page = components['schemas']['EntityRecordPage'];
 type Body = Record<string, unknown>;
 
 export interface OrderRow { id: string; ma_don: string; ten_kh: string; am: string; trang_thai: string; giai_doan: number; revenue: number | null }
-export interface TaskRow { id: string; ma: string; trang_thai: FlowTask['status']; vai_tro: string; claimedBy: string | null }
+export interface TaskRow { id: string; ma: string; trang_thai: FlowTask['status']; vai_tro: string; claimedBy: string | null; han: string | null }
+export interface ProposalRow { id?: string; dong_hang: string; gia_mua_de_xuat: number | null; ncc_id: string; ly_do: string }
+export type TaskAct = 'xong' | 'tra_lai' | 'yeu_cau_sua' | 'khong_ap_dung';
 export interface SupplierRec { id: string; ten: string }
 export interface Summary { phan: 'dich_vu' | 'hang_hoa'; data: Record<string, number> }
 export interface LoadedOrder {
@@ -25,11 +27,15 @@ export interface LoadedOrder {
   trang_thai: string;
   ma_don: string;
   giai_doan: number;
+  /** Đơn đã phê duyệt đang chờ SD duyệt lại: AM, IS sửa được dòng hàng và giá (spec §12.6). */
+  choDuyetLai: boolean;
   lyDoGui: string;
   locked: { result: PlResult; at: string | null } | null;
   /** false khi người xem không đọc được giá bán / tài chính (Kỹ thuật, Mua hàng): ẩn P&L, hiện bản tóm tắt phần của họ. */
   seesMoney: boolean;
   summaries: Summary[];
+  /** Đề xuất giá mua của PROC; `null` khi người xem không đọc được (Kỹ thuật). */
+  proposals: ProposalRow[] | null;
   tasks: TaskRow[];
   /** Task đang nằm trong My Work của người xem: chỉ với các task này mới hiện nút thao tác. */
   workIds: Set<string>;
@@ -37,7 +43,7 @@ export interface LoadedOrder {
 
 const bodyOf = (r: Wire): Body => r.body as Body;
 const num = (v: unknown): number => (typeof v === 'number' ? v : Number(v) || 0);
-const TASK_KIND: Record<string, MyTask['kind']> = { t11: 'submit', t22: 'approve', t31: 'approve', t23: 'do' };
+
 
 export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
   const objects = getAppObjects<LogicalKey>(host.api);
@@ -155,13 +161,14 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
       seen.clear();
       const rec = await read('don_hang', id);
       const b = bodyOf(rec);
-      const [dong, prices, finance, tasks, mine, tomTat] = await Promise.all([
+      const [dong, prices, finance, tasks, mine, tomTat, de_xuat] = await Promise.all([
         queryAll('dong_hang', [{ field: 'don_hang', op: 'eq', value: id }], 'stt'),
         queryAll('gia_ban_dong', [{ field: 'don_hang', op: 'eq', value: id }]).catch(() => null),
         queryAll('tai_chinh_don', [{ field: 'don_hang', op: 'eq', value: id }]).catch(() => null),
         queryAll('task', [{ field: 'don_hang', op: 'eq', value: id }]),
         workIds().catch(() => new Set<string>()),
         queryAll('tom_tat_don', [{ field: 'don_hang', op: 'eq', value: id }]).catch(() => [] as Wire[]),
+        queryAll('de_xuat_mua_hang', [{ field: 'don_hang', op: 'eq', value: id }]).catch(() => null),
       ]);
       for (const r of [rec, ...dong, ...(prices ?? []), ...(finance ?? [])]) seen.set(r.id, r.updated_at);
       const fin = finance?.[0];
@@ -170,8 +177,9 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
       let locked: LoadedOrder['locked'] = null;
       if (fb.pl_chot) { try { locked = { result: JSON.parse(str(fb.pl_chot)) as PlResult, at: str(fb.chot_luc) || null }; } catch { locked = null; } }
       return {
-        order, lines, trang_thai: str(b.trang_thai), ma_don: str(b.ma_don), giai_doan: num(b.giai_doan), lyDoGui: str(b.ly_do_gui), locked,
+        order, lines, trang_thai: str(b.trang_thai), ma_don: str(b.ma_don), giai_doan: num(b.giai_doan), lyDoGui: str(b.ly_do_gui), choDuyetLai: b.cho_duyet_lai === true, locked,
         seesMoney: prices !== null && finance !== null,
+        proposals: de_xuat ? de_xuat.map((x) => { const pb = bodyOf(x); return { id: x.id, dong_hang: str(pb.dong_hang), gia_mua_de_xuat: pb.gia_mua_de_xuat == null ? null : num(pb.gia_mua_de_xuat), ncc_id: str(pb.ncc_id), ly_do: str(pb.ly_do) }; }) : null,
         summaries: tomTat.map((t) => {
           let data: Record<string, number> = {};
           try { data = JSON.parse(str(bodyOf(t).du_lieu)) as Record<string, number>; } catch { /* rỗng */ }
@@ -179,7 +187,7 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
         }),
         tasks: tasks.map((t) => {
           const tb = bodyOf(t);
-          return { id: t.id, ma: str(tb.ma), trang_thai: str(tb.trang_thai) as TaskRow['trang_thai'], vai_tro: str(tb.vai_tro), claimedBy: str(tb.claimed_by) || null };
+          return { id: t.id, ma: str(tb.ma), trang_thai: str(tb.trang_thai) as TaskRow['trang_thai'], vai_tro: str(tb.vai_tro), claimedBy: str(tb.claimed_by) || null, han: str(tb.han) || null };
         }),
         workIds: mine,
       };
@@ -242,12 +250,12 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
       return tasks.map((t) => {
         const b = bodyOf(t);
         const orderId = str(b.don_hang);
-        return { id: t.id, ma: str(b.ma), orderId, orderCode: code.get(orderId) ?? orderId, kind: TASK_KIND[str(b.ma)] ?? 'do' };
+        return { id: t.id, ma: str(b.ma), orderId, orderCode: code.get(orderId) ?? orderId, kind: taskKind(str(b.ma)), han: str(b.han) || null };
       });
     },
 
     /** Người làm task: nhận task nếu chưa giữ (task giao cho nhóm), rồi đổi trạng thái. Trả lại ghi lý do lên task. */
-    async actOnTask(taskId: string, status: 'xong' | 'tra_lai', reason: string): Promise<void> {
+    async actOnTask(taskId: string, status: TaskAct, reason: string): Promise<void> {
       const entity_id = await entityId('task');
       const rec = await read('task', taskId);
       if (!str(bodyOf(rec).claimed_by)) {
@@ -256,6 +264,20 @@ export function makeApi(host: Pick<AppHost, 'api' | 'context'>) {
         } catch { /* đã được giao thẳng cho người này, hoặc đã nhận */ }
       }
       await patch('task', taskId, reason ? { trang_thai: status, ly_do: reason } : { trang_thai: status });
+    },
+
+    /** IS / AM của đơn gửi yêu cầu Close-lost hoặc Xin duyệt lại: một task yêu cầu, điều phối xử lý (spec §7.4, §12.6). */
+    async requestOrder(orderId: string, kind: 'close_lost' | 'xin_duyet_lai', reason: string): Promise<void> {
+      await create('task', { don_hang: orderId, ma: kind === 'close_lost' ? 'yc_close_lost' : 'yc_xin_duyet_lai', vai_tro: 'is', trang_thai: 'dang_lam', ly_do: reason });
+    },
+
+    /** PROC lưu đề xuất giá mua và NCC cho từng dòng TB/License (tạo hoặc sửa). */
+    async saveProposals(orderId: string, rows: ProposalRow[]): Promise<void> {
+      for (const r of rows) {
+        const body = forCreate({ dong_hang: r.dong_hang, don_hang: orderId, gia_mua_de_xuat: r.gia_mua_de_xuat, ncc_id: r.ncc_id || null, ly_do: r.ly_do });
+        if (r.id) await patch('de_xuat_mua_hang', r.id, { gia_mua_de_xuat: r.gia_mua_de_xuat, ncc_id: r.ncc_id || null, ly_do: r.ly_do });
+        else await create('de_xuat_mua_hang', body);
+      }
     },
 
     emptyOrder: () => emptyOrder(me),

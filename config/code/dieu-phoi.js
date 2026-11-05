@@ -90,16 +90,47 @@ var APP = (() => {
   var AUTO_APPROVE_MAX = 3e8;
   var applies = (d, o) => d.when === "always" || (d.when === "service" ? o.hasService : o.hasGoods);
   var requiresOf = (d, o) => o.advanceFirst && (d.code === "t61" || d.code === "t62") ? [...d.requires, "t51"] : d.requires;
-  function nextActions(order, tasks, scope) {
+  function nextActions(order, allTasks, scope) {
+    const requests = allTasks.filter((x) => x.code.startsWith("yc_") && x.status === "dang_lam");
+    const tasks = allTasks.filter((x) => !x.code.startsWith("yc_"));
     const live = tasks.filter((x) => x.status !== "huy");
+    const dropRequests = () => requests.map((r) => ({ id: r.id, status: "huy" }));
+    const request = (code) => requests.find((r) => r.code === code);
+    const doneNow = (c) => live.some((x) => x.code === c && DONE.includes(x.status));
+    if (order.status === "close_lost") return { create: [], update: [...live.map((x) => ({ id: x.id, status: "huy" })), ...dropRequests()], order: {}, flags: { noWrite: true } };
+    if (order.status === "hoan_tat") return { create: [], update: dropRequests(), order: {}, flags: { noWrite: true } };
+    if (request("yc_close_lost")) {
+      if (doneNow("t41")) return { create: [], update: dropRequests(), order: {}, flags: { closeLostRejected: true, noWrite: true } };
+      return { create: [], update: [...live.map((x) => ({ id: x.id, status: "huy" })), ...dropRequests()], order: { status: "close_lost", choDuyetLai: false }, flags: { closeLost: true } };
+    }
+    if (request("yc_xin_duyet_lai")) {
+      if (order.status !== "da_phe_duyet") return { create: [], update: dropRequests(), order: {}, flags: { reapprovalRejected: true, noWrite: true } };
+      const stage4 = live.filter((x) => TASKS[x.code].stage >= 4 || x.code === "t31");
+      return {
+        create: [{ code: "t31", role: "sd", status: "dang_lam" }],
+        update: [...stage4.map((x) => ({ id: x.id, status: "huy" })), ...dropRequests()],
+        order: { status: "dang_xu_ly", stage: 3, choDuyetLai: true },
+        flags: { reapproval: true }
+      };
+    }
     if (live.some((x) => x.status === "tra_lai")) {
       return {
         create: [{ code: "t11", role: "am", status: "dang_lam" }],
         update: live.map((x) => ({ id: x.id, status: "huy" })),
-        order: { status: "tra_lai", stage: 1 }
+        order: { status: "tra_lai", stage: 1, choDuyetLai: false }
       };
     }
-    const status = new Map(live.map((x) => [x.code, x.status]));
+    const revise = live.some((x) => x.code === "t42" && x.status === "yeu_cau_sua");
+    const update = [];
+    const gone = /* @__PURE__ */ new Set();
+    if (revise) {
+      for (const x of live.filter((y) => y.code === "t42" || y.code === "t40" || y.code === "t44")) {
+        update.push({ id: x.id, status: "huy" });
+        gone.add(x.id);
+      }
+    }
+    const kept = live.filter((x) => !gone.has(x.id));
+    const status = new Map(kept.map((x) => [x.code, x.status]));
     const isDone = (c) => DONE.includes(status.get(c));
     const create = [];
     for (let changed = true; changed; ) {
@@ -109,7 +140,7 @@ var APP = (() => {
         if (!scope.includes(code) || d.kind === "submit" || status.has(code)) continue;
         if (!requiresOf(d, order).every(isDone)) continue;
         let s = applies(d, order) ? "dang_lam" : "bo_qua";
-        if (code === "t31" && order.revenue <= AUTO_APPROVE_MAX && !order.hasGoods && order.passed) s = "xong";
+        if (code === "t31" && !order.reapproval && order.revenue <= AUTO_APPROVE_MAX && !order.hasGoods && order.passed) s = "xong";
         create.push({ code, role: d.role, status: s });
         status.set(code, s);
         changed = true;
@@ -117,18 +148,21 @@ var APP = (() => {
     }
     if (status.get("t11") === "dang_lam") return { create, update: [], order: {} };
     const approved = isDone("t31");
+    const completed = isDone("t72");
     const pending = scope.filter((c) => !isDone(c) && (status.has(c) || TASKS[c].kind !== "submit"));
-    const stage = pending.length ? Math.min(...pending.map((c) => TASKS[c].stage)) : Math.max(...scope.map((c) => TASKS[c].stage)) + 1;
+    const stage = completed ? 7 : pending.length ? Math.min(...pending.map((c) => TASKS[c].stage)) : Math.max(...scope.map((c) => TASKS[c].stage)) + 1;
     const firstWave = create.some((c) => TASKS[c.code].requires.includes("t11"));
     const justApproved = approved && order.status !== "da_phe_duyet";
     return {
       create,
-      update: [],
+      update,
       order: {
-        status: approved ? "da_phe_duyet" : "dang_xu_ly",
+        status: completed ? "hoan_tat" : approved ? "da_phe_duyet" : "dang_xu_ly",
         stage,
-        ...firstWave || justApproved ? { lockPl: true } : {}
-      }
+        ...firstWave || justApproved ? { lockPl: true } : {},
+        ...order.reapproval ? { choDuyetLai: !approved } : {}
+      },
+      ...revise || completed ? { flags: { ...revise ? { draftRevision: true } : {}, ...completed ? { completed: true } : {} } } : {}
     };
   }
 
@@ -286,6 +320,24 @@ var APP = (() => {
       proposal: order.tv_proposal,
       poc: order.tv_poc
     };
+  }
+
+  // src/domain/purchase.ts
+  function checkProposals(lines, proposals) {
+    const out = [];
+    lines.forEach((l, i) => {
+      const type = LINE_TYPE_OF_CODE[l.loai];
+      if (!type || !isGoods(type)) return;
+      const f = (k) => `dong_${i + 1}.${k}`;
+      const p = proposals.find((x) => x.dong_hang === l.id);
+      if (!p || p.gia_mua_de_xuat === null || !(p.gia_mua_de_xuat > 0)) {
+        out.push({ field: f("gia_mua_de_xuat"), code: "required" });
+        return;
+      }
+      if (!p.ncc_id) out.push({ field: f("ncc_id"), code: "required" });
+      if (p.gia_mua_de_xuat > l.gia_mua && !p.ly_do.trim()) out.push({ field: f("ly_do"), code: "required" });
+    });
+    return out;
   }
 
   // src/domain/form.ts
@@ -497,6 +549,10 @@ var APP = (() => {
   var str = (v) => typeof v === "string" ? v : "";
   var idOf = (v) => v && typeof v === "object" ? String(v.id) : v ? String(v) : null;
   var nullable = (v) => v === null || v === void 0 || v === "" ? null : n(v);
+  function toIso(display) {
+    const m = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(normalize("date", display));
+    return m ? `${m[3]}-${m[2]}-${m[1]}` : null;
+  }
   function fromIso(iso) {
     const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(str(iso));
     return m ? `${m[3]}/${m[2]}/${m[1]}` : "";
@@ -589,6 +645,47 @@ var APP = (() => {
     return { order, lines };
   }
 
+  // src/domain/renewal.ts
+  var addMonths = (iso, months) => {
+    const d = /* @__PURE__ */ new Date(`${iso}T00:00:00Z`);
+    const day = d.getUTCDate();
+    d.setUTCMonth(d.getUTCMonth() + months);
+    if (d.getUTCDate() < day) d.setUTCDate(0);
+    return d.toISOString().slice(0, 10);
+  };
+  function renewalOf(lines, deliveredIso) {
+    let latest = "";
+    let periodic = false;
+    for (const l of lines) {
+      const type = LINE_TYPE_OF_CODE[l.loai];
+      if (!type) continue;
+      const recurring = isPeriodic(type) || isMonthly(type);
+      if (recurring) periodic = true;
+      if (recurring || !isGoods(type)) {
+        const end = toIso(l.ngay_ket_thuc);
+        if (end && end > latest) latest = end;
+      } else if (isGoods(type) && deliveredIso && l.so_thang > 0) {
+        const end = addMonths(deliveredIso, l.so_thang);
+        if (end > latest) latest = end;
+      }
+    }
+    return { ngay_het_han: latest, theo_doi_tai_ky: periodic };
+  }
+
+  // src/domain/sla.ts
+  var HOUR = 36e5;
+  var DAY = 24 * HOUR;
+  function parseTime(s) {
+    if (!s) return null;
+    const t = Date.parse(s.replace(/(\.\d{3})\d+/, "$1"));
+    return Number.isNaN(t) ? null : t;
+  }
+  function lateness(han, doneAt) {
+    const h = parseTime(han);
+    if (h === null || doneAt <= h) return { onTime: true, daysLate: 0 };
+    return { onTime: false, daysLate: Math.ceil((doneAt - h) / DAY) };
+  }
+
   // src/domain/stages.ts
   function recipientsOf(stages, source) {
     const out = [];
@@ -614,7 +711,7 @@ var APP = (() => {
   }
 
   // src/code/dieu-phoi.ts
-  var SCOPE = ["t11", "t22", "t23", "t31"];
+  var SCOPE = TASK_CODES;
   function mergeConfig(base, raw) {
     let over = {};
     try {
@@ -630,6 +727,7 @@ var APP = (() => {
     };
     return merge(base, over);
   }
+  var dateOnly = (v) => /^(\d{4}-\d{2}-\d{2})/.exec(str(v))?.[1] ?? null;
   function run(inputs) {
     const don = flat(inputs.don);
     const tasks = list(inputs.tasks);
@@ -649,56 +747,108 @@ var APP = (() => {
     const issues = validateOrder(order, lines);
     const t11Done = tasks.some((t) => t.ma === "t11" && t.trang_thai === "xong");
     const gated = t11Done && issues.length > 0 && (status === "nhap" || status === "tra_lai");
-    const flowTasks = tasks.map((t) => ({
+    const isId = idOf(don.is);
+    const badRequest = (t) => str(t.ma).startsWith("yc_") && t.trang_thai === "dang_lam" && (!isId || idOf(t.nguoi_tao) !== isId || !str(t.ly_do).trim());
+    const rejected = tasks.filter(badRequest);
+    const proposals = list(inputs.de_xuat).map((p) => ({
+      dong_hang: idOf(p.dong_hang) ?? "",
+      gia_mua_de_xuat: p.gia_mua_de_xuat == null ? null : n(p.gia_mua_de_xuat),
+      ncc_id: idOf(p.ncc_id) ?? "",
+      ly_do: str(p.ly_do)
+    }));
+    const t23 = tasks.find((t) => t.ma === "t23" && t.trang_thai === "xong");
+    const t31Exists = tasks.some((t) => t.ma === "t31" && t.trang_thai !== "huy");
+    const proposalIssues = t23 && !t31Exists ? checkProposals(lines, proposals) : [];
+    const reopenT23 = proposalIssues.length > 0 && !!t23;
+    const dropped = /* @__PURE__ */ new Set([...rejected.map((t) => t.id), ...reopenT23 ? [t23.id] : []]);
+    const flowTasks = tasks.filter((t) => !dropped.has(t.id)).map((t) => ({
       id: t.id,
-      code: t.ma,
+      code: str(t.ma),
       status: gated && t.ma === "t11" && t.trang_thai === "xong" ? "tra_lai" : t.trang_thai
     }));
     const actions = nextActions(
-      { hasService, hasGoods, advanceFirst: order.tu_truoc, revenue: pl.revenue, passed: pl.passed, status },
+      { hasService, hasGoods, advanceFirst: order.tu_truoc, revenue: pl.revenue, passed: pl.passed, status, reapproval: don.cho_duyet_lai === true },
       flowTasks,
       SCOPE
     );
+    for (const id of dropped) actions.update.push({ id, status: "huy" });
     const returned = tasks.find((t) => t.trang_thai === "tra_lai");
     const returning = gated || !!returned;
     const reason = gated ? issues.map((i) => i.field).join(", ") : str(returned?.ly_do);
     const locked = !!actions.order.lockPl;
+    const newStatus = actions.order.status ?? status;
+    const newStage = actions.order.stage ?? n(don.giai_doan);
     const groupOf = (role) => role === "am" || role === "is" ? [] : [groups[role]];
     const history = (hanh_dong, task = "", ghi_chu = "", sau = "") => ({ don_hang: don.id, hanh_dong, task, ghi_chu, sau });
     const lich_su = [];
+    const request = tasks.find((t) => str(t.ma).startsWith("yc_") && t.trang_thai === "dang_lam" && !dropped.has(t.id));
+    const flags = actions.flags ?? {};
     if (gated) lich_su.push(history("tra_lai_may_chu", "t11", reason));
     else if (returned) lich_su.push(history("tra_lai", str(returned.ma), reason));
-    else if (actions.create.some((c) => c.code === "t22" || c.code === "t23")) lich_su.push(history("gui_duyet", "t11"));
+    else if (actions.create.some((c) => (c.code === "t22" || c.code === "t23") && !reopenT23)) lich_su.push(history("gui_duyet", "t11"));
+    if (reopenT23) lich_su.push(history("tra_lai_may_chu", "t23", proposalIssues.map((i) => i.field).join(", ")));
+    for (const t of rejected) lich_su.push(history("tu_choi_yeu_cau", str(t.ma), str(t.ly_do) || "thi\u1EBFu l\xFD do ho\u1EB7c kh\xF4ng ph\u1EA3i IS c\u1EE7a \u0111\u01A1n"));
+    if (flags.closeLost && request) lich_su.push(history("close_lost", "", str(request.ly_do)));
+    if (flags.closeLostRejected && request) lich_su.push(history("tu_choi_yeu_cau", str(request.ma), "\u0111\xE3 qua t41"));
+    if (flags.reapproval && request) lich_su.push(history("xin_duyet_lai", "t31", str(request.ly_do)));
+    if (flags.reapprovalRejected && request) lich_su.push(history("tu_choi_yeu_cau", str(request.ma), "\u0111\u01A1n ch\u01B0a \u1EDF tr\u1EA1ng th\xE1i \u0111\xE3 ph\xEA duy\u1EC7t"));
+    if (flags.draftRevision) lich_su.push(history("yeu_cau_sua", "t42", str(tasks.find((t) => t.ma === "t42" && t.trang_thai === "yeu_cau_sua")?.ly_do)));
     if (!returning) for (const c of actions.create) lich_su.push(history("mo_task", c.code, c.status));
-    for (const u of actions.update) lich_su.push(history("huy_task", tasks.find((t) => t.id === u.id)?.ma ?? "", ""));
+    for (const u of actions.update) {
+      const old = tasks.find((t) => t.id === u.id);
+      if (old && !str(old.ma).startsWith("yc_")) lich_su.push(history("huy_task", str(old.ma), ""));
+    }
     if (locked && !returning) lich_su.push(history("chot_pl", "", "", String(pl.netProfit)));
     if (actions.order.status === "da_phe_duyet" && status !== "da_phe_duyet") lich_su.push(history("phe_duyet", "t31"));
+    if (!returning && newStatus !== "close_lost") {
+      const from = n(don.giai_doan);
+      const to = newStatus === "hoan_tat" ? 8 : newStage;
+      for (let g = Math.max(from, 1); g < to && from > 0; g += 1) lich_su.push(history("hoan_tat_gd", "", `G\u0110${g}`));
+    }
+    if (flags.completed) lich_su.push(history("hoan_tat", "t72"));
+    const trigger = flat(inputs.kich_hoat);
+    if (trigger.trang_thai === "xong" && !str(trigger.ma).startsWith("yc_")) {
+      const done = parseTime(str(trigger.done_at)) ?? Date.now();
+      const late = lateness(str(trigger.han) || null, done);
+      if (!late.onTime) lich_su.push(history("canh_bao", str(trigger.ma), `Ho\xE0n th\xE0nh qu\xE1 h\u1EA1n, tr\u1EC5 ${late.daysLate} ng\xE0y`, "qua_han"));
+    }
+    if (trigger.trang_thai === "xong" && (trigger.ma === "t11" || trigger.ma === "t31") && !pl.passed && !returning) {
+      lich_su.push(history("canh_bao", str(trigger.ma), str(trigger.ly_do) || "kh\xF4ng c\xF3 l\xFD do", "pl_khong_dat"));
+    }
     const tom_tat = [];
     if (locked && !returning) {
       if (hasService) tom_tat.push({ don_hang: don.id, phan: "dich_vu", du_lieu: JSON.stringify(summaryFor("dich_vu", plInput.lines, pl, cfg)), nhom_xem: [groups.tm] });
       if (hasGoods) tom_tat.push({ don_hang: don.id, phan: "hang_hoa", du_lieu: JSON.stringify(summaryFor("hang_hoa", plInput.lines, pl, cfg)), nhom_xem: [groups.proc] });
     }
+    const t61 = tasks.find((t) => t.ma === "t61" && t.trang_thai === "xong");
+    const renewal = flags.completed ? renewalOf(lines, dateOnly(t61?.done_at)) : { ngay_het_han: str(don.ngay_het_han), theo_doi_tai_ky: don.theo_doi_tai_ky === true };
+    const toTask = (c) => ({
+      don_hang: don.id,
+      ma: c.code,
+      vai_tro: c.role,
+      trang_thai: c.status,
+      sla_ngay: cfg.slaDays[c.code] ?? 0,
+      am: idOf(don.am),
+      is: idOf(don.is),
+      nhom: groupOf(c.role)
+    });
+    const quiet = !!flags.noWrite || str(trigger.ma).startsWith("yc_") && rejected.some((t) => t.id === trigger.id);
     return {
-      tao: actions.create.map((c) => ({
-        don_hang: don.id,
-        ma: c.code,
-        vai_tro: c.role,
-        trang_thai: c.status,
-        sla_ngay: cfg.slaDays[c.code] ?? 0,
-        am: idOf(don.am),
-        is: idOf(don.is),
-        nhom: groupOf(c.role)
-      })),
+      ghi: !quiet,
+      tao: quiet ? [] : actions.create.map(toTask).filter((t) => t.sla_ngay > 0),
+      tao_khong_han: quiet ? [] : actions.create.map(toTask).filter((t) => t.sla_ngay <= 0),
       cap_nhat: actions.update.map((u) => ({ id: u.id, trang_thai: u.status })),
       don: {
-        trang_thai: actions.order.status ?? status,
-        giai_doan: actions.order.stage ?? n(don.giai_doan),
+        trang_thai: newStatus,
+        giai_doan: newStage,
         co_dich_vu: hasService,
         co_hang_hoa: hasGoods,
         ky_thuat: hasService ? [groups.tm] : [],
         mua_hang: hasGoods ? [groups.proc] : [],
         nguoi_duoc_chia: recipientsOf(order.giai_doan, { kind: order.nguon_kh, nguoi: order.nguon_kh_nguoi }),
-        ly_do_gui: returning ? reason : ""
+        ly_do_gui: returning ? reason : "",
+        cho_duyet_lai: actions.order.choDuyetLai ?? don.cho_duyet_lai === true,
+        ...renewal
       },
       chot: locked && !returning ? { pl_chot: JSON.stringify(pl), cau_hinh_chot: JSON.stringify(cfg), ln_thuan_chot: pl.netProfit, dat_chot: pl.passed } : null,
       tom_tat,
